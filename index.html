@@ -1,0 +1,1021 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="월배성당">
+  <meta property="og:url" content="https://wbcatholic-ch.github.io/-/">
+  <meta property="og:title" content="월배성당 사목비상연락망">
+  <meta property="og:description" content="사목위원·제단체장 연락망입니다. 전화번호를 누르면 바로 전화 연결됩니다.">
+  <meta property="og:image" content="https://wbcatholic-ch.github.io/-/kakao-preview-wolbae.png">
+  <meta property="og:image:secure_url" content="https://wbcatholic-ch.github.io/-/kakao-preview-wolbae.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="월배성당 사목비상연락망">
+  <meta name="twitter:description" content="사목위원·제단체장 연락망입니다. 전화번호를 누르면 바로 전화 연결됩니다.">
+  <meta name="twitter:image" content="https://wbcatholic-ch.github.io/-/kakao-preview-wolbae.png">
+
+  <title>월배성당 사목비상연락망</title>
+  <style>
+    :root {
+      --bg: #f7f8f3;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #e2e8f0;
+      --navy: #1f2937;
+      --teal: #0f766e;
+      --gold: #b7791f;
+      --soft: #eef7f5;
+      --soft2: #fff8e7;
+      --blue: #075985;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+    body { padding-bottom: 28px; }
+    header { background: linear-gradient(135deg, var(--navy), #334155); color: #fff; padding: 22px 17px 18px; position: sticky; top: 0; z-index: 20; box-shadow: 0 4px 18px rgba(15, 23, 42, .18); }
+    .title { max-width: 900px; margin: 0 auto; }
+    h1 { margin: 0; font-size: 1.42rem; line-height: 1.25; letter-spacing: -0.02em; }
+    .subtitle { margin: 8px 0 0; font-size: 1rem; line-height: 1.45; opacity: .92; }
+    main { max-width: 900px; margin: 0 auto; padding: 10px 14px 14px; }
+    .notice { background: var(--soft2); border: 1px solid #f2d58b; border-radius: 18px; padding: 14px 15px; margin: 12px 0 14px; font-size: 1.02rem; line-height: 1.55; }
+    .toolbar { background: rgba(255,255,255,.96); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 18px 18px; padding: 6px 10px 10px; margin-bottom: 14px; position: sticky; top: calc(var(--sticky-top, 86px) - 1px); z-index: 19; box-shadow: 0 8px 20px rgba(15, 23, 42, .08); backdrop-filter: blur(8px); }
+    .search { width: 100%; min-height: 52px; border: 2px solid #d3dae6; border-radius: 14px; padding: 0 14px; font-size: 1.05rem; color: var(--ink); outline: none; background: #fff; }
+    .search:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(15,118,110,.12); }
+    .filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    button.filter { min-height: 46px; border: 1px solid var(--line); border-radius: 14px; background: #fff; color: var(--ink); font-size: 1rem; font-weight: 800; }
+    button.filter.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .count { margin: 8px 3px 0; color: var(--muted); font-size: .94rem; }
+    .section-title { margin: 22px 2px 10px; padding: 10px 13px; border-radius: 14px; background: #eaf4f2; color: #0f766e; font-size: 1.13rem; font-weight: 950; letter-spacing: -.02em; }
+    .list { display: grid; gap: 12px; }
+    .section-wrap.hidden-section { display: none; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px 15px; box-shadow: 0 4px 14px rgba(15, 23, 42, .06); scroll-margin-top: calc(var(--sticky-offset, 170px) + 12px); }
+    .topline { display: flex; align-items: flex-start; gap: 0; }
+    .person { min-width: 0; width: 100%; }
+    .card h2 { margin: 0; font-size: 1.34rem; line-height: 1.24; letter-spacing: -0.02em; }
+    .role { margin: 5px 0 0; font-size: 1.06rem; line-height: 1.38; color: #334155; font-weight: 750; }
+    .extras { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding-left: 0; }
+    .extra-chip { display: inline-flex; align-items: center; min-height: 28px; padding: 0 9px; border-radius: 999px; background: var(--soft); color: var(--teal); font-size: .92rem; font-weight: 800; }
+    .info-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); margin-top: 12px; padding-top: 11px; }
+    .label { flex: 0 0 auto; color: var(--muted); font-size: .96rem; font-weight: 800; }
+    .value { font-size: 1.05rem; font-weight: 900; color: var(--ink); }
+    .feast { color: var(--gold); }
+    .phone-row { margin-top: 8px; padding-top: 9px; }
+    .phone-link { color: var(--blue); text-decoration: none; font-size: 1.22rem; font-weight: 950; letter-spacing: .01em; padding: 4px 0; }
+    .phone-link:active { opacity: .65; }
+    .hidden { display: none !important; }
+    .empty { display: none; text-align: center; background: #fff; border: 1px dashed #cbd5e1; border-radius: 18px; padding: 28px 14px; color: var(--muted); font-size: 1.05rem; }
+    footer { max-width: 900px; margin: 18px auto 0; padding: 0 14px; color: var(--muted); font-size: .9rem; line-height: 1.5; }
+    @media (min-width: 720px) {
+      .list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      h1 { font-size: 1.72rem; }
+    }
+    @media (max-width: 360px) {
+      header { padding-left: 14px; padding-right: 14px; }
+      main { padding-left: 10px; padding-right: 10px; }
+      .card h2 { font-size: 1.22rem; }
+      .role { font-size: 1rem; }
+      .phone-link { font-size: 1.12rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <h1>월배성당 사목비상연락망</h1>
+      <p class="subtitle">전화번호를 누르면 바로 전화 연결됩니다.</p>
+    </div>
+  </header>
+  <main>
+    <div class="notice">
+      월배성당 내부 공유용입니다. 외부로 전달하지 말아 주세요.<br>
+      </div>
+
+    <section class="toolbar" aria-label="검색 및 분류">
+      <input id="search" class="search" type="search" placeholder="이름·세례명·직책·전화번호 검색" autocomplete="off" inputmode="search" enterkeyhint="search">
+      <div class="filters">
+        <button type="button" class="filter active" data-filter="전체">전체</button>
+        <button type="button" class="filter" data-filter="사목위원">사목위원</button>
+        <button type="button" class="filter" data-filter="제단체장">제단체장</button>
+      </div>
+      <p id="count" class="count">전체 45명</p>
+    </section>
+
+    <section class="section-wrap" data-section-wrap="사목위원">
+      <h2 class="section-title">사목위원 22명</h2>
+      <div class="list">
+      <article class="card" data-section="사목위원" data-search="사목위원 김해원 가브리엘 주임신부님 010-7355-1228 9월 29일">
+        <div class="topline">
+          <div class="person">
+            <h2>김해원 가브리엘</h2>
+            <p class="role">주임신부님</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">9월 29일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01073551228" aria-label="김해원 가브리엘 전화 연결">010-7355-1228</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 김병훈 세례자요한 보좌신부님 010-7767-1934 6월 24일">
+        <div class="topline">
+          <div class="person">
+            <h2>김병훈 세례자요한</h2>
+            <p class="role">보좌신부님</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">6월 24일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01077671934" aria-label="김병훈 세례자요한 전화 연결">010-7767-1934</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 박재영 클라라 전교수녀님 010-9408-4211 8월 11일">
+        <div class="topline">
+          <div class="person">
+            <h2>박재영 클라라</h2>
+            <p class="role">전교수녀님</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">8월 11일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01094084211" aria-label="박재영 클라라 전화 연결">010-9408-4211</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 박희정 마르띤 전교수녀님 010-8109-4626 11월 3일">
+        <div class="topline">
+          <div class="person">
+            <h2>박희정 마르띤</h2>
+            <p class="role">전교수녀님</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">11월 3일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01081094626" aria-label="박희정 마르띤 전화 연결">010-8109-4626</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 최호용 토마스모어 총회장 010-3542-9342 6월 22일">
+        <div class="topline">
+          <div class="person">
+            <h2>최호용 토마스모어</h2>
+            <p class="role">총회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">6월 22일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01035429342" aria-label="최호용 토마스모어 전화 연결">010-3542-9342</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 이대헌 니꼴라오 사목 남부회장 010-4530-5351 12월 6일">
+        <div class="topline">
+          <div class="person">
+            <h2>이대헌 니꼴라오</h2>
+            <p class="role">사목 남부회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">12월 6일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01045305351" aria-label="이대헌 니꼴라오 전화 연결">010-4530-5351</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 윤희자 엘리사벳 사목 여부회장 010-2757-7207 11월 17일 여성위원장">
+        <div class="topline">
+          <div class="person">
+            <h2>윤희자 엘리사벳</h2>
+            <p class="role">사목 여부회장</p>
+          </div>
+        </div>
+        <div class="extras"><span class="extra-chip">겸임 여성위원장</span></div>
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">11월 17일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01027577207" aria-label="윤희자 엘리사벳 전화 연결">010-2757-7207</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 박재흠 스테파노 사목 총무 010-3509-7284 12월 26일">
+        <div class="topline">
+          <div class="person">
+            <h2>박재흠 스테파노</h2>
+            <p class="role">사목 총무</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">12월 26일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01035097284" aria-label="박재흠 스테파노 전화 연결">010-3509-7284</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 유은숙 프란치스카 사목 서기 010-8564-1144 10월 4일">
+        <div class="topline">
+          <div class="person">
+            <h2>유은숙 프란치스카</h2>
+            <p class="role">사목 서기</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">10월 4일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01085641144" aria-label="유은숙 프란치스카 전화 연결">010-8564-1144</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 조병건 프란치스코 재무위원장 010-3271-4741 10월 4일">
+        <div class="topline">
+          <div class="person">
+            <h2>조병건 프란치스코</h2>
+            <p class="role">재무위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">10월 4일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01032714741" aria-label="조병건 프란치스코 전화 연결">010-3271-4741</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 김정옥 실비아 가정위원장 010-9042-3501 11월 3일">
+        <div class="topline">
+          <div class="person">
+            <h2>김정옥 실비아</h2>
+            <p class="role">가정위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">11월 3일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01090423501" aria-label="김정옥 실비아 전화 연결">010-9042-3501</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 이지원 안젤라 교육위원장 010-4811-7262 1월 27일">
+        <div class="topline">
+          <div class="person">
+            <h2>이지원 안젤라</h2>
+            <p class="role">교육위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">1월 27일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01048117262" aria-label="이지원 안젤라 전화 연결">010-4811-7262</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 박철암 바르나바 노인위원장 010-3817-8170 6월 11일">
+        <div class="topline">
+          <div class="person">
+            <h2>박철암 바르나바</h2>
+            <p class="role">노인위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">6월 11일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01038178170" aria-label="박철암 바르나바 전화 연결">010-3817-8170</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 김묵주 마리아 복음화위원장 010-2608-5732 8월 15일">
+        <div class="topline">
+          <div class="person">
+            <h2>김묵주 마리아</h2>
+            <p class="role">복음화위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">8월 15일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01026085732" aria-label="김묵주 마리아 전화 연결">010-2608-5732</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 박태남 제노베파 사회복지위원장 010-9960-1050 1월 3일">
+        <div class="topline">
+          <div class="person">
+            <h2>박태남 제노베파</h2>
+            <p class="role">사회복지위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">1월 3일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01099601050" aria-label="박태남 제노베파 전화 연결">010-9960-1050</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 정상주 안토니오 생태환경위원장 010-3817-1382 6월 13일">
+        <div class="topline">
+          <div class="person">
+            <h2>정상주 안토니오</h2>
+            <p class="role">생태환경위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">6월 13일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01038171382" aria-label="정상주 안토니오 전화 연결">010-3817-1382</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 유진숙 소피아 성소계발위원장 010-6612-2616 9월 3일">
+        <div class="topline">
+          <div class="person">
+            <h2>유진숙 소피아</h2>
+            <p class="role">성소계발위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">9월 3일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01066122616" aria-label="유진숙 소피아 전화 연결">010-6612-2616</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 박종황 바오로 시설위원장 010-7564-9588 6월 29일">
+        <div class="topline">
+          <div class="person">
+            <h2>박종황 바오로</h2>
+            <p class="role">시설위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">6월 29일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01075649588" aria-label="박종황 바오로 전화 연결">010-7564-9588</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 이동걸 대건안드레아 전례위원장 010-8342-5236 7월 5일 1구역장">
+        <div class="topline">
+          <div class="person">
+            <h2>이동걸 대건안드레아</h2>
+            <p class="role">전례위원장</p>
+          </div>
+        </div>
+        <div class="extras"><span class="extra-chip">겸임 1구역장</span></div>
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">7월 5일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01083425236" aria-label="이동걸 대건안드레아 전화 연결">010-8342-5236</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 김홍식 요한 보스코 청년청소년위원장 010-5191-3872 1월 31일">
+        <div class="topline">
+          <div class="person">
+            <h2>김홍식 요한 보스코</h2>
+            <p class="role">청년청소년위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">1월 31일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01051913872" aria-label="김홍식 요한 보스코 전화 연결">010-5191-3872</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 김규동 베드로 평신도사도직단체협회장 010-4769-5876 6월 29일 성인복사단장">
+        <div class="topline">
+          <div class="person">
+            <h2>김규동 베드로</h2>
+            <p class="role">평신도사도직단체협회장</p>
+          </div>
+        </div>
+        <div class="extras"><span class="extra-chip">겸임 성인복사단장</span></div>
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">6월 29일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01047695876" aria-label="김규동 베드로 전화 연결">010-4769-5876</a>
+        </div>
+      </article>
+      <article class="card" data-section="사목위원" data-search="사목위원 서상봉 그레고리오 홍보위원장 010-8009-4600 1월 2일">
+        <div class="topline">
+          <div class="person">
+            <h2>서상봉 그레고리오</h2>
+            <p class="role">홍보위원장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">1월 2일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01080094600" aria-label="서상봉 그레고리오 전화 연결">010-8009-4600</a>
+        </div>
+      </article></div>
+    </section>
+
+    <section class="section-wrap" data-section-wrap="제단체장">
+      <h2 class="section-title">제단체장 23명</h2>
+      <div class="list">
+      <article class="card" data-section="제단체장" data-search="제단체장 이석훈 이냐시오 교사회장 010-2807-6116 미기재">
+        <div class="topline">
+          <div class="person">
+            <h2>이석훈 이냐시오</h2>
+            <p class="role">교사회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">미기재</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01028076116" aria-label="이석훈 이냐시오 전화 연결">010-2807-6116</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 조미자 막달레나 세라핌 성가대 단장 010-3822-9400 7월 22일">
+        <div class="topline">
+          <div class="person">
+            <h2>조미자 막달레나</h2>
+            <p class="role">세라핌 성가대 단장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">7월 22일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01038229400" aria-label="조미자 막달레나 전화 연결">010-3822-9400</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 류순영 마리안나 글로리아 성가대 단장 010-6423-7190 4월 17일">
+        <div class="topline">
+          <div class="person">
+            <h2>류순영 마리안나</h2>
+            <p class="role">글로리아 성가대 단장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">4월 17일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01064237190" aria-label="류순영 마리안나 전화 연결">010-6423-7190</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 허언영 율리아나 성모회 회장 010-2684-6971 6월 19일">
+        <div class="topline">
+          <div class="person">
+            <h2>허언영 율리아나</h2>
+            <p class="role">성모회 회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">6월 19일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01026846971" aria-label="허언영 율리아나 전화 연결">010-2684-6971</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 윤상철 율리오 실버복사단 단장 010-3460-6230 12월 2일 성요셉성경대학장 2구역장">
+        <div class="topline">
+          <div class="person">
+            <h2>윤상철 율리오</h2>
+            <p class="role">실버복사단 단장</p>
+          </div>
+        </div>
+        <div class="extras"><span class="extra-chip">겸임 성요셉성경대학장</span><span class="extra-chip">겸임 2구역장</span></div>
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">12월 2일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01034606230" aria-label="윤상철 율리오 전화 연결">010-3460-6230</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 박정란 가밀라 안나회장 010-8595-4508 7월 15일 7구역장 겸임">
+        <div class="topline">
+          <div class="person">
+            <h2>박정란 가밀라</h2>
+            <p class="role">안나회장</p>
+          </div>
+        </div>
+        <div class="extras"><span class="extra-chip">겸임 7구역장</span></div>
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">7월 15일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01085954508" aria-label="박정란 가밀라 전화 연결">010-8595-4508</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 견일태 사도요한 위령회장 010-5038-6291 12월 27일">
+        <div class="topline">
+          <div class="person">
+            <h2>견일태 사도요한</h2>
+            <p class="role">위령회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">12월 27일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01050386291" aria-label="견일태 사도요한 전화 연결">010-5038-6291</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 주철식 토마스 요셉회장 010-5254-7404 7월 3일">
+        <div class="topline">
+          <div class="person">
+            <h2>주철식 토마스</h2>
+            <p class="role">요셉회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">7월 3일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01052547404" aria-label="주철식 토마스 전화 연결">010-5254-7404</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 강소희 데레사 자모회장 010-4331-1032 10월 15일">
+        <div class="topline">
+          <div class="person">
+            <h2>강소희 데레사</h2>
+            <p class="role">자모회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">10월 15일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01043311032" aria-label="강소희 데레사 전화 연결">010-4331-1032</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 박순옥 루치아 제대회장 010-2522-5203 12월 13일">
+        <div class="topline">
+          <div class="person">
+            <h2>박순옥 루치아</h2>
+            <p class="role">제대회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">12월 13일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01025225203" aria-label="박순옥 루치아 전화 연결">010-2522-5203</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 차재민 토마스아퀴나스 콜베 청년회장 010-2876-7573 12월 6일">
+        <div class="topline">
+          <div class="person">
+            <h2>차재민 토마스아퀴나스</h2>
+            <p class="role">콜베 청년회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">12월 6일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01028767573" aria-label="차재민 토마스아퀴나스 전화 연결">010-2876-7573</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 김상엽 바르톨로메오 프란치스코회장 010-5176-9820 8월 24일">
+        <div class="topline">
+          <div class="person">
+            <h2>김상엽 바르톨로메오</h2>
+            <p class="role">프란치스코회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">8월 24일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01051769820" aria-label="김상엽 바르톨로메오 전화 연결">010-5176-9820</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 허엽 요셉 꾸르실리스따회장 010-8576-3058 3월 19일">
+        <div class="topline">
+          <div class="person">
+            <h2>허엽 요셉</h2>
+            <p class="role">꾸르실리스따회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">3월 19일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01085763058" aria-label="허엽 요셉 전화 연결">010-8576-3058</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 백인석 노엘 m.e 대표부부 010-8591-4456 12월 25일">
+        <div class="topline">
+          <div class="person">
+            <h2>백인석 노엘</h2>
+            <p class="role">M.E 대표부부</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">12월 25일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01085914456" aria-label="백인석 노엘 전화 연결">010-8591-4456</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 김진문 안드레아 애덕의 모후 cu. 010-2542-2516 11월 3일">
+        <div class="topline">
+          <div class="person">
+            <h2>김진문 안드레아</h2>
+            <p class="role">애덕의 모후 CU.</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">11월 3일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01025422516" aria-label="김진문 안드레아 전화 연결">010-2542-2516</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 김경자 세실리아 천상은총 cu. 010-4512-5232 11월 22일">
+        <div class="topline">
+          <div class="person">
+            <h2>김경자 세실리아</h2>
+            <p class="role">천상은총 CU.</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">11월 22일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01045125232" aria-label="김경자 세실리아 전화 연결">010-4512-5232</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 정봉조 벨라뎃다 천주의 성모 cu. 010-8397-9783 4월 16일">
+        <div class="topline">
+          <div class="person">
+            <h2>정봉조 벨라뎃다</h2>
+            <p class="role">천주의 성모 CU.</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">4월 16일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01083979783" aria-label="정봉조 벨라뎃다 전화 연결">010-8397-9783</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 김미수 글라라 평화의 어머니 cu 010-3133-2078 8월 11일">
+        <div class="topline">
+          <div class="person">
+            <h2>김미수 글라라</h2>
+            <p class="role">평화의 어머니 CU</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">8월 11일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01031332078" aria-label="김미수 글라라 전화 연결">010-3133-2078</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 정남희 엘리사벳 구역협의회 회장 010-5877-8745 11월 5일">
+        <div class="topline">
+          <div class="person">
+            <h2>정남희 엘리사벳</h2>
+            <p class="role">구역협의회 회장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">11월 5일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01058778745" aria-label="정남희 엘리사벳 전화 연결">010-5877-8745</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 송순선 요안나 3구역장 010-9565-3500 4월 2일">
+        <div class="topline">
+          <div class="person">
+            <h2>송순선 요안나</h2>
+            <p class="role">3구역장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">4월 2일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01095653500" aria-label="송순선 요안나 전화 연결">010-9565-3500</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 권경숙 안젤라 4구역장 010-6533-6982 1월 27일">
+        <div class="topline">
+          <div class="person">
+            <h2>권경숙 안젤라</h2>
+            <p class="role">4구역장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">1월 27일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01065336982" aria-label="권경숙 안젤라 전화 연결">010-6533-6982</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 강인선 아녜스 5구역장 010-8501-6582 1월 21일">
+        <div class="topline">
+          <div class="person">
+            <h2>강인선 아녜스</h2>
+            <p class="role">5구역장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">1월 21일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01085016582" aria-label="강인선 아녜스 전화 연결">010-8501-6582</a>
+        </div>
+      </article>
+      <article class="card" data-section="제단체장" data-search="제단체장 김종순 세실리아 6구역장 010-2267-6922 11월 22일">
+        <div class="topline">
+          <div class="person">
+            <h2>김종순 세실리아</h2>
+            <p class="role">6구역장</p>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">축일</span>
+          <span class="value feast">11월 22일</span>
+        </div>
+        <div class="info-row phone-row">
+          <span class="label">전화</span>
+          <a class="phone-link" href="tel:01022676922" aria-label="김종순 세실리아 전화 연결">010-2267-6922</a>
+        </div>
+      </article></div>
+    </section>
+
+    <div id="empty" class="empty">검색 결과가 없습니다.</div>
+  </main>
+  <footer>
+    <p>※ 공개 검색 방지를 위한 noindex 설정은 포함되어 있지만, 링크를 아는 사람은 열람할 수 있습니다.</p>
+  </footer>
+
+  <script>
+    (function() {
+      const header = document.querySelector('header');
+      const toolbar = document.querySelector('.toolbar');
+      const search = document.getElementById('search');
+      const cards = Array.from(document.querySelectorAll('.card'));
+      const count = document.getElementById('count');
+      const empty = document.getElementById('empty');
+      const filters = Array.from(document.querySelectorAll('.filter'));
+      const wraps = Array.from(document.querySelectorAll('.section-wrap'));
+      let currentFilter = '전체';
+      let revealTimer = null;
+      let isComposing = false;
+
+      function normalize(s) {
+        return (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
+      }
+
+      function onlyDigits(s) {
+        return (s || '').toString().replace(/\D/g, '');
+      }
+
+      function syncStickyTop() {
+        const headerHeight = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+        const toolbarHeight = toolbar ? Math.ceil(toolbar.getBoundingClientRect().height) : 0;
+        document.documentElement.style.setProperty('--sticky-top', headerHeight + 'px');
+        document.documentElement.style.setProperty('--sticky-offset', (headerHeight + toolbarHeight) + 'px');
+      }
+
+      function revealFirstVisibleCard() {
+        const first = cards.find(card => !card.classList.contains('hidden'));
+        if (!first) return;
+        window.clearTimeout(revealTimer);
+        revealTimer = window.setTimeout(() => {
+          syncStickyTop();
+          const headerHeight = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+          const toolbarHeight = toolbar ? Math.ceil(toolbar.getBoundingClientRect().height) : 0;
+          const offset = headerHeight + toolbarHeight + 12;
+          const rect = first.getBoundingClientRect();
+          const targetY = window.scrollY + rect.top - offset;
+          window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+        }, 80);
+      }
+
+      function apply(options) {
+        const shouldReveal = !!(options && options.reveal);
+        const q = normalize(search.value);
+        const qDigits = onlyDigits(search.value);
+        let shown = 0;
+        const shownBySection = {};
+
+        cards.forEach(card => {
+          const sectionOk = currentFilter === '전체' || card.dataset.section === currentFilter;
+          const rawText = [card.dataset.search || '', card.textContent || ''].join(' ');
+          const haystack = normalize(rawText);
+          const haystackDigits = onlyDigits(rawText);
+          const searchOk = !q || haystack.includes(q) || (!!qDigits && haystackDigits.includes(qDigits));
+          const visible = sectionOk && searchOk;
+          card.classList.toggle('hidden', !visible);
+          if (visible) {
+            shown += 1;
+            shownBySection[card.dataset.section] = (shownBySection[card.dataset.section] || 0) + 1;
+          }
+        });
+
+        wraps.forEach(wrap => {
+          const sec = wrap.dataset.sectionWrap;
+          const visible = currentFilter === '전체' || currentFilter === sec;
+          const hasVisibleCard = !!shownBySection[sec];
+          wrap.classList.toggle('hidden-section', !visible || !hasVisibleCard);
+        });
+
+        count.textContent = (currentFilter === '전체' ? '전체' : currentFilter) + ' ' + shown + '명';
+        empty.style.display = shown === 0 ? 'block' : 'none';
+
+        if (shouldReveal && shown > 0) revealFirstVisibleCard();
+      }
+
+      function finishSearch() {
+        apply({ reveal: true });
+        if (document.activeElement === search) {
+          search.blur();
+        }
+      }
+
+      filters.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (document.activeElement === search) search.blur();
+          filters.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter;
+          apply({ reveal: true });
+        });
+      });
+
+      search.addEventListener('compositionstart', () => {
+        isComposing = true;
+      });
+
+      search.addEventListener('compositionend', () => {
+        isComposing = false;
+        // 입력 중에는 자동 스크롤을 하지 않아 검색창 위치가 위아래로 흔들리지 않게 함
+        apply({ reveal: false });
+      });
+
+      search.addEventListener('input', () => {
+        // 입력 중에는 결과만 즉시 걸러내고, 위치 보정은 키보드의 검색/완료를 눌렀을 때만 실행
+        apply({ reveal: false });
+      });
+
+      search.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && !isComposing) {
+          event.preventDefault();
+          finishSearch();
+        }
+      });
+
+      search.addEventListener('search', () => {
+        apply({ reveal: true });
+        if (normalize(search.value)) {
+          window.setTimeout(finishSearch, 0);
+        }
+      });
+
+      window.addEventListener('resize', syncStickyTop, { passive: true });
+      window.addEventListener('orientationchange', syncStickyTop);
+      syncStickyTop();
+      apply();
+    })();
+  </script>
+</body>
+</html>
