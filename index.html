@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f0e8">
+  <meta name="color-scheme" content="light">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="순례길내비">
+  <meta name="application-name" content="순례길내비">
+  <meta name="description" content="가톨릭길동무 순례길 내비게이션 독립 PWA">
+  <title>순례길 내비게이션</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="icons/icon-512x512.png">
+  <link rel="stylesheet" href="css/route-nav.css">
+  <script>
+    window.APP_CONFIG = {
+      KAKAO_JS_KEY: '07f7989e29fdfb425fff924f36fb3ec0'
+    };
+  </script>
+</head>
+<body>
+  <div id="app-shell">
+    <header class="topbar">
+      <div class="brand-mark">✝</div>
+      <div class="brand-copy">
+        <h1>순례길 내비게이션</h1>
+        <p>가톨릭길동무 독립 테스트 PWA</p>
+      </div>
+      <button id="install-btn" class="top-btn" type="button" hidden>설치</button>
+    </header>
+
+    <main class="main-layout">
+      <section id="route-list-view" class="route-list-view" aria-label="순례길 목록">
+        <div class="hero-card">
+          <div class="hero-badge">독립 테스트</div>
+          <h2>순례길을 선택하세요</h2>
+          <p>기존 앱의 성지·성당·피정 지도와 일반 길찾기 기능은 제거하고, GPX 경로 따라가기 기능만 분리했습니다.</p>
+        </div>
+        <div id="route-list" class="route-list"></div>
+        <div class="notice-card">
+          <strong>GitHub Pages 테스트 전 확인</strong>
+          <p>Kakao Developers에서 이 PWA를 올릴 GitHub Pages 도메인을 JavaScript 키의 웹 플랫폼 도메인에 등록해야 지도가 열립니다.</p>
+        </div>
+      </section>
+
+      <section id="map-view" class="map-view" aria-label="순례길 지도" hidden>
+        <div class="map-head">
+          <button id="back-to-list" class="round-btn" type="button" aria-label="목록으로 돌아가기">‹</button>
+          <div class="map-title-wrap">
+            <div id="map-title" class="map-title">순례길</div>
+            <div id="map-subtitle" class="map-subtitle">경로 준비 중</div>
+          </div>
+          <button id="fit-route-btn" class="head-action" type="button">전체</button>
+        </div>
+
+        <div id="map-canvas" class="map-canvas">
+          <div id="map-loading" class="map-loading">
+            <div class="loading-cross">✝</div>
+            <div>지도를 불러오는 중입니다</div>
+          </div>
+        </div>
+
+        <div class="map-floating-actions" aria-label="지도 조작">
+          <button id="my-location-btn" class="float-btn" type="button">📍<span>내위치</span></button>
+          <button id="follow-btn" class="float-btn primary" type="button">🧭<span>따라가기</span></button>
+        </div>
+
+        <aside id="status-sheet" class="status-sheet" aria-live="polite">
+          <div class="sheet-handle"></div>
+          <div class="status-main-row">
+            <div>
+              <div id="status-label" class="status-label">위치 확인 전</div>
+              <div id="status-message" class="status-message">내 위치를 누르면 순례길과의 거리를 계산합니다.</div>
+            </div>
+            <div id="offroute-chip" class="offroute-chip neutral">대기</div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-card">
+              <span>경로까지</span>
+              <strong id="route-distance">—</strong>
+            </div>
+            <div class="metric-card">
+              <span>진행률</span>
+              <strong id="route-progress">—</strong>
+            </div>
+            <div class="metric-card wide">
+              <span>다음 지점</span>
+              <strong id="next-stamp">—</strong>
+            </div>
+          </div>
+          <div id="flex-note" class="flex-note" hidden></div>
+        </aside>
+      </section>
+    </main>
+
+    <div id="chrome-open-panel" class="chrome-open-panel" hidden>
+      <div>
+        <strong>Chrome에서 테스트 권장</strong>
+        <p>위치 권한과 PWA 설치 테스트는 Chrome이 가장 안정적입니다.</p>
+      </div>
+      <button id="open-chrome-btn" type="button">Chrome으로 열기</button>
+    </div>
+  </div>
+
+  <script src="routes/hanti-route-data-v1.js"></script>
+  <script src="js/route-nav.js"></script>
+</body>
+</html>
