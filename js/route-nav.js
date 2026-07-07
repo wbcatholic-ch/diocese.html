@@ -1115,6 +1115,7 @@
   function updateFollowButtons() {
     const followBtn = $('follow-btn');
     const endBtn = $('end-follow-btn');
+    const directionBtn = $('direction-btn');
     const row = followBtn?.closest('.nav-control-row');
     const hasTrack = state.walkedTrack.length > 0 || state.elapsedActiveMs > 0 || Boolean(state.lastCoords);
     if (followBtn) {
@@ -1128,14 +1129,21 @@
           : '시작 <span aria-hidden="true">▶</span>';
     }
     if (endBtn) endBtn.hidden = state.following || !hasTrack;
-    if (row) row.classList.toggle('single', state.following || !hasTrack);
+    if (directionBtn) directionBtn.hidden = !state.activeRoute;
+    if (row) {
+      row.classList.toggle('single', false);
+      row.classList.toggle('has-end', !state.following && hasTrack);
+    }
     updateDirectionButton();
   }
 
   function updateDirectionButton() {
     const btn = $('direction-btn');
     if (!btn) return;
-    btn.querySelector('span').textContent = state.routeDirection === 'forward' ? '역방향' : '정방향';
+    const label = state.routeDirection === 'forward' ? '역방향' : '정방향';
+    const span = btn.querySelector('span');
+    if (span) span.textContent = label;
+    else btn.textContent = label;
     btn.title = state.routeDirection === 'forward' ? '역방향으로 걷기' : '정방향으로 걷기';
   }
 
