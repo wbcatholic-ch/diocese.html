@@ -3,9 +3,11 @@
 
   const $ = (id) => document.getElementById(id);
   const AUTO_CENTER_RETURN_DELAY_MS = 15000;
+  const STATUS_SHEET_HIDDEN = 'hidden';
   const STATUS_SHEET_COMPACT = 'compact';
   const STATUS_SHEET_EXPANDED = 'expanded';
   const NAVIGATION_EXPIRE_MS = 8 * 60 * 60 * 1000;
+  const EXIT_BACK_WINDOW_MS = 3200;
   const TEMP_STATE_KEY = 'gildongmu.pilgrimageRouteNavigation.temp.v1';
   const ON_ROUTE_M = 45;
   const NEAR_ROUTE_M = 120;
@@ -34,6 +36,8 @@
     elapsedTimer: null,
     autoCenterPaused: false,
     autoCenterResumeTimer: null,
+    mapExitBackPrimed: false,
+    mapExitBackTimer: null,
     mapInteractionHandlersReady: false,
     statusSheetMode: STATUS_SHEET_COMPACT,
     statusSheetPointerStartY: null,
@@ -112,6 +116,10 @@
   }
 
   function toggleStatusSheetMode() {
+    if (state.statusSheetMode === STATUS_SHEET_HIDDEN) {
+      setStatusSheetMode(STATUS_SHEET_COMPACT);
+      return;
+    }
     setStatusSheetMode(state.statusSheetMode === STATUS_SHEET_EXPANDED ? STATUS_SHEET_COMPACT : STATUS_SHEET_EXPANDED);
   }
 
@@ -120,16 +128,17 @@
     const handle = $('sheet-handle');
     const label = $('sheet-handle-label');
     if (!sheet) return;
-    const nextMode = mode === STATUS_SHEET_EXPANDED ? STATUS_SHEET_EXPANDED : STATUS_SHEET_COMPACT;
+    const nextMode = [STATUS_SHEET_HIDDEN, STATUS_SHEET_COMPACT, STATUS_SHEET_EXPANDED].includes(mode) ? mode : STATUS_SHEET_COMPACT;
     state.statusSheetMode = nextMode;
     sheet.dataset.sheetMode = nextMode;
     if (handle) {
       const expanded = nextMode === STATUS_SHEET_EXPANDED;
+      const hidden = nextMode === STATUS_SHEET_HIDDEN;
       handle.setAttribute('aria-expanded', String(expanded));
-      handle.setAttribute('aria-label', expanded ? '정보카드 내리기' : '정보카드 올리기');
-      handle.title = expanded ? '정보카드 내리기' : '정보카드 올리기';
+      handle.setAttribute('aria-label', hidden ? '정보카드 올리기' : expanded ? '정보카드 내리기' : '정보카드 올리기');
+      handle.title = hidden ? '정보카드 올리기' : expanded ? '정보카드 내리기' : '정보카드 올리기';
     }
-    if (label) label.textContent = nextMode === STATUS_SHEET_EXPANDED ? '지도 더 보기' : '정보 보기';
+    if (label) label.textContent = nextMode === STATUS_SHEET_HIDDEN ? '정보 보기' : nextMode === STATUS_SHEET_EXPANDED ? '지도 더 보기' : '정보 보기';
   }
 
   function setupNavigationLifecycle() {
@@ -142,6 +151,7 @@
     });
     window.addEventListener('pagehide', () => touchNavigationActivity({ saveOnly: true }));
     window.addEventListener('pageshow', handleNavigationReturn);
+    window.addEventListener('popstate', handleBrowserBackRequest);
   }
 
   function renderRouteList() {
@@ -194,6 +204,8 @@
 
     $('route-list-view').hidden = true;
     $('map-view').hidden = false;
+    activateMapHistory();
+    clearMapExitBanner();
     updateRouteHeader();
     resetStatusForActiveRoute(Boolean(options.restoreState));
     updateFollowButtons();
@@ -214,14 +226,66 @@
   }
 
   function handleBackToList() {
-    if (state.following || state.walkedTrack.length) {
-      confirmEndNavigation({ afterEnd: showListWithoutPrompt });
+    handleMapBackRequest();
+  }
+
+  function handleBrowserBackRequest(event) {
+    if (!state.activeRoute) return;
+    if (event) event.preventDefault?.();
+    handleMapBackRequest({ fromBrowserBack: true });
+    if (state.activeRoute && history?.pushState) {
+      try { history.pushState({ gildongmuRouteNav: true }, '', location.href); } catch (_) {}
+    }
+  }
+
+  function handleMapBackRequest() {
+    if (!state.activeRoute) return;
+    if (!hasStartedNavigationSession()) {
+      showListWithoutPrompt();
       return;
     }
-    showListWithoutPrompt();
+    if (state.mapExitBackPrimed) {
+      clearMapExitBanner();
+      endNavigation();
+      showListWithoutPrompt();
+      return;
+    }
+    setStatusSheetMode(STATUS_SHEET_HIDDEN);
+    showMapExitBanner();
+  }
+
+  function showMapExitBanner() {
+    const banner = $('nav-exit-banner');
+    state.mapExitBackPrimed = true;
+    clearTimeout(state.mapExitBackTimer);
+    if (banner) {
+      banner.textContent = '뒤로가기를 한 번 더 누르면 지금까지 이동한 경로가 삭제됩니다.';
+      banner.hidden = false;
+      banner.classList.add('show');
+    }
+    state.mapExitBackTimer = setTimeout(clearMapExitBanner, EXIT_BACK_WINDOW_MS);
+  }
+
+  function clearMapExitBanner() {
+    const banner = $('nav-exit-banner');
+    state.mapExitBackPrimed = false;
+    clearTimeout(state.mapExitBackTimer);
+    state.mapExitBackTimer = null;
+    if (banner) {
+      banner.classList.remove('show');
+      banner.hidden = true;
+    }
+  }
+
+  function activateMapHistory() {
+    if (!history?.pushState) return;
+    const currentState = history.state || {};
+    if (currentState.gildongmuRouteNav) return;
+    try { history.pushState({ ...currentState, gildongmuRouteNav: true }, '', location.href); } catch (_) {}
   }
 
   function showListWithoutPrompt() {
+    clearMapExitBanner();
     stopLocationWatch();
     clearTemporaryNavigationState();
     clearMapObjects();
@@ -406,6 +470,7 @@
   }
 
   function locateOnce() {
+    clearMapExitBanner();
     resumeAutoCenter();
     if (state.lastCoords) {
       updateMyLocation(state.lastCoords, { center: true, following: state.following });
@@ -418,6 +483,7 @@
   }
 
   function handleFollowControl() {
+    clearMapExitBanner();
     if (state.following) {
       pauseFollow();
       return;
@@ -580,6 +646,7 @@
 
   function confirmEndNavigation(options = {}) {
     if (!state.activeRoute) return;
+    clearMapExitBanner();
     const ok = window.confirm('지금까지 이동한 경로가 삭제됩니다.');
     if (!ok) return;
     endNavigation();
@@ -597,6 +664,7 @@
     state.lastCoords = null;
     state.following = false;
     state.autoCenterPaused = false;
+    clearMapExitBanner();
     clearTimeout(state.autoCenterResumeTimer);
     state.autoCenterResumeTimer = null;
     renderRouteProgressLines(null);
@@ -653,6 +721,7 @@
 
   function resumeAutoCenter(options = {}) {
     state.autoCenterPaused = false;
+    clearMapExitBanner();
     clearTimeout(state.autoCenterResumeTimer);
     state.autoCenterResumeTimer = null;
     if (!options.skipPan && state.following && state.lastCoords) {
@@ -968,7 +1037,7 @@
     const content = document.createElement('div');
     content.className = 'direction-arrow';
     content.style.transform = `rotate(${bearing}deg)`;
-    content.textContent = '▲';
+    content.textContent = '↑';
     const overlay = new kakao.maps.CustomOverlay({
       position: new kakao.maps.LatLng(point.lat, point.lng),
       content,
@@ -1102,7 +1171,7 @@
   }
 
   function toggleRouteDirection() {
-    if (!state.activeRoute) return;
+    if (!state.activeRoute || hasStartedNavigationSession()) return;
     state.routeDirection = state.routeDirection === 'forward' ? 'reverse' : 'forward';
     rebuildNavigationModel();
     updateRouteHeader();
@@ -1117,24 +1186,28 @@
     const endBtn = $('end-follow-btn');
     const directionBtn = $('direction-btn');
     const row = followBtn?.closest('.nav-control-row');
-    const hasTrack = state.walkedTrack.length > 0 || state.elapsedActiveMs > 0 || Boolean(state.lastCoords);
+    const started = hasStartedNavigationSession();
     if (followBtn) {
       followBtn.classList.toggle('pause', state.following);
       followBtn.classList.toggle('start', !state.following);
       followBtn.disabled = false;
       followBtn.innerHTML = state.following
         ? '정지 <span aria-hidden="true">Ⅱ</span>'
-        : hasTrack
+        : started
           ? '재시작 <span aria-hidden="true">▶</span>'
           : '시작 <span aria-hidden="true">▶</span>';
     }
-    if (endBtn) endBtn.hidden = state.following || !hasTrack;
-    if (directionBtn) directionBtn.hidden = !state.activeRoute;
+    if (endBtn) endBtn.hidden = state.following || !started;
+    if (directionBtn) directionBtn.hidden = !state.activeRoute || started;
     if (row) {
-      row.classList.toggle('single', false);
-      row.classList.toggle('has-end', !state.following && hasTrack);
+      row.classList.toggle('single', !state.activeRoute || started);
+      row.classList.toggle('has-end', !state.following && started);
     }
     updateDirectionButton();
+  }
+
+  function hasStartedNavigationSession() {
+    return Boolean(state.following || state.walkedTrack.length > 0 || state.elapsedActiveMs > 0 || state.activeSince);
   }
 
   function updateDirectionButton() {
