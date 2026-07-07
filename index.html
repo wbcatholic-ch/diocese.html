@@ -14,7 +14,12 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
   <link rel="apple-touch-icon" href="icons/icon-512x512.png">
-  <link rel="stylesheet" href="css/route-nav.css?v=20260707-hiddenfix1">
+  <link rel="stylesheet" href="css/route-nav.css?v=20260707-kakao-stable2">
+  <script>
+    window.APP_CONFIG = {
+      KAKAO_JS_KEY: '07f7989e29fdfb425fff924f36fb3ec0'
+    };
+  </script>
 </head>
 <body>
   <div id="app-shell">
@@ -37,7 +42,7 @@
         <div id="route-list" class="route-list"></div>
         <div class="notice-card">
           <strong>GitHub Pages 테스트 전 확인</strong>
-          <p>이번 버전은 GitHub Pages 테스트용으로 OpenStreetMap 기반 지도를 사용합니다. Chrome에서 https 주소로 열면 별도 Kakao 도메인 등록 없이 지도가 먼저 떠야 합니다.</p>
+          <p>모든 지도 기준은 가톨릭길동무 본앱과 동일하게 Kakao Map으로 유지합니다. 도메인 등록이 되어 있어도 예전 서비스워커 캐시가 남으면 지도가 멈출 수 있으므로 새 버전 업로드 후 새로고침해 주세요.</p>
         </div>
       </section>
 
@@ -52,6 +57,7 @@
         </div>
 
         <div id="map-canvas" class="map-canvas">
+          <div id="map-layer" class="map-layer" aria-hidden="true"></div>
           <div id="map-loading" class="map-loading">
             <div class="loading-cross">✝</div>
             <div>지도를 불러오는 중입니다</div>
@@ -105,7 +111,7 @@
   </div>
 
   <script src="routes/hanti-route-data-v1.js"></script>
-  <script src="routes/seoul-pilgrimage-routes.js?v=20260707-gpx4"></script>
-  <script src="js/route-nav.js?v=20260707-hiddenfix1"></script>
+  <script src="routes/seoul-pilgrimage-routes.js?v=20260707-kakao-stable2"></script>
+  <script src="js/route-nav.js?v=20260707-kakao-stable2"></script>
 </body>
 </html>

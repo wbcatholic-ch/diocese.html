@@ -1,12 +1,12 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v8-hiddenfix-20260707';
+const CACHE_NAME = 'pilgrimage-route-nav-v10-kakao-stable-20260707';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260707-hiddenfix1',
-  './js/route-nav.js?v=20260707-hiddenfix1',
+  './css/route-nav.css?v=20260707-kakao-stable2',
+  './js/route-nav.js?v=20260707-kakao-stable2',
   './routes/hanti-route-data-v1.js',
-  './routes/seoul-pilgrimage-routes.js?v=20260707-gpx4',
+  './routes/seoul-pilgrimage-routes.js?v=20260707-kakao-stable2',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'
@@ -35,7 +35,7 @@ self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(request.url);
   const scopeUrl = new URL(self.registration.scope);
 
-  // OpenStreetMap/Leaflet CDN 등 외부 지도 요청은 서비스워커가 가로채지 않는다.
+  // Kakao 지도 SDK/타일 같은 외부 요청은 서비스워커가 절대 가로채지 않는다.
   if (requestUrl.origin !== scopeUrl.origin) return;
 
   if (request.mode === 'navigate') {
