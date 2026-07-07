@@ -1037,7 +1037,8 @@
     const content = document.createElement('div');
     content.className = 'direction-arrow';
     content.style.transform = `rotate(${bearing}deg)`;
-    content.textContent = '↑';
+    content.setAttribute('aria-hidden', 'true');
+    content.innerHTML = '<svg class="direction-arrow-svg" viewBox="0 0 24 24" focusable="false"><path d="M6 15 L12 9 L18 15"></path></svg>';
     const overlay = new kakao.maps.CustomOverlay({
       position: new kakao.maps.LatLng(point.lat, point.lng),
       content,

@@ -155,19 +155,25 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .float-btn.danger { border-color: rgba(185, 28, 28, .55); color: #991b1b; }
 .float-btn.danger:not([hidden]) { display: flex; }
 .direction-arrow {
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  color: #1d4ed8;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 30px;
-  font-weight: 900;
-  line-height: 1;
-  -webkit-text-stroke: 1.6px #fff;
-  text-shadow: 0 2px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 4px 8px rgba(15, 23, 42, .34);
+  width: 24px;
+  height: 24px;
+  display: block;
   pointer-events: none;
   transform-origin: 50% 50%;
+}
+.direction-arrow-svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 1px 3px rgba(15, 23, 42, .28));
+}
+.direction-arrow-svg path {
+  fill: none;
+  stroke: #1d4ed8;
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .status-sheet {
