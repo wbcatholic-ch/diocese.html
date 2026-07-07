@@ -197,8 +197,8 @@
 
   function buildHantiRouteGroup(route) {
     const courseOptions = Array.isArray(route.courses) ? route.courses.map((course) => ({
-      label: `${course.courseNo || ''}코스`,
-      title: course.name || `${course.courseNo || ''}코스`,
+      label: `${course.courseNo || ''}코스 ${course.name || ''}`.trim(),
+      title: '',
       meta: [course.distanceLabel, course.durationLabel].filter(Boolean).join(' · '),
       route: createHantiCourseRoute(route, course)
     })) : [];
@@ -211,8 +211,8 @@
       foot: `${route.courseSummaryLabel || '5개 코스'} · ${route.distanceLabel || ''}`,
       options: [
         {
-          label: '전체',
-          title: route.name || '한티가는길 전체',
+          label: '한티가는길 전체',
+          title: '',
           meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
           route
         },
@@ -223,19 +223,20 @@
 
   function buildSeoulRouteGroup(routes) {
     const orderedRoutes = routes.slice().sort(compareSeoulRouteOrder);
+    const fullCourseRoutes = orderedRoutes.filter((route) => !isKimDaegeonSeoulRoute(route));
     const options = [];
-    if (orderedRoutes.length > 1) {
+    if (fullCourseRoutes.length > 1) {
       options.push({
-        label: '전체',
-        title: '가톨릭 서울순례길 전체',
-        meta: `${orderedRoutes.length}개 순례길`,
-        route: createSeoulFullRoute(orderedRoutes)
+        label: '천주교 서울순례길 1~3코스 전체',
+        title: '',
+        meta: `${fullCourseRoutes.length}개 코스`,
+        route: createSeoulFullRoute(fullCourseRoutes)
       });
     }
     orderedRoutes.forEach((route) => {
       options.push({
         label: seoulRouteOptionLabel(route),
-        title: route.shortName || route.name || '서울순례길',
+        title: '',
         meta: route.distanceLabel || '',
         route
       });
@@ -244,8 +245,8 @@
       kind: 'group',
       id: 'seoul-route-group',
       icon: '⛪',
-      title: '가톨릭 서울순례길',
-      meta: '전체 코스, 1~3코스, 김대건 신부 치명 순교길을 선택하세요.',
+      title: '천주교 서울순례길',
+      meta: '전체는 1~3코스만 포함합니다. 김대건 신부 치명 순례길은 별도 선택하세요.',
       foot: `${orderedRoutes.length}개 순례길`,
       options
     };
@@ -274,7 +275,7 @@
       btn.className = 'route-option-btn';
       btn.innerHTML = `
         <strong>${escapeHtml(option.label || '선택')}</strong>
-        <span>${escapeHtml(option.title || '')}</span>
+        ${option.title ? `<span>${escapeHtml(option.title)}</span>` : ''}
         ${option.meta ? `<em>${escapeHtml(option.meta)}</em>` : ''}
       `;
       btn.addEventListener('click', () => openRoute(option.route));
@@ -320,9 +321,9 @@
     return {
       ...baseRoute,
       id: `${baseRoute.id}__course_${course.courseNo || course.id}`,
-      name: `한티가는길 ${course.courseNo || ''}코스 · ${course.name || ''}`.trim(),
+      name: `한티가는길 ${course.courseNo || ''}코스 ${course.name || ''}`.trim(),
       shortName: `${course.courseNo || ''}코스 ${course.name || ''}`.trim(),
-      courseLabel: `${course.courseNo || ''}코스 · ${course.name || ''}`.trim(),
+      courseLabel: `${course.courseNo || ''}코스 ${course.name || ''}`.trim(),
       selectedCourseNo: course.courseNo,
       distanceLabel: course.distanceLabel || baseRoute.distanceLabel,
       durationLabel: course.durationLabel || baseRoute.durationLabel,
@@ -343,7 +344,9 @@
   }
 
   function createSeoulFullRoute(routes) {
-    const orderedRoutes = routes.slice().sort(compareSeoulRouteOrder);
+    const orderedRoutes = routes.slice()
+      .filter((route) => !isKimDaegeonSeoulRoute(route))
+      .sort(compareSeoulRouteOrder);
     const routeSegments = [];
     const stamps = [];
     orderedRoutes.forEach((route) => {
@@ -367,15 +370,15 @@
     });
     return {
       id: 'seoul-pilgrimage-full',
-      name: '가톨릭 서울순례길 전체',
-      shortName: '서울순례길 전체',
+      name: '천주교 서울순례길 1~3코스 전체',
+      shortName: '서울순례길 1~3코스 전체',
       region: '서울대교구',
       type: 'pilgrimage_route',
       mode: 'route_navigation',
       lineType: 'gpx',
       dataQuality: 'actual-gpx',
       routeGroup: '서울순례길',
-      distanceLabel: `${orderedRoutes.length}개 순례길`,
+      distanceLabel: `${orderedRoutes.length}개 코스`,
       startName: orderedRoutes[0]?.startName || '출발지',
       finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
       features: {
@@ -428,27 +431,35 @@
   }
 
   function seoulRouteSortValue(route) {
-    const text = `${route?.name || ''} ${route?.shortName || ''}`;
+    const text = seoulRouteSearchText(route);
     const match = text.match(/(\d+)\s*코스/);
     if (match) return Number(match[1]);
-    if (/김대건/.test(text)) return 4;
+    if (isKimDaegeonSeoulRoute(route)) return 4;
     return 99;
   }
 
   function seoulRouteOptionLabel(route) {
-    const text = `${route?.name || ''} ${route?.shortName || ''}`;
+    const text = seoulRouteSearchText(route);
     const match = text.match(/(\d+)\s*코스/);
-    if (match) return `${match[1]}코스`;
-    if (/김대건/.test(text)) return '김대건';
+    if (match) return route?.shortName || `${match[1]}코스`;
+    if (isKimDaegeonSeoulRoute(route)) return '김대건 신부 치명 순례길';
     return route?.shortName || '선택';
   }
 
   function seoulRouteMarkerPrefix(route) {
-    const text = `${route?.name || ''} ${route?.shortName || ''}`;
+    const text = seoulRouteSearchText(route);
     const match = text.match(/(\d+)\s*코스/);
     if (match) return match[1];
-    if (/김대건/.test(text)) return '김';
+    if (isKimDaegeonSeoulRoute(route)) return '김';
     return '';
+  }
+
+  function isKimDaegeonSeoulRoute(route) {
+    return /김대건/.test(seoulRouteSearchText(route));
+  }
+
+  function seoulRouteSearchText(route) {
+    return `${route?.name || ''} ${route?.shortName || ''} ${route?.courseLabel || ''}`;
   }
 
   function findRouteForRestore(routeId) {
@@ -493,6 +504,9 @@
           updateMyLocation(state.lastCoords, { center: state.following, following: state.following });
           updateRouteStatus(state.lastCoords);
         }
+        return requestInitialMapLocation();
+      })
+      .then(() => {
         if (state.following) startFollow({ restored: true });
         saveNavigationState();
       })
@@ -810,6 +824,25 @@
       const coords = toCoords(position);
       handleLocationUpdate(coords, { center: true, fromWatch: false });
     }).catch(showLocationError);
+  }
+
+  function requestInitialMapLocation() {
+    if (!state.activeRoute || !navigator.geolocation) return Promise.resolve();
+    return getCurrentPosition()
+      .then((position) => {
+        const coords = sanitizeCoords(toCoords(position));
+        if (!coords) return;
+        state.lastCoords = coords;
+        updateMyLocation(coords, { center: true, following: state.following });
+        updateRouteStatus(coords);
+        saveNavigationState();
+      })
+      .catch(() => {
+        if (state.lastCoords) return;
+        $('status-label').textContent = '위치 확인 전';
+        $('status-message').textContent = '위치 권한을 허용하면 내 위치가 지도에 표시됩니다.';
+        setChip('neutral', '대기');
+      });
   }
 
   function handleFollowControl() {

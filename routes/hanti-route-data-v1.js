@@ -36,8 +36,8 @@ window.PILGRIMAGE_ROUTE_HANTI = {
     {
       "id": "hanti-course-1",
       "courseNo": 1,
-      "name": "걷는 길",
-      "en": "Walking Path",
+      "name": "돌아보는 길",
+      "en": "Looking Back Path",
       "distanceLabel": "10.5km",
       "durationLabel": "4시간 30분",
       "stampIds": ["1-1", "1-2", "1-3", "1-4"]
@@ -45,8 +45,8 @@ window.PILGRIMAGE_ROUTE_HANTI = {
     {
       "id": "hanti-course-2",
       "courseNo": 2,
-      "name": "비움의 길",
-      "en": "Empty Road",
+      "name": "비우는 길",
+      "en": "Emptying Path",
       "distanceLabel": "9.5km",
       "durationLabel": "4시간",
       "stampIds": ["2-1", "2-2", "2-3"]
@@ -54,7 +54,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
     {
       "id": "hanti-course-3",
       "courseNo": 3,
-      "name": "회개의 길",
+      "name": "뉘우치는 길",
       "en": "Path of Repentance",
       "distanceLabel": "9km",
       "durationLabel": "4시간",
