@@ -37,6 +37,33 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .hero-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; word-break: keep-all; }
 .route-list { display: grid; gap: 12px; }
 .route-card { width: 100%; text-align: left; padding: 0; overflow: hidden; border-width: 2px; cursor: pointer; background: linear-gradient(180deg, #fffdf8, #faf4eb); }
+
+.route-group-card { cursor: default; }
+.route-group-card .route-card-main { padding-bottom: 12px; }
+.route-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+.route-option-btn {
+  min-height: 62px;
+  border: 1.5px solid #d8c6aa;
+  border-radius: 17px;
+  background: #fff;
+  color: #172033;
+  padding: 9px 10px;
+  text-align: left;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(15,23,42,.08);
+}
+.route-option-btn strong { font-size: 15px; font-weight: 950; letter-spacing: -.05em; color: var(--blue); }
+.route-option-btn span { font-size: 12px; font-weight: 900; letter-spacing: -.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.route-option-btn em { font-style: normal; font-size: 11px; color: var(--muted); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.route-option-btn:active { transform: translateY(1px); }
 .route-card-main { display: flex; gap: 13px; align-items: center; padding: 16px; }
 .route-icon { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 18px; display: grid; place-items: center; background: #eaf2ff; font-size: 24px; }
 .route-copy { min-width: 0; flex: 1; }
@@ -375,7 +402,7 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 .route-marker { transform: translate(-50%, -100%); padding: 6px 8px; border-radius: 999px; background: #172033; color: #fff; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(15,23,42,.3); font-size: 11px; font-weight: 950; white-space: nowrap; }
-.stamp-marker { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: #fff7e8; border: 2px solid #b7791f; color: #7a4f10; font-size: 11px; font-weight: 950; box-shadow: 0 4px 10px rgba(15,23,42,.25); cursor: pointer; user-select: none; }
+.stamp-marker { min-width: 30px; width: auto; height: 30px; padding: 0 5px; border-radius: 50%; display: grid; place-items: center; background: #fff7e8; border: 2px solid #b7791f; color: #7a4f10; font-size: 11px; font-weight: 950; box-shadow: 0 4px 10px rgba(15,23,42,.25); cursor: pointer; user-select: none; }
 .stamp-marker:active { transform: scale(.94); }
 .stamp-info-card {
   min-width: 180px;

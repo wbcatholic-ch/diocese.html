@@ -162,31 +162,305 @@
       list.innerHTML = '<div class="notice-card"><strong>순례길 데이터가 없습니다</strong><p>routes 폴더에 순례길 데이터 파일을 추가하세요.</p></div>';
       return;
     }
-    state.routes.forEach((route) => {
-      const totalKm = computeRouteTotalDistance(route) / 1000;
-      const distanceText = route.distanceLabel || `약 ${totalKm.toFixed(1)}km`;
-      const representative = routeUsesRepresentativeLine(route);
-      const testRoute = routeIsTestRoute(route);
+    buildRouteMenuItems(state.routes).forEach((item) => {
+      if (item.kind === 'group') renderRouteGroupCard(list, item);
+      else renderSingleRouteCard(list, item.route);
+    });
+  }
+
+  function buildRouteMenuItems(routes) {
+    const items = [];
+    const consumed = new Set();
+    let seoulGroupAdded = false;
+    const seoulRoutes = routes.filter((route) => route?.routeGroup === '서울순례길');
+
+    routes.forEach((route) => {
+      if (!route || consumed.has(route.id)) return;
+      if (route.id === 'hanti' || route.routeGroup === '한티가는길') {
+        items.push(buildHantiRouteGroup(route));
+        consumed.add(route.id);
+        return;
+      }
+      if (route.routeGroup === '서울순례길') {
+        if (!seoulGroupAdded) {
+          items.push(buildSeoulRouteGroup(seoulRoutes));
+          seoulRoutes.forEach((seoulRoute) => consumed.add(seoulRoute.id));
+          seoulGroupAdded = true;
+        }
+        return;
+      }
+      items.push({ kind: 'route', route });
+      consumed.add(route.id);
+    });
+    return items;
+  }
+
+  function buildHantiRouteGroup(route) {
+    const courseOptions = Array.isArray(route.courses) ? route.courses.map((course) => ({
+      label: `${course.courseNo || ''}코스`,
+      title: course.name || `${course.courseNo || ''}코스`,
+      meta: [course.distanceLabel, course.durationLabel].filter(Boolean).join(' · '),
+      route: createHantiCourseRoute(route, course)
+    })) : [];
+    return {
+      kind: 'group',
+      id: 'hanti-route-group',
+      icon: '🧭',
+      title: route.name || '한티가는길',
+      meta: '전체 코스 또는 1~5코스를 선택하세요.',
+      foot: `${route.courseSummaryLabel || '5개 코스'} · ${route.distanceLabel || ''}`,
+      options: [
+        {
+          label: '전체',
+          title: route.name || '한티가는길 전체',
+          meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
+          route
+        },
+        ...courseOptions
+      ]
+    };
+  }
+
+  function buildSeoulRouteGroup(routes) {
+    const orderedRoutes = routes.slice().sort(compareSeoulRouteOrder);
+    const options = [];
+    if (orderedRoutes.length > 1) {
+      options.push({
+        label: '전체',
+        title: '가톨릭 서울순례길 전체',
+        meta: `${orderedRoutes.length}개 순례길`,
+        route: createSeoulFullRoute(orderedRoutes)
+      });
+    }
+    orderedRoutes.forEach((route) => {
+      options.push({
+        label: seoulRouteOptionLabel(route),
+        title: route.shortName || route.name || '서울순례길',
+        meta: route.distanceLabel || '',
+        route
+      });
+    });
+    return {
+      kind: 'group',
+      id: 'seoul-route-group',
+      icon: '⛪',
+      title: '가톨릭 서울순례길',
+      meta: '전체 코스, 1~3코스, 김대건 신부 치명 순교길을 선택하세요.',
+      foot: `${orderedRoutes.length}개 순례길`,
+      options
+    };
+  }
+
+  function renderRouteGroupCard(list, group) {
+    const card = document.createElement('section');
+    card.className = 'route-card route-group-card';
+    card.innerHTML = `
+      <div class="route-card-main">
+        <div class="route-icon">${escapeHtml(group.icon || '🧭')}</div>
+        <div class="route-copy">
+          <div class="route-name-row">
+            <h3 class="route-name">${escapeHtml(group.title || '순례길')}</h3>
+          </div>
+          <div class="route-meta">${escapeHtml(group.meta || '')}</div>
+        </div>
+      </div>
+      <div class="route-option-grid"></div>
+      <div class="route-foot"><span>${escapeHtml(group.foot || '')}</span><strong>선택</strong></div>
+    `;
+    const grid = card.querySelector('.route-option-grid');
+    (group.options || []).forEach((option) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `route-card${representative ? ' representative' : ''}${testRoute ? ' test-route' : ''}`;
+      btn.className = 'route-option-btn';
       btn.innerHTML = `
-        <div class="route-card-main">
-          <div class="route-icon">${testRoute ? '🧪' : '🧭'}</div>
-          <div class="route-copy">
-            <div class="route-name-row">
-              <h3 class="route-name">${escapeHtml(route.name || '순례길')}</h3>
-              ${testRoute ? '<span class="route-badge test">테스트</span>' : ''}
-              ${representative ? '<span class="route-badge">대표선</span>' : ''}
-            </div>
-            <div class="route-meta">${escapeHtml(route.routeGroup ? route.routeGroup + ' · ' : '')}${escapeHtml(route.startName || '출발지')} → ${escapeHtml(route.finishName || '도착지')}</div>
-          </div>
-        </div>
-        <div class="route-foot"><span>${route.stamps?.length || 0}개 지점${testRoute ? ' · GPX 테스트' : representative ? ' · 대표 경로' : ''}</span><strong>${escapeHtml(distanceText)}</strong></div>
+        <strong>${escapeHtml(option.label || '선택')}</strong>
+        <span>${escapeHtml(option.title || '')}</span>
+        ${option.meta ? `<em>${escapeHtml(option.meta)}</em>` : ''}
       `;
-      btn.addEventListener('click', () => openRoute(route));
-      list.appendChild(btn);
+      btn.addEventListener('click', () => openRoute(option.route));
+      grid.appendChild(btn);
     });
+    list.appendChild(card);
+  }
+
+  function renderSingleRouteCard(list, route) {
+    const totalKm = computeRouteTotalDistance(route) / 1000;
+    const distanceText = route.distanceLabel || `약 ${totalKm.toFixed(1)}km`;
+    const representative = routeUsesRepresentativeLine(route);
+    const testRoute = routeIsTestRoute(route);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `route-card${representative ? ' representative' : ''}${testRoute ? ' test-route' : ''}`;
+    btn.innerHTML = `
+      <div class="route-card-main">
+        <div class="route-icon">${testRoute ? '🧪' : '🧭'}</div>
+        <div class="route-copy">
+          <div class="route-name-row">
+            <h3 class="route-name">${escapeHtml(route.name || '순례길')}</h3>
+            ${testRoute ? '<span class="route-badge test">테스트</span>' : ''}
+            ${representative ? '<span class="route-badge">대표선</span>' : ''}
+          </div>
+          <div class="route-meta">${escapeHtml(route.routeGroup ? route.routeGroup + ' · ' : '')}${escapeHtml(route.startName || '출발지')} → ${escapeHtml(route.finishName || '도착지')}</div>
+        </div>
+      </div>
+      <div class="route-foot"><span>${route.stamps?.length || 0}개 지점${testRoute ? ' · GPX 테스트' : representative ? ' · 대표 경로' : ''}</span><strong>${escapeHtml(distanceText)}</strong></div>
+    `;
+    btn.addEventListener('click', () => openRoute(route));
+    list.appendChild(btn);
+  }
+
+  function createHantiCourseRoute(baseRoute, course) {
+    const stampIds = Array.isArray(course?.stampIds) ? course.stampIds : [];
+    const stamps = stampIds
+      .map((id) => (baseRoute.stamps || []).find((stamp) => stamp.id === id))
+      .filter(Boolean);
+    const startStamp = stamps[0] || null;
+    const finishStamp = stamps[stamps.length - 1] || null;
+    const points = sliceRoutePointsByStamps(baseRoute, startStamp?.id, finishStamp?.id);
+    return {
+      ...baseRoute,
+      id: `${baseRoute.id}__course_${course.courseNo || course.id}`,
+      name: `한티가는길 ${course.courseNo || ''}코스 · ${course.name || ''}`.trim(),
+      shortName: `${course.courseNo || ''}코스 ${course.name || ''}`.trim(),
+      courseLabel: `${course.courseNo || ''}코스 · ${course.name || ''}`.trim(),
+      selectedCourseNo: course.courseNo,
+      distanceLabel: course.distanceLabel || baseRoute.distanceLabel,
+      durationLabel: course.durationLabel || baseRoute.durationLabel,
+      courseSummaryLabel: [course.distanceLabel, course.durationLabel].filter(Boolean).join(' · '),
+      startStampId: startStamp?.id || baseRoute.startStampId,
+      completionStampId: finishStamp?.id || baseRoute.completionStampId,
+      startName: startStamp?.name || baseRoute.startName,
+      finishName: finishStamp?.name || baseRoute.finishName,
+      stamps,
+      routeSegments: [{
+        id: `${baseRoute.id}-course-${course.courseNo || course.id}-slice`,
+        type: 'gpx-slice',
+        points
+      }],
+      courses: undefined,
+      flexibleRouteSections: filterFlexibleSectionsForStamps(baseRoute.flexibleRouteSections, stampIds)
+    };
+  }
+
+  function createSeoulFullRoute(routes) {
+    const orderedRoutes = routes.slice().sort(compareSeoulRouteOrder);
+    const routeSegments = [];
+    const stamps = [];
+    orderedRoutes.forEach((route) => {
+      const coursePrefix = seoulRouteMarkerPrefix(route);
+      (route.routeSegments || []).forEach((segment, index) => {
+        routeSegments.push({
+          ...segment,
+          id: `seoul-full-${route.id}-${segment.id || index}`,
+          points: segment.points || []
+        });
+      });
+      (route.stamps || []).forEach((stamp) => {
+        const rawNo = stamp.order || stamp.id || '';
+        stamps.push({
+          ...stamp,
+          id: `${route.id}-${stamp.id || rawNo}`,
+          displayOrder: coursePrefix ? `${coursePrefix}-${rawNo}` : rawNo,
+          sourceRouteName: route.shortName || route.name
+        });
+      });
+    });
+    return {
+      id: 'seoul-pilgrimage-full',
+      name: '가톨릭 서울순례길 전체',
+      shortName: '서울순례길 전체',
+      region: '서울대교구',
+      type: 'pilgrimage_route',
+      mode: 'route_navigation',
+      lineType: 'gpx',
+      dataQuality: 'actual-gpx',
+      routeGroup: '서울순례길',
+      distanceLabel: `${orderedRoutes.length}개 순례길`,
+      startName: orderedRoutes[0]?.startName || '출발지',
+      finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
+      features: {
+        showRouteLine: true,
+        showStampMarkers: true,
+        autoStamp: false,
+        nextStampDistance: true,
+        offRouteAlert: true,
+        nearestStampDistance: true
+      },
+      stamps,
+      routeSegments
+    };
+  }
+
+  function sliceRoutePointsByStamps(route, startStampId, finishStampId) {
+    const points = flattenRoutePoints(route);
+    if (!points.length) return [];
+    const startStamp = (route.stamps || []).find((stamp) => stamp.id === startStampId);
+    const finishStamp = (route.stamps || []).find((stamp) => stamp.id === finishStampId);
+    const startIndex = findNearestRoutePointIndex(points, startStamp);
+    const finishIndex = findNearestRoutePointIndex(points, finishStamp);
+    if (!Number.isFinite(startIndex) || !Number.isFinite(finishIndex)) return points;
+    const from = Math.max(0, Math.min(startIndex, finishIndex));
+    const to = Math.min(points.length - 1, Math.max(startIndex, finishIndex));
+    return points.slice(from, to + 1);
+  }
+
+  function findNearestRoutePointIndex(points, stamp) {
+    if (!stamp || !isFiniteNumber(stamp.lat) || !isFiniteNumber(stamp.lng)) return NaN;
+    let bestIndex = NaN;
+    let bestDistance = Infinity;
+    points.forEach((point, index) => {
+      const distance = haversineM(point, { lat: Number(stamp.lat), lng: Number(stamp.lng) });
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+    return bestIndex;
+  }
+
+  function filterFlexibleSectionsForStamps(sections, stampIds) {
+    if (!Array.isArray(sections) || !Array.isArray(stampIds) || !stampIds.length) return [];
+    return sections.filter((section) => stampIds.includes(section.fromStampId) && stampIds.includes(section.toStampId));
+  }
+
+  function compareSeoulRouteOrder(a, b) {
+    return seoulRouteSortValue(a) - seoulRouteSortValue(b);
+  }
+
+  function seoulRouteSortValue(route) {
+    const text = `${route?.name || ''} ${route?.shortName || ''}`;
+    const match = text.match(/(\d+)\s*코스/);
+    if (match) return Number(match[1]);
+    if (/김대건/.test(text)) return 4;
+    return 99;
+  }
+
+  function seoulRouteOptionLabel(route) {
+    const text = `${route?.name || ''} ${route?.shortName || ''}`;
+    const match = text.match(/(\d+)\s*코스/);
+    if (match) return `${match[1]}코스`;
+    if (/김대건/.test(text)) return '김대건';
+    return route?.shortName || '선택';
+  }
+
+  function seoulRouteMarkerPrefix(route) {
+    const text = `${route?.name || ''} ${route?.shortName || ''}`;
+    const match = text.match(/(\d+)\s*코스/);
+    if (match) return match[1];
+    if (/김대건/.test(text)) return '김';
+    return '';
+  }
+
+  function findRouteForRestore(routeId) {
+    if (!routeId) return null;
+    for (const item of buildRouteMenuItems(state.routes)) {
+      if (item.kind === 'route' && item.route?.id === routeId) return item.route;
+      if (item.kind === 'group') {
+        const option = (item.options || []).find((candidate) => candidate.route?.id === routeId);
+        if (option) return option.route;
+      }
+    }
+    return null;
   }
 
   function openRoute(route, options = {}) {
@@ -446,8 +720,9 @@
       const position = new KM.LatLng(Number(stamp.lat), Number(stamp.lng));
       const content = document.createElement('div');
       content.className = 'stamp-marker';
-      content.textContent = stamp.order || stamp.id || '•';
-      content.title = stamp.order ? `${stamp.order}. ${stamp.name || ''}` : (stamp.name || '');
+      const markerText = stampMarkerText(stamp);
+      content.textContent = markerText;
+      content.title = markerText ? `${markerText}. ${stamp.name || ''}` : (stamp.name || '');
       content.setAttribute('role', 'button');
       content.setAttribute('tabindex', '0');
       content.setAttribute('aria-label', content.title || '순례 지점 정보 보기');
@@ -472,11 +747,19 @@
     });
   }
 
+  function stampMarkerText(stamp) {
+    if (!stamp) return '';
+    if (stamp.displayOrder) return String(stamp.displayOrder);
+    if (typeof stamp.id === 'string' && stamp.id.includes('-')) return stamp.id;
+    if (stamp.order) return String(stamp.order);
+    return stamp.id ? String(stamp.id) : '';
+  }
+
   function showStampInfo(stamp, position) {
     if (!state.map || !window.kakao?.maps || !stamp) return;
     hideStampInfo();
     const KM = kakao.maps;
-    const orderText = stamp.order || stamp.id || '';
+    const orderText = stampMarkerText(stamp);
     const title = `${orderText ? orderText + '. ' : ''}${stamp.name || '순례 지점'}`;
     const groupText = state.activeRoute?.routeGroup || state.activeRoute?.region || state.activeRoute?.name || '순례길';
     const content = document.createElement('div');
@@ -1300,7 +1583,7 @@
       clearTemporaryNavigationState();
       return;
     }
-    const route = state.routes.find((item) => item.id === saved.routeId);
+    const route = findRouteForRestore(saved.routeId);
     if (!route) {
       clearTemporaryNavigationState();
       return;

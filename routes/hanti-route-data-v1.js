@@ -3,6 +3,10 @@ window.PILGRIMAGE_ROUTE_HANTI = {
   "name": "한티가는길",
   "en": "Road to Hanti",
   "type": "pilgrimage_route",
+  "routeGroup": "한티가는길",
+  "distanceLabel": "총 45.6km",
+  "durationLabel": "약 20시간",
+  "courseSummaryLabel": "5개 코스 · 20개 지점",
   "startStampId": "1-1",
   "completionStampId": "5-5",
   "startName": "가실성당",
@@ -28,6 +32,53 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "5-5": 80
     }
   },
+  "courses": [
+    {
+      "id": "hanti-course-1",
+      "courseNo": 1,
+      "name": "걷는 길",
+      "en": "Walking Path",
+      "distanceLabel": "10.5km",
+      "durationLabel": "4시간 30분",
+      "stampIds": ["1-1", "1-2", "1-3", "1-4"]
+    },
+    {
+      "id": "hanti-course-2",
+      "courseNo": 2,
+      "name": "비움의 길",
+      "en": "Empty Road",
+      "distanceLabel": "9.5km",
+      "durationLabel": "4시간",
+      "stampIds": ["2-1", "2-2", "2-3"]
+    },
+    {
+      "id": "hanti-course-3",
+      "courseNo": 3,
+      "name": "회개의 길",
+      "en": "Path of Repentance",
+      "distanceLabel": "9km",
+      "durationLabel": "4시간",
+      "stampIds": ["3-1", "3-2", "3-3", "3-4"]
+    },
+    {
+      "id": "hanti-course-4",
+      "courseNo": 4,
+      "name": "용서의 길",
+      "en": "Path of Forgiveness",
+      "distanceLabel": "8.5km",
+      "durationLabel": "4시간",
+      "stampIds": ["4-1", "4-2", "4-3", "4-4"]
+    },
+    {
+      "id": "hanti-course-5",
+      "courseNo": 5,
+      "name": "사랑의 길",
+      "en": "Road of Love",
+      "distanceLabel": "8.1km",
+      "durationLabel": "3시간 30분",
+      "stampIds": ["5-1", "5-2", "5-3", "5-4", "5-5"]
+    }
+  ],
   "stamps": [
     {
       "id": "1-1",
@@ -56,8 +107,8 @@ window.PILGRIMAGE_ROUTE_HANTI = {
     {
       "id": "1-3",
       "order": 3,
-      "name": "금무봉 고사리화석산지",
-      "en": "Geummubong Fern Fossil Site",
+      "name": "금무봉",
+      "en": "Geummubong",
       "role": "stamp",
       "lat": 35.95982714807614,
       "lng": 128.434693998345,
@@ -80,8 +131,8 @@ window.PILGRIMAGE_ROUTE_HANTI = {
     {
       "id": "2-1",
       "order": 5,
-      "name": "신나무골성지",
-      "en": "Sinnamugol Shrine",
+      "name": "신나무골",
+      "en": "Sinnamugol",
       "role": "stamp",
       "lat": 35.96641062879366,
       "lng": 128.46196989473646,
@@ -117,7 +168,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "id": "3-1",
       "order": 8,
       "name": "사기점공소",
-      "en": "Sagijeom Catholic Mission Station",
+      "en": "Sagijeomgongso",
       "role": "stamp",
       "lat": 35.99160448,
       "lng": 128.4969264,
@@ -213,7 +264,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "id": "5-1",
       "order": 16,
       "name": "가산산성 진남문",
-      "en": "Gasansanseong Fortress Jinnam Gate",
+      "en": "Gasan Mountain Fortress Jinnammun Gate",
       "role": "stamp",
       "lat": 36.01917109576215,
       "lng": 128.58972670991113,
@@ -237,7 +288,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "id": "5-3",
       "order": 18,
       "name": "한티순교성지",
-      "en": "Hanti Martyrs' Holy Site",
+      "en": "Hanti Martyrs’ Shrine",
       "role": "stamp",
       "lat": 36.01354144897436,
       "lng": 128.62265809651632,
@@ -261,7 +312,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "id": "5-5",
       "order": 20,
       "name": "한티마을사람",
-      "en": "Hanti Villagers",
+      "en": "Hanti Villager",
       "role": "finish",
       "lat": 36.01697830140817,
       "lng": 128.6264798934365,
