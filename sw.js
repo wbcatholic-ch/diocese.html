@@ -1,10 +1,10 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v7-gpx4-20260707';
+const CACHE_NAME = 'pilgrimage-route-nav-v8-hiddenfix-20260707';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260707-osmfix1',
-  './js/route-nav.js?v=20260707-osmfix1',
+  './css/route-nav.css?v=20260707-hiddenfix1',
+  './js/route-nav.js?v=20260707-hiddenfix1',
   './routes/hanti-route-data-v1.js',
   './routes/seoul-pilgrimage-routes.js?v=20260707-gpx4',
   './icons/icon-192x192.png',
