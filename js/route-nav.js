@@ -28,6 +28,10 @@
 
   function init() {
     state.routes = Array.isArray(window.PILGRIMAGE_ROUTES) ? window.PILGRIMAGE_ROUTES.filter(Boolean) : [];
+    // 초기 진입은 반드시 목록 화면이다. CSS 캐시나 브라우저 hidden 처리 차이로
+    // 지도 화면이 먼저 보이는 일을 막기 위해 시작 상태를 명시한다.
+    if ($('route-list-view')) $('route-list-view').hidden = false;
+    if ($('map-view')) $('map-view').hidden = true;
     registerPwa();
     setupChromeOpenPanel();
     setupButtons();
