@@ -1,5 +1,5 @@
 // 서울대교구 순례길 데이터
-// 서울순례길 1·2·3·4코스는 업로드된 GPX 파일의 실제 경로선을 사용합니다.
+// 서울순례길 1·2·3코스와 별도 김대건 신부 치명 순교길은 업로드된 GPX 파일의 실제 경로선을 사용합니다.
 
 window.PILGRIMAGE_ROUTES = window.PILGRIMAGE_ROUTES || [];
 window.PILGRIMAGE_ROUTE_SEOUL = [
@@ -17226,9 +17226,9 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     "courseNo": 3
   },
   {
-    "id": "seoul-kim-daegun-martyr-road",
-    "name": "서울순례길 4코스 · 김대건 신부 치명 순교길",
-    "shortName": "4코스 김대건 신부 치명 순교길",
+    "id": "kim-daegun-martyr-road",
+    "name": "김대건 신부 치명 순교길",
+    "shortName": "김대건 신부 치명 순교길",
     "region": "서울대교구",
     "type": "pilgrimage_route",
     "mode": "route_navigation",
@@ -17285,8 +17285,8 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     ],
     "routeSegments": [
       {
-        "id": "seoul-course-4-kim-daegun-gpx",
-        "name": "서울순례길 4코스 김대건 신부 치명 순교길 GPX 경로",
+        "id": "kim-daegun-martyr-gpx",
+        "name": "김대건 신부 치명 순교길 GPX 경로",
         "type": "gpx",
         "sourceFile": "김대건신부 치명 순교길.gpx",
         "points": [
@@ -21722,7 +21722,7 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
       }
     ],
     "flexibleRouteSections": [],
-    "courseNo": 4
+    "routeGroup": "김대건 신부 치명 순교길"
   }
 ];
 window.PILGRIMAGE_ROUTE_SEOUL.forEach((route) => window.PILGRIMAGE_ROUTES.push(route));
