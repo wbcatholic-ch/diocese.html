@@ -234,3 +234,7 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 @media (min-width: 720px) {
   #app-shell { max-width: 480px; margin: 0 auto; border-left: 1px solid #e5d7c4; border-right: 1px solid #e5d7c4; }
 }
+
+.route-card.test-route { border-color: rgba(29, 78, 216, .34); }
+.route-card.test-route .route-icon { background: #eef2ff; }
+.route-badge.test { background: #eef2ff; color: #1d4ed8; border-color: rgba(29, 78, 216, .32); }

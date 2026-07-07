@@ -52,21 +52,23 @@
       const totalKm = computeRouteTotalDistance(route) / 1000;
       const distanceText = route.distanceLabel || `약 ${totalKm.toFixed(1)}km`;
       const representative = routeUsesRepresentativeLine(route);
+      const testRoute = routeIsTestRoute(route);
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `route-card${representative ? ' representative' : ''}`;
+      btn.className = `route-card${representative ? ' representative' : ''}${testRoute ? ' test-route' : ''}`;
       btn.innerHTML = `
         <div class="route-card-main">
-          <div class="route-icon">🧭</div>
+          <div class="route-icon">${testRoute ? '🧪' : '🧭'}</div>
           <div class="route-copy">
             <div class="route-name-row">
               <h3 class="route-name">${escapeHtml(route.name || '순례길')}</h3>
+              ${testRoute ? '<span class="route-badge test">테스트</span>' : ''}
               ${representative ? '<span class="route-badge">대표선</span>' : ''}
             </div>
             <div class="route-meta">${escapeHtml(route.startName || '출발지')} → ${escapeHtml(route.finishName || '도착지')}</div>
           </div>
         </div>
-        <div class="route-foot"><span>${route.stamps?.length || 0}개 지점${representative ? ' · 대표 경로' : ''}</span><strong>${escapeHtml(distanceText)}</strong></div>
+        <div class="route-foot"><span>${route.stamps?.length || 0}개 지점${testRoute ? ' · GPX 테스트' : representative ? ' · 대표 경로' : ''}</span><strong>${escapeHtml(distanceText)}</strong></div>
       `;
       btn.addEventListener('click', () => openRoute(route));
       list.appendChild(btn);
@@ -81,10 +83,12 @@
     $('map-view').hidden = false;
     $('map-title').textContent = route.name || '순례길';
     $('map-subtitle').textContent = `${route.startName || '출발지'} → ${route.finishName || '도착지'}${routeUsesRepresentativeLine(route) ? ' · 대표선' : ''}`;
-    $('status-label').textContent = '순례길 준비 완료';
-    $('status-message').textContent = routeUsesRepresentativeLine(route)
-      ? '내 위치 또는 따라가기를 누르면 대표 경로선과의 거리를 계산합니다.'
-      : '내 위치 또는 따라가기를 누르면 GPX 경로와의 거리를 계산합니다.';
+    $('status-label').textContent = routeIsTestRoute(route) ? '테스트 경로 준비 완료' : '순례길 준비 완료';
+    $('status-message').textContent = routeIsTestRoute(route)
+      ? '실제 순례기록 저장 없이 GPX 따라가기 기능을 테스트합니다.'
+      : routeUsesRepresentativeLine(route)
+        ? '내 위치 또는 따라가기를 누르면 대표 경로선과의 거리를 계산합니다.'
+        : '내 위치 또는 따라가기를 누르면 GPX 경로와의 거리를 계산합니다.';
     $('route-distance').textContent = '—';
     $('route-progress').textContent = '—';
     $('next-stamp').textContent = '—';
@@ -514,6 +518,10 @@
 
   function routeUsesRepresentativeLine(route) {
     return route?.lineType === 'representative' || route?.dataQuality === 'waypoint-representative';
+  }
+
+  function routeIsTestRoute(route) {
+    return route?.type === 'test_route' || route?.testOnly === true || route?.dataQuality === 'user-test-gpx';
   }
 
   function escapeHtml(value) {

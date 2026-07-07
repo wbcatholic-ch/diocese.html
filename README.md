@@ -17,6 +17,8 @@
 - 서울순례길 3코스 · 일치의 길: 실제 GPX
 - 김대건 신부 치명 순교길: 실제 GPX
   - 서울순례길 4코스가 아니라 별도 순례길로 분리
+- 도원동 테스트 GPX: 사용자 테스트용 GPX
+- 회사 근처 테스트 GPX: 사용자 테스트용 GPX
 
 ## GitHub Pages 테스트 전 확인
 
@@ -33,4 +35,5 @@ Kakao Map을 사용합니다. 도메인 등록이 이미 되어 있는데도 지
 - Kakao Map SDK 로딩 타임아웃을 SDK 파일 로딩뿐 아니라 `kakao.maps.load()` 완료까지 적용
 - 지도 컨테이너를 `map-layer`와 로딩 오버레이로 분리
 - 김대건 신부 치명 순교길을 서울순례길 4코스가 아닌 별도 순례길로 정정
-- PWA 캐시 버전 업데이트: `pilgrimage-route-nav-v10-kakao-stable-20260707`
+- PWA 캐시 버전 업데이트: `pilgrimage-route-nav-v11-kakao-test-routes-20260707`
+- 기존 한티 테스트용으로 있던 도원동/회사 근처 GPX를 독립 PWA의 테스트 경로로 추가
