@@ -21,6 +21,7 @@
     map: null,
     kakaoReady: false,
     stampMarkers: [],
+    stampInfoOverlay: null,
     arrowOverlays: [],
     myMarker: null,
     traveledPolyline: null,
@@ -420,6 +421,7 @@
 
   function clearMapObjects(options = {}) {
     clearDirectionArrows();
+    hideStampInfo();
     state.stampMarkers.forEach((item) => item.setMap(null));
     state.stampMarkers = [];
     clearPolyline('traveledPolyline');
@@ -441,12 +443,25 @@
     const KM = kakao.maps;
     (route.stamps || []).forEach((stamp) => {
       if (!isFiniteNumber(stamp.lat) || !isFiniteNumber(stamp.lng)) return;
+      const position = new KM.LatLng(Number(stamp.lat), Number(stamp.lng));
       const content = document.createElement('div');
       content.className = 'stamp-marker';
       content.textContent = stamp.order || stamp.id || '•';
       content.title = stamp.order ? `${stamp.order}. ${stamp.name || ''}` : (stamp.name || '');
+      content.setAttribute('role', 'button');
+      content.setAttribute('tabindex', '0');
+      content.setAttribute('aria-label', content.title || '순례 지점 정보 보기');
+      const openInfo = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        showStampInfo(stamp, position);
+      };
+      content.addEventListener('click', openInfo);
+      content.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') openInfo(event);
+      });
       const overlay = new KM.CustomOverlay({
-        position: new KM.LatLng(Number(stamp.lat), Number(stamp.lng)),
+        position,
         content,
         yAnchor: 0.5,
         xAnchor: 0.5,
@@ -455,6 +470,41 @@
       overlay.setMap(state.map);
       state.stampMarkers.push(overlay);
     });
+  }
+
+  function showStampInfo(stamp, position) {
+    if (!state.map || !window.kakao?.maps || !stamp) return;
+    hideStampInfo();
+    const KM = kakao.maps;
+    const orderText = stamp.order || stamp.id || '';
+    const title = `${orderText ? orderText + '. ' : ''}${stamp.name || '순례 지점'}`;
+    const groupText = state.activeRoute?.routeGroup || state.activeRoute?.region || state.activeRoute?.name || '순례길';
+    const content = document.createElement('div');
+    content.className = 'stamp-info-card';
+    content.innerHTML = `
+      <button class="stamp-info-close" type="button" aria-label="지점 정보 닫기">×</button>
+      <div class="stamp-info-title">${escapeHtml(title)}</div>
+      <div class="stamp-info-meta">${escapeHtml(groupText)}</div>
+    `;
+    content.querySelector('.stamp-info-close')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      hideStampInfo();
+    });
+    state.stampInfoOverlay = new KM.CustomOverlay({
+      position,
+      content,
+      xAnchor: 0,
+      yAnchor: 0,
+      zIndex: 32
+    });
+    state.stampInfoOverlay.setMap(state.map);
+  }
+
+  function hideStampInfo() {
+    if (!state.stampInfoOverlay) return;
+    state.stampInfoOverlay.setMap(null);
+    state.stampInfoOverlay = null;
   }
 
   function fitRouteBounds() {
@@ -677,12 +727,18 @@
   function setupMapInteractionHandlers() {
     if (!state.map || state.mapInteractionHandlersReady || !window.kakao?.maps?.event) return;
     const events = kakao.maps.event;
-    events.addListener(state.map, 'dragstart', () => pauseAutoCenterForManualMapUse(false));
+    events.addListener(state.map, 'dragstart', () => {
+      hideStampInfo();
+      pauseAutoCenterForManualMapUse(false);
+    });
     events.addListener(state.map, 'dragend', () => {
       renderDirectionArrows();
       pauseAutoCenterForManualMapUse(true);
     });
-    events.addListener(state.map, 'zoom_start', () => pauseAutoCenterForManualMapUse(false));
+    events.addListener(state.map, 'zoom_start', () => {
+      hideStampInfo();
+      pauseAutoCenterForManualMapUse(false);
+    });
     events.addListener(state.map, 'zoom_changed', () => {
       renderDirectionArrows();
       pauseAutoCenterForManualMapUse(true);

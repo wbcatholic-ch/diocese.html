@@ -1,13 +1,13 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v21-header-back-20260707';
+const CACHE_NAME = 'pilgrimage-route-nav-v22-small-sheet-stamp-info-20260707';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260707-header-back-v21',
-  './js/route-nav.js?v=20260707-header-back-v21',
+  './css/route-nav.css?v=20260707-v22-small-sheet-stamp-info',
+  './js/route-nav.js?v=20260707-v22-small-sheet-stamp-info',
   './routes/hanti-route-data-v1.js',
-  './routes/seoul-pilgrimage-routes.js?v=20260707-header-back-v21',
-  './routes/test-route-data-v1.js?v=20260707-header-back-v21',
+  './routes/seoul-pilgrimage-routes.js?v=20260707-v22-small-sheet-stamp-info',
+  './routes/test-route-data-v1.js?v=20260707-v22-small-sheet-stamp-info',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'
