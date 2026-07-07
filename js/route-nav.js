@@ -7,7 +7,6 @@
   const STATUS_SHEET_COMPACT = 'compact';
   const STATUS_SHEET_EXPANDED = 'expanded';
   const NAVIGATION_EXPIRE_MS = 8 * 60 * 60 * 1000;
-  const EXIT_BACK_WINDOW_MS = 3200;
   const TEMP_STATE_KEY = 'gildongmu.pilgrimageRouteNavigation.temp.v1';
   const ON_ROUTE_M = 45;
   const NEAR_ROUTE_M = 120;
@@ -258,12 +257,12 @@
     const banner = $('nav-exit-banner');
     state.mapExitBackPrimed = true;
     clearTimeout(state.mapExitBackTimer);
+    state.mapExitBackTimer = null;
     if (banner) {
       banner.textContent = '뒤로가기를 한 번 더 누르면 지금까지 이동한 경로가 삭제됩니다.';
       banner.hidden = false;
       banner.classList.add('show');
     }
-    state.mapExitBackTimer = setTimeout(clearMapExitBanner, EXIT_BACK_WINDOW_MS);
   }
 
   function clearMapExitBanner() {
@@ -278,10 +277,8 @@
   }
 
   function activateMapHistory() {
-    if (!history?.pushState) return;
-    const currentState = history.state || {};
-    if (currentState.gildongmuRouteNav) return;
-    try { history.pushState({ ...currentState, gildongmuRouteNav: true }, '', location.href); } catch (_) {}
+    if (!history?.pushState || history.state?.gildongmuRouteNav) return;
+    try { history.pushState({ gildongmuRouteNav: true }, '', location.href); } catch (_) {}
   }
 
   function showListWithoutPrompt() {
@@ -1417,19 +1414,6 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
-      $('install-btn').hidden = false;
-    });
-    $('install-btn')?.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice.catch(() => null);
-      deferredPrompt = null;
-      $('install-btn').hidden = true;
-    });
   }
 
   function setupChromeOpenPanel() {
