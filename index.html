@@ -14,7 +14,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
   <link rel="apple-touch-icon" href="icons/icon-512x512.png">
-  <link rel="stylesheet" href="css/route-nav.css?v=20260707-arrow-sheet">
+  <link rel="stylesheet" href="css/route-nav.css?v=20260707-sheet-controls">
   <script>
     window.APP_CONFIG = {
       KAKAO_JS_KEY: '07f7989e29fdfb425fff924f36fb3ec0'
@@ -66,9 +66,7 @@
 
         <div class="map-floating-actions" aria-label="지도 조작">
           <button id="my-location-btn" class="float-btn" type="button">📍<span>내위치</span></button>
-          <button id="follow-btn" class="float-btn primary" type="button">🧭<span>따라가기</span></button>
           <button id="direction-btn" class="float-btn" type="button">↔<span>역방향</span></button>
-          <button id="end-follow-btn" class="float-btn danger" type="button" hidden>■<span>종료</span></button>
         </div>
 
         <aside id="status-sheet" class="status-sheet" aria-live="polite" data-sheet-mode="compact">
@@ -85,21 +83,25 @@
           </div>
           <div class="metric-grid">
             <div class="metric-card">
-              <span>경로까지</span>
-              <strong id="route-distance">—</strong>
+              <span>운동시간</span>
+              <strong id="exercise-time">00:00:00</strong>
+            </div>
+            <div class="metric-card">
+              <span>운동거리</span>
+              <strong id="exercise-distance">0m</strong>
             </div>
             <div class="metric-card">
               <span>진행률</span>
               <strong id="route-progress">—</strong>
             </div>
             <div class="metric-card">
-              <span>방향</span>
-              <strong id="route-direction">정방향</strong>
+              <span>다음 지점까지</span>
+              <strong id="next-distance">—</strong>
             </div>
-            <div class="metric-card wide">
-              <span>다음 지점</span>
-              <strong id="next-stamp">—</strong>
-            </div>
+          </div>
+          <div class="nav-control-row" aria-label="따라가기 조작">
+            <button id="end-follow-btn" class="nav-control-btn end" type="button" hidden>종료 <span aria-hidden="true">■</span></button>
+            <button id="follow-btn" class="nav-control-btn start" type="button">시작 <span aria-hidden="true">▶</span></button>
           </div>
           <div id="flex-note" class="flex-note" hidden></div>
         </aside>
@@ -120,8 +122,8 @@
   </div>
 
   <script src="routes/hanti-route-data-v1.js"></script>
-  <script src="routes/seoul-pilgrimage-routes.js?v=20260707-arrow-sheet"></script>
-  <script src="routes/test-route-data-v1.js?v=20260707-arrow-sheet"></script>
-  <script src="js/route-nav.js?v=20260707-arrow-sheet"></script>
+  <script src="routes/seoul-pilgrimage-routes.js?v=20260707-sheet-controls"></script>
+  <script src="routes/test-route-data-v1.js?v=20260707-sheet-controls"></script>
+  <script src="js/route-nav.js?v=20260707-sheet-controls"></script>
 </body>
 </html>

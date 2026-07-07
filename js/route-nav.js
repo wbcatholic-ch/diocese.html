@@ -29,6 +29,9 @@
     following: false,
     lastCoords: null,
     walkedTrack: [],
+    elapsedActiveMs: 0,
+    activeSince: null,
+    elapsedTimer: null,
     autoCenterPaused: false,
     autoCenterResumeTimer: null,
     mapInteractionHandlersReady: false,
@@ -65,7 +68,7 @@
       fitRouteBounds();
     });
     $('my-location-btn')?.addEventListener('click', locateOnce);
-    $('follow-btn')?.addEventListener('click', startFollow);
+    $('follow-btn')?.addEventListener('click', handleFollowControl);
     $('direction-btn')?.addEventListener('click', toggleRouteDirection);
     $('end-follow-btn')?.addEventListener('click', confirmEndNavigation);
   }
@@ -182,6 +185,8 @@
     state.routeDirection = normalizeDirection(options.restoreState?.routeDirection || 'forward');
     state.lastCoords = sanitizeCoords(options.restoreState?.lastCoords) || null;
     state.walkedTrack = sanitizeTrack(options.restoreState?.walkedTrack || []);
+    state.elapsedActiveMs = sanitizeElapsedMs(options.restoreState?.elapsedActiveMs);
+    state.activeSince = null;
     state.following = Boolean(options.restoreState?.following);
     resumeAutoCenter({ skipPan: true });
     rebuildNavigationModel();
@@ -234,10 +239,7 @@
     const route = state.activeRoute;
     if (!route) return;
     $('map-title').textContent = route.name || '순례길';
-    $('route-distance').textContent = '—';
-    $('route-progress').textContent = '—';
-    $('next-stamp').textContent = '—';
-    updateDirectionMetric();
+    resetNavigationMetrics();
     setChip('neutral', restored ? '복귀' : '대기');
     $('status-label').textContent = restored ? '따라가기 복귀 준비' : (routeIsTestRoute(route) ? '테스트 경로 준비 완료' : '순례길 준비 완료');
     $('status-message').textContent = restored
@@ -416,6 +418,14 @@
     }).catch(showLocationError);
   }
 
+  function handleFollowControl() {
+    if (state.following) {
+      pauseFollow();
+      return;
+    }
+    startFollow();
+  }
+
   function startFollow(options = {}) {
     if (!state.activeRoute) return;
     if (!navigator.geolocation) {
@@ -427,12 +437,31 @@
       return;
     }
     state.following = true;
+    if (!state.activeSince) state.activeSince = Date.now();
+    startElapsedTimer();
     resumeAutoCenter({ skipPan: options.restored && !state.lastCoords });
     updateFollowButtons();
-    $('status-label').textContent = options.restored ? '따라가기 복귀 중' : '따라가기 시작';
+    updateNavigationMetrics();
+    $('status-label').textContent = options.restored ? '따라가기 복귀 중' : (state.walkedTrack.length ? '따라가기 재시작' : '따라가기 시작');
     $('status-message').textContent = options.restored ? '현재 위치를 다시 확인해 경로 따라가기를 이어갑니다.' : '현재 위치를 계속 확인합니다.';
     startLocationWatch();
     touchNavigationActivity({ saveOnly: true });
+  }
+
+  function pauseFollow() {
+    if (!state.following) return;
+    finalizeActiveElapsed();
+    if (state.watchId !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(state.watchId);
+    }
+    state.watchId = null;
+    state.following = false;
+    updateFollowButtons();
+    updateNavigationMetrics();
+    $('status-label').textContent = '따라가기 정지';
+    $('status-message').textContent = '재시작을 누르면 현재 순례길 따라가기를 이어갑니다.';
+    setChip('neutral', '정지');
+    saveNavigationState();
   }
 
   function startLocationWatch() {
@@ -448,12 +477,14 @@
   }
 
   function stopLocationWatch() {
+    finalizeActiveElapsed();
     if (state.watchId !== null && navigator.geolocation) {
       navigator.geolocation.clearWatch(state.watchId);
     }
     state.watchId = null;
     state.following = false;
     updateFollowButtons();
+    updateNavigationMetrics();
   }
 
   function handleLocationUpdate(coords, options = {}) {
@@ -474,6 +505,64 @@
       state.walkedTrack.splice(0, state.walkedTrack.length - MAX_TRACK_POINTS);
     }
     renderWalkedTrack();
+    updateNavigationMetrics();
+  }
+
+  function startElapsedTimer() {
+    stopElapsedTimer();
+    state.elapsedTimer = setInterval(updateNavigationMetrics, 1000);
+  }
+
+  function stopElapsedTimer() {
+    if (state.elapsedTimer !== null) clearInterval(state.elapsedTimer);
+    state.elapsedTimer = null;
+  }
+
+  function finalizeActiveElapsed() {
+    if (!state.activeSince) {
+      stopElapsedTimer();
+      return;
+    }
+    state.elapsedActiveMs = getCurrentElapsedMs();
+    state.activeSince = null;
+    stopElapsedTimer();
+  }
+
+  function getCurrentElapsedMs() {
+    const base = Number.isFinite(state.elapsedActiveMs) ? state.elapsedActiveMs : 0;
+    return state.activeSince ? base + Math.max(0, Date.now() - state.activeSince) : base;
+  }
+
+  function resetNavigationMetrics() {
+    const progressEl = $('route-progress');
+    const nextEl = $('next-distance');
+    if (progressEl) progressEl.textContent = '—';
+    if (nextEl) nextEl.textContent = '—';
+    updateNavigationMetrics();
+  }
+
+  function updateNavigationMetrics(values = {}) {
+    const timeEl = $('exercise-time');
+    const distEl = $('exercise-distance');
+    const progressEl = $('route-progress');
+    const nextEl = $('next-distance');
+    if (timeEl) timeEl.textContent = formatDuration(getCurrentElapsedMs());
+    if (distEl) distEl.textContent = formatDistance(computeWalkedTrackDistance());
+    if (progressEl && Number.isFinite(values.progress)) progressEl.textContent = `${values.progress.toFixed(1)}%`;
+    if (nextEl && values.nextStamp) nextEl.textContent = formatDistance(values.nextStamp.remainingM);
+    else if (nextEl && values.nextStamp === null) nextEl.textContent = '도착 근처';
+  }
+
+  function computeWalkedTrackDistance() {
+    let total = 0;
+    const track = state.walkedTrack.filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng));
+    for (let i = 1; i < track.length; i += 1) total += haversineM(track[i - 1], track[i]);
+    return total;
+  }
+
+  function sanitizeElapsedMs(value) {
+    const number = Number(value);
+    return Number.isFinite(number) && number > 0 ? Math.min(number, NAVIGATION_EXPIRE_MS) : 0;
   }
 
   function getCurrentPosition() {
@@ -503,6 +592,9 @@
     stopLocationWatch();
     clearTemporaryNavigationState();
     state.walkedTrack = [];
+    state.elapsedActiveMs = 0;
+    state.activeSince = null;
+    stopElapsedTimer();
     state.lastCoords = null;
     state.following = false;
     state.autoCenterPaused = false;
@@ -514,6 +606,7 @@
       state.myMarker.setMap(null);
       state.myMarker = null;
     }
+    resetNavigationMetrics();
     updateFollowButtons();
   }
 
@@ -594,10 +687,7 @@
     const progress = state.navigationModel.totalDistanceM ? clamp((nearest.distanceAlongM / state.navigationModel.totalDistanceM) * 100, 0, 100) : 0;
     const lineName = routeUsesRepresentativeLine(state.activeRoute) ? '대표 경로선' : 'GPX 경로';
 
-    $('route-distance').textContent = formatDistance(nearest.distanceM);
-    $('route-progress').textContent = `${progress.toFixed(1)}%`;
-    $('next-stamp').textContent = nextStamp ? `${nextStamp.name} · ${formatDistance(nextStamp.remainingM)}` : '마지막 지점 근처';
-    updateDirectionMetric();
+    updateNavigationMetrics({ progress, nextStamp });
     renderRouteProgressLines(nearest.distanceAlongM);
 
     if (state.autoCenterPaused && state.following) return;
@@ -1026,12 +1116,20 @@
   function updateFollowButtons() {
     const followBtn = $('follow-btn');
     const endBtn = $('end-follow-btn');
+    const row = followBtn?.closest('.nav-control-row');
+    const hasTrack = state.walkedTrack.length > 0 || state.elapsedActiveMs > 0 || Boolean(state.lastCoords);
     if (followBtn) {
-      followBtn.classList.toggle('active', state.following);
-      followBtn.disabled = state.following;
-      followBtn.querySelector('span').textContent = state.following ? '진행중' : '따라가기';
+      followBtn.classList.toggle('pause', state.following);
+      followBtn.classList.toggle('start', !state.following);
+      followBtn.disabled = false;
+      followBtn.innerHTML = state.following
+        ? '정지 <span aria-hidden="true">Ⅱ</span>'
+        : hasTrack
+          ? '재시작 <span aria-hidden="true">▶</span>'
+          : '시작 <span aria-hidden="true">▶</span>';
     }
-    if (endBtn) endBtn.hidden = !state.following && !state.walkedTrack.length;
+    if (endBtn) endBtn.hidden = state.following || !hasTrack;
+    if (row) row.classList.toggle('single', state.following || !hasTrack);
     updateDirectionButton();
   }
 
@@ -1040,11 +1138,6 @@
     if (!btn) return;
     btn.querySelector('span').textContent = state.routeDirection === 'forward' ? '역방향' : '정방향';
     btn.title = state.routeDirection === 'forward' ? '역방향으로 걷기' : '정방향으로 걷기';
-  }
-
-  function updateDirectionMetric() {
-    const el = $('route-direction');
-    if (el) el.textContent = directionText();
   }
 
   function directionText() {
@@ -1098,6 +1191,7 @@
       following: state.following,
       lastCoords: state.lastCoords,
       walkedTrack: state.walkedTrack,
+      elapsedActiveMs: getCurrentElapsedMs(),
       lastActiveAt: Date.now()
     };
     try {
@@ -1128,6 +1222,9 @@
     stopLocationWatch();
     clearTemporaryNavigationState();
     state.walkedTrack = [];
+    state.elapsedActiveMs = 0;
+    state.activeSince = null;
+    stopElapsedTimer();
     state.lastCoords = null;
     state.following = false;
     updateFollowButtons();
@@ -1191,6 +1288,14 @@
     const y = Math.sin(dLng) * Math.cos(lat2);
     const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
     return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  }
+
+  function formatDuration(ms) {
+    const seconds = Math.max(0, Math.floor((Number(ms) || 0) / 1000));
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s].map((part) => String(part).padStart(2, '0')).join(':');
   }
 
   function formatDistance(meters) {
