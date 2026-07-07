@@ -151,6 +151,23 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .float-btn.primary { border-color: rgba(29, 78, 216, .55); color: var(--blue); }
 .float-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
+.float-btn:disabled { opacity: .72; cursor: default; }
+.float-btn.danger { border-color: rgba(185, 28, 28, .55); color: #991b1b; }
+.float-btn.danger:not([hidden]) { display: flex; }
+.direction-arrow {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: #1d4ed8;
+  font-size: 22px;
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 3px 8px rgba(15, 23, 42, .35);
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}
+
 .status-sheet {
   position: absolute;
   left: 0;
@@ -223,7 +240,7 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
 .route-marker { transform: translate(-50%, -100%); padding: 6px 8px; border-radius: 999px; background: #172033; color: #fff; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(15,23,42,.3); font-size: 11px; font-weight: 950; white-space: nowrap; }
 .stamp-marker { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: #fff7e8; border: 2px solid #b7791f; color: #7a4f10; font-size: 11px; font-weight: 950; box-shadow: 0 4px 10px rgba(15,23,42,.25); }
-.my-location-marker { width: 19px; height: 19px; border-radius: 50%; background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 5px rgba(37,99,235,.22), 0 4px 12px rgba(15,23,42,.25); }
+.my-location-marker { position: relative; width: 19px; height: 19px; border-radius: 50%; background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 5px rgba(37,99,235,.22), 0 4px 12px rgba(15,23,42,.25); }
 .my-location-marker.following::after { content: ""; position: absolute; left: 50%; top: -12px; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 12px solid #2563eb; }
 
 @media (max-width: 420px) {
