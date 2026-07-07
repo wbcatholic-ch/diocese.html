@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v1-20260706';
+const CACHE_NAME = 'pilgrimage-route-nav-v3-20260707';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const CORE_ASSETS = [
   './css/route-nav.css',
   './js/route-nav.js',
   './routes/hanti-route-data-v1.js',
+  './routes/seoul-pilgrimage-routes.js',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'
