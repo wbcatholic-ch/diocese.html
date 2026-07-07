@@ -14,6 +14,10 @@
 }
 
 * { box-sizing: border-box; }
+
+/* hidden 속성이 author CSS의 display:flex/grid보다 항상 우선되도록 고정.
+   초기 화면에서 지도 화면이 목록 위를 덮어 "경로 준비 중" 상태로 멈추던 원인 수정. */
+[hidden] { display: none !important; }
 html, body { margin: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
 button { font: inherit; -webkit-tap-highlight-color: transparent; }
 #app-shell { width: 100%; height: 100%; display: flex; flex-direction: column; background: linear-gradient(180deg, #f8f3eb, #efe5d6); }
