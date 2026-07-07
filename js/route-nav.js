@@ -260,7 +260,6 @@
     const representative = routeUsesRepresentativeLine(route) ? ' · 대표선' : '';
     $('map-title').textContent = route.name || '순례길';
     $('map-subtitle').textContent = `${start || '출발지'} → ${finish || '도착지'}${directionText}${representative}`;
-    updateDirectionMetric();
     updateDirectionButton();
   }
 

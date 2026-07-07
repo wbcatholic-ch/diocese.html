@@ -83,4 +83,11 @@ PWA에서는 브라우저/OS가 허용하는 범위에서 `watchPosition`을 유
 
 ## 캐시 버전
 
-`pilgrimage-route-nav-v16-sheet-controls-20260707`
+`pilgrimage-route-nav-v17-map-init-fix-20260707`
+
+
+## v17 지도 초기화 수정
+
+- 정보카드 단순화 작업 후 제거된 `updateDirectionMetric()` 호출이 `updateRouteHeader()`에 남아 있어 코스 선택 직후 JS가 중단되던 문제를, 해당 호출 위치에서 직접 삭제했습니다.
+- 이 오류 때문에 Kakao Map 로딩까지 진행되지 않아 지도가 보이지 않았습니다.
+- 지도/따라가기/정보카드 기능은 기존 주인 로직을 유지하고, 중복 함수나 패치성 우회 코드는 추가하지 않았습니다.
