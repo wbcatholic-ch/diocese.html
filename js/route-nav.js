@@ -84,6 +84,7 @@
     $('next-stamp').textContent = '—';
     setChip('neutral', '대기');
     showFlexNote(route);
+    resetMapLoading('지도를 불러오는 중입니다');
     loadKakaoMap().then(() => drawRoute(route)).catch(showMapError);
   }
 
@@ -96,34 +97,58 @@
   function loadKakaoMap() {
     if (state.kakaoReady && window.kakao?.maps) return Promise.resolve();
     return new Promise((resolve, reject) => {
-      if (window.kakao?.maps) {
-        kakao.maps.load(() => { state.kakaoReady = true; resolve(); });
+      if (!/^https?:$/.test(location.protocol)) {
+        reject(new Error('지도는 https 주소에서 열어야 합니다. GitHub Pages 주소로 접속해 주세요.'));
         return;
       }
-      const key = window.APP_CONFIG?.KAKAO_JS_KEY;
-      if (!key) {
-        reject(new Error('Kakao JavaScript 키가 없습니다.'));
-        return;
-      }
-      const old = document.getElementById('kakao-map-sdk');
-      if (old) old.remove();
-      const script = document.createElement('script');
-      script.id = 'kakao-map-sdk';
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false`;
-      script.async = true;
-      const timer = setTimeout(() => reject(new Error('지도 로딩 시간이 초과되었습니다. GitHub Pages 도메인 등록을 확인하세요.')), 20000);
-      script.onload = () => {
-        clearTimeout(timer);
+
+      if (window.kakao?.maps?.load) {
         try {
           kakao.maps.load(() => { state.kakaoReady = true; resolve(); });
         } catch (error) {
           reject(error);
         }
+        return;
+      }
+
+      const key = window.APP_CONFIG?.KAKAO_JS_KEY;
+      if (!key) {
+        reject(new Error('Kakao JavaScript 키가 없습니다.'));
+        return;
+      }
+
+      const existing = document.getElementById('kakao-map-sdk');
+      if (existing) existing.remove();
+
+      const script = document.createElement('script');
+      script.id = 'kakao-map-sdk';
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false`;
+      script.async = true;
+      script.referrerPolicy = 'no-referrer-when-downgrade';
+
+      const timer = setTimeout(() => {
+        script.remove();
+        reject(new Error('지도 로딩 시간이 초과되었습니다. Chrome에서 열었는지와 Kakao Developers 도메인 등록을 확인하세요.'));
+      }, 20000);
+
+      script.onload = () => {
+        clearTimeout(timer);
+        try {
+          if (!window.kakao?.maps?.load) {
+            reject(new Error('Kakao 지도 SDK가 정상 응답하지 않았습니다. JavaScript 키와 웹 플랫폼 도메인을 확인하세요.'));
+            return;
+          }
+          kakao.maps.load(() => { state.kakaoReady = true; resolve(); });
+        } catch (error) {
+          reject(error);
+        }
       };
+
       script.onerror = () => {
         clearTimeout(timer);
-        reject(new Error('지도를 불러오지 못했습니다. Kakao Developers의 웹 플랫폼 도메인 등록이 필요할 수 있습니다.'));
+        reject(new Error('지도를 불러오지 못했습니다. GitHub Pages 주소를 Kakao Developers의 웹 플랫폼 도메인에 등록해야 합니다.'));
       };
+
       document.head.appendChild(script);
     });
   }
@@ -175,7 +200,10 @@
       state.stampMarkers.push(overlay);
     });
 
-    fitRouteBounds();
+    setTimeout(() => {
+      if (state.map?.relayout) state.map.relayout();
+      fitRouteBounds();
+    }, 80);
   }
 
   function clearMapObjects() {
@@ -328,10 +356,33 @@
     stopFollow();
   }
 
-  function showMapError(error) {
+  function resetMapLoading(message) {
     const loading = $('map-loading');
     loading.style.display = 'grid';
-    loading.innerHTML = `<div class="loading-cross">🗺️</div><div>${escapeHtml(error?.message || '지도를 불러오지 못했습니다.')}</div>`;
+    loading.innerHTML = `<div class="loading-cross">✝</div><div>${escapeHtml(message || '지도를 불러오는 중입니다')}</div>`;
+  }
+
+  function showMapError(error) {
+    const loading = $('map-loading');
+    const host = location.hostname || '현재 주소';
+    const message = error?.message || '지도를 불러오지 못했습니다.';
+    loading.style.display = 'grid';
+    loading.innerHTML = `
+      <div class="loading-cross">🗺️</div>
+      <div class="map-error-box">
+        <strong>지도 열기 실패</strong>
+        <p>${escapeHtml(message)}</p>
+        <p class="map-error-small">Kakao Developers → 내 애플리케이션 → 플랫폼 → Web에 <b>${escapeHtml(host)}</b> 도메인을 등록해야 합니다.</p>
+        <div class="map-error-actions">
+          <button id="retry-map-btn" type="button">다시 불러오기</button>
+          <button id="error-copy-link-btn" type="button">주소 복사</button>
+        </div>
+      </div>`;
+    $('retry-map-btn')?.addEventListener('click', () => {
+      resetMapLoading('지도를 다시 불러오는 중입니다');
+      loadKakaoMap().then(() => drawRoute(state.activeRoute)).catch(showMapError);
+    });
+    $('error-copy-link-btn')?.addEventListener('click', copyCurrentUrl);
   }
 
   function buildSegmentIndex(route) {
@@ -462,16 +513,80 @@
   }
 
   function setupChromeOpenPanel() {
+    const panel = $('chrome-open-panel');
+    const context = detectAndroidBrowserContext();
+
+    if (context.shouldShowChromePanel) {
+      panel.hidden = false;
+    } else {
+      panel.hidden = true;
+    }
+
+    $('open-chrome-btn').addEventListener('click', openCurrentPageInChrome);
+    $('copy-link-btn')?.addEventListener('click', copyCurrentUrl);
+    $('close-chrome-panel')?.addEventListener('click', () => { panel.hidden = true; });
+  }
+
+  function detectAndroidBrowserContext() {
     const ua = navigator.userAgent || '';
     const isAndroid = /Android/i.test(ua);
-    const isChrome = /Chrome\//i.test(ua) && !/; wv\)|SamsungBrowser|KAKAOTALK|NAVER|FBAN|Instagram/i.test(ua);
+    const isStandalone = window.matchMedia?.('(display-mode: standalone)')?.matches || window.navigator.standalone;
+    const isKnownInApp = /; wv\)|\bwv\b|Version\/4\.0|KAKAOTALK|NAVER|FBAN|FBAV|Instagram|Line\/|DaumApps/i.test(ua);
+    const isSamsung = /SamsungBrowser/i.test(ua);
+    const isOtherAndroidBrowser = /EdgA|OPR\/|Whale|Firefox/i.test(ua);
+    const isRealChrome = /Chrome\//i.test(ua) && !isKnownInApp && !isSamsung && !isOtherAndroidBrowser;
+    const canUseIntent = isAndroid && /^https?:$/.test(location.protocol);
+
+    return {
+      isAndroid,
+      isStandalone,
+      isRealChrome,
+      shouldShowChromePanel: canUseIntent && !isStandalone && !isRealChrome && (isKnownInApp || isSamsung || isOtherAndroidBrowser)
+    };
+  }
+
+  function openCurrentPageInChrome() {
+    const currentUrl = location.href;
+    const protocol = location.protocol === 'http:' ? 'http' : 'https';
+    const urlWithoutScheme = currentUrl.replace(/^https?:\/\//, '');
+    const fallback = encodeURIComponent(currentUrl);
+    const intentUrl = `intent://${urlWithoutScheme}#Intent;scheme=${protocol};package=com.android.chrome;S.browser_fallback_url=${fallback};end`;
+
     const panel = $('chrome-open-panel');
-    if (isAndroid && !isChrome && location.protocol === 'https:') {
-      panel.hidden = false;
+    const anchor = document.createElement('a');
+    anchor.href = intentUrl;
+    anchor.rel = 'noreferrer';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    setTimeout(() => {
+      if (!detectAndroidBrowserContext().isRealChrome && panel && !panel.hidden) {
+        panel.querySelector('p').textContent = '자동 전환이 막히면 주소 복사 후 Chrome 주소창에 붙여넣어 주세요.';
+      }
+    }, 900);
+  }
+
+  async function copyCurrentUrl() {
+    const url = location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      showCopyToast('주소를 복사했습니다. Chrome 주소창에 붙여넣어 주세요.');
+    } catch (_) {
+      window.prompt('아래 주소를 복사해서 Chrome 주소창에 붙여넣어 주세요.', url);
     }
-    $('open-chrome-btn').addEventListener('click', () => {
-      const url = location.href.replace(/^https?:\/\//, '');
-      location.href = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`;
-    });
+  }
+
+  function showCopyToast(message) {
+    let toast = document.querySelector('.copy-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'copy-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2200);
   }
 })();

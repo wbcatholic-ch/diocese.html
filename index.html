@@ -14,7 +14,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
   <link rel="apple-touch-icon" href="icons/icon-512x512.png">
-  <link rel="stylesheet" href="css/route-nav.css">
+  <link rel="stylesheet" href="css/route-nav.css?v=20260707-fix2">
   <script>
     window.APP_CONFIG = {
       KAKAO_JS_KEY: '07f7989e29fdfb425fff924f36fb3ec0'
@@ -101,12 +101,16 @@
         <strong>Chrome에서 테스트 권장</strong>
         <p>위치 권한과 PWA 설치 테스트는 Chrome이 가장 안정적입니다.</p>
       </div>
-      <button id="open-chrome-btn" type="button">Chrome으로 열기</button>
+      <div class="chrome-open-actions">
+        <button id="open-chrome-btn" type="button">Chrome으로 열기</button>
+        <button id="copy-link-btn" class="secondary" type="button">주소 복사</button>
+        <button id="close-chrome-panel" class="ghost" type="button" aria-label="Chrome 안내 닫기">닫기</button>
+      </div>
     </div>
   </div>
 
   <script src="routes/hanti-route-data-v1.js"></script>
-  <script src="routes/seoul-pilgrimage-routes.js"></script>
-  <script src="js/route-nav.js"></script>
+  <script src="routes/seoul-pilgrimage-routes.js?v=20260707-gpx3"></script>
+  <script src="js/route-nav.js?v=20260707-fix2"></script>
 </body>
 </html>
