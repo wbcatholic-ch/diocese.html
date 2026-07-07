@@ -2,23 +2,27 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
+
   const state = {
     routes: [],
     activeRoute: null,
-    map: null,
-    kakaoReady: false,
-    polylines: [],
-    stampMarkers: [],
+    mapProvider: null,
+    leafletMap: null,
+    routeLayers: [],
+    stampLayers: [],
     myMarker: null,
     watchId: null,
     following: false,
     totalDistanceM: 0,
-    segmentIndex: []
+    segmentIndex: [],
+    staticProjection: null
   };
 
   const SEOUL_FALLBACK = { lat: 37.56, lng: 126.98 };
   const ON_ROUTE_M = 45;
   const NEAR_ROUTE_M = 120;
+  const LEAFLET_CSS_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  const LEAFLET_JS_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 
   document.addEventListener('DOMContentLoaded', init);
 
@@ -31,19 +35,21 @@
   }
 
   function setupButtons() {
-    $('back-to-list').addEventListener('click', showList);
-    $('fit-route-btn').addEventListener('click', fitRouteBounds);
-    $('my-location-btn').addEventListener('click', locateOnce);
-    $('follow-btn').addEventListener('click', toggleFollow);
+    $('back-to-list')?.addEventListener('click', showList);
+    $('fit-route-btn')?.addEventListener('click', fitRouteBounds);
+    $('my-location-btn')?.addEventListener('click', locateOnce);
+    $('follow-btn')?.addEventListener('click', toggleFollow);
   }
 
   function renderRouteList() {
     const list = $('route-list');
+    if (!list) return;
     list.innerHTML = '';
     if (!state.routes.length) {
       list.innerHTML = '<div class="notice-card"><strong>순례길 데이터가 없습니다</strong><p>routes 폴더에 순례길 데이터 파일을 추가하세요.</p></div>';
       return;
     }
+
     state.routes.forEach((route) => {
       const totalKm = computeRouteTotalDistance(route) / 1000;
       const distanceText = route.distanceLabel || `약 ${totalKm.toFixed(1)}km`;
@@ -71,6 +77,9 @@
 
   function openRoute(route) {
     state.activeRoute = route;
+    state.segmentIndex = buildSegmentIndex(route);
+    state.totalDistanceM = state.segmentIndex.length ? state.segmentIndex[state.segmentIndex.length - 1].endDistanceM : 0;
+
     $('route-list-view').hidden = true;
     $('map-view').hidden = false;
     $('map-title').textContent = route.name || '순례길';
@@ -84,151 +93,230 @@
     $('next-stamp').textContent = '—';
     setChip('neutral', '대기');
     showFlexNote(route);
-    resetMapLoading('지도를 불러오는 중입니다');
-    loadKakaoMap().then(() => drawRoute(route)).catch(showMapError);
+
+    prepareMapCanvas('지도를 불러오는 중입니다');
+    openMap(route);
   }
 
   function showList() {
     stopFollow();
+    destroyMap();
     $('map-view').hidden = true;
     $('route-list-view').hidden = false;
   }
 
-  function loadKakaoMap() {
-    if (state.kakaoReady && window.kakao?.maps) return Promise.resolve();
+  function openMap(route) {
+    if (!/^https?:$/.test(location.protocol)) {
+      renderStaticRouteMap(route, new Error('위치 기능과 지도 타일은 https 주소에서 가장 안정적으로 작동합니다. GitHub Pages 주소로 접속해 주세요.'));
+      return;
+    }
+
+    loadLeaflet()
+      .then(() => drawLeafletRoute(route))
+      .catch((error) => renderStaticRouteMap(route, error));
+  }
+
+  function loadLeaflet() {
+    if (window.L?.map) return Promise.resolve();
+
     return new Promise((resolve, reject) => {
-      if (!/^https?:$/.test(location.protocol)) {
-        reject(new Error('지도는 https 주소에서 열어야 합니다. GitHub Pages 주소로 접속해 주세요.'));
-        return;
-      }
+      ensureLeafletCss();
 
-      if (window.kakao?.maps?.load) {
-        try {
-          kakao.maps.load(() => { state.kakaoReady = true; resolve(); });
-        } catch (error) {
-          reject(error);
-        }
-        return;
-      }
-
-      const key = window.APP_CONFIG?.KAKAO_JS_KEY;
-      if (!key) {
-        reject(new Error('Kakao JavaScript 키가 없습니다.'));
-        return;
-      }
-
-      const existing = document.getElementById('kakao-map-sdk');
-      if (existing) existing.remove();
+      const old = document.getElementById('leaflet-sdk');
+      if (old) old.remove();
 
       const script = document.createElement('script');
-      script.id = 'kakao-map-sdk';
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false`;
+      script.id = 'leaflet-sdk';
+      script.src = LEAFLET_JS_URL;
       script.async = true;
-      script.referrerPolicy = 'no-referrer-when-downgrade';
+      script.crossOrigin = '';
 
       const timer = setTimeout(() => {
         script.remove();
-        reject(new Error('지도 로딩 시간이 초과되었습니다. Chrome에서 열었는지와 Kakao Developers 도메인 등록을 확인하세요.'));
-      }, 20000);
+        reject(new Error('지도 라이브러리 연결 시간이 초과되어 경로 전용 보기로 전환했습니다.'));
+      }, 10000);
 
       script.onload = () => {
         clearTimeout(timer);
-        try {
-          if (!window.kakao?.maps?.load) {
-            reject(new Error('Kakao 지도 SDK가 정상 응답하지 않았습니다. JavaScript 키와 웹 플랫폼 도메인을 확인하세요.'));
-            return;
-          }
-          kakao.maps.load(() => { state.kakaoReady = true; resolve(); });
-        } catch (error) {
-          reject(error);
+        if (window.L?.map) {
+          resolve();
+        } else {
+          reject(new Error('지도 라이브러리가 정상적으로 준비되지 않아 경로 전용 보기로 전환했습니다.'));
         }
       };
 
       script.onerror = () => {
         clearTimeout(timer);
-        reject(new Error('지도를 불러오지 못했습니다. GitHub Pages 주소를 Kakao Developers의 웹 플랫폼 도메인에 등록해야 합니다.'));
+        reject(new Error('지도 라이브러리를 불러오지 못해 경로 전용 보기로 전환했습니다.'));
       };
 
       document.head.appendChild(script);
     });
   }
 
-  function drawRoute(route) {
-    const KM = kakao.maps;
-    const center = firstPoint(route) || SEOUL_FALLBACK;
-    if (!state.map) {
-      state.map = new KM.Map($('map-canvas'), {
-        center: new KM.LatLng(center.lat, center.lng),
-        level: 8
-      });
-    }
-    clearMapObjects();
-    $('map-loading').style.display = 'none';
+  function ensureLeafletCss() {
+    if (document.getElementById('leaflet-css')) return;
+    const link = document.createElement('link');
+    link.id = 'leaflet-css';
+    link.rel = 'stylesheet';
+    link.href = LEAFLET_CSS_URL;
+    link.crossOrigin = '';
+    document.head.appendChild(link);
+  }
 
-    state.segmentIndex = buildSegmentIndex(route);
-    state.totalDistanceM = state.segmentIndex.length ? state.segmentIndex[state.segmentIndex.length - 1].endDistanceM : 0;
+  function drawLeafletRoute(route) {
+    const L = window.L;
+    if (!L?.map) throw new Error('지도 라이브러리가 없습니다.');
+
+    destroyMap();
+    state.mapProvider = 'leaflet';
+    prepareMapCanvas('지도를 표시하는 중입니다');
+
+    const center = firstPoint(route) || SEOUL_FALLBACK;
+    state.leafletMap = L.map('leaflet-map', {
+      zoomControl: false,
+      attributionControl: true,
+      preferCanvas: true
+    }).setView([center.lat, center.lng], 13);
+
+    L.control.zoom({ position: 'bottomleft' }).addTo(state.leafletMap);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(state.leafletMap);
 
     (route.routeSegments || []).forEach((segment) => {
-      const path = (segment.points || [])
-        .filter((p) => isFiniteNumber(p.lat) && isFiniteNumber(p.lng))
-        .map((p) => new KM.LatLng(Number(p.lat), Number(p.lng)));
-      if (path.length < 2) return;
-      const polyline = new KM.Polyline({
-        path,
-        strokeWeight: 5,
-        strokeColor: segment.color || route.routeColor || (routeUsesRepresentativeLine(route) ? '#b7791f' : '#1d4ed8'),
-        strokeOpacity: routeUsesRepresentativeLine(route) ? 0.82 : 0.9,
-        strokeStyle: routeUsesRepresentativeLine(route) ? 'shortdash' : 'solid'
-      });
-      polyline.setMap(state.map);
-      state.polylines.push(polyline);
+      const points = cleanPoints(segment.points);
+      if (points.length < 2) return;
+      const layer = L.polyline(points.map((p) => [p.lat, p.lng]), {
+        weight: 5,
+        opacity: routeUsesRepresentativeLine(route) ? 0.82 : 0.92,
+        color: segment.color || route.routeColor || (routeUsesRepresentativeLine(route) ? '#b7791f' : '#1d4ed8'),
+        dashArray: routeUsesRepresentativeLine(route) ? '8 8' : null
+      }).addTo(state.leafletMap);
+      state.routeLayers.push(layer);
     });
 
     (route.stamps || []).forEach((stamp) => {
       if (!isFiniteNumber(stamp.lat) || !isFiniteNumber(stamp.lng)) return;
-      const content = document.createElement('div');
-      content.className = 'stamp-marker';
-      content.textContent = stamp.id || '•';
-      content.title = stamp.name || '';
-      const overlay = new KM.CustomOverlay({
-        position: new KM.LatLng(Number(stamp.lat), Number(stamp.lng)),
-        content,
-        yAnchor: 0.5,
-        xAnchor: 0.5
-      });
-      overlay.setMap(state.map);
-      state.stampMarkers.push(overlay);
+      const marker = L.marker([Number(stamp.lat), Number(stamp.lng)], {
+        icon: L.divIcon({
+          className: 'leaflet-stamp-icon-wrap',
+          html: `<div class="leaflet-stamp-marker" title="${escapeHtml(stamp.name || '')}">${escapeHtml(stamp.id || '•')}</div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(state.leafletMap);
+      state.stampLayers.push(marker);
     });
 
+    hideMapLoading();
     setTimeout(() => {
-      if (state.map?.relayout) state.map.relayout();
+      state.leafletMap?.invalidateSize?.();
       fitRouteBounds();
     }, 80);
   }
 
-  function clearMapObjects() {
-    state.polylines.forEach((item) => item.setMap(null));
-    state.stampMarkers.forEach((item) => item.setMap(null));
-    state.polylines = [];
-    state.stampMarkers = [];
-    if (state.myMarker) state.myMarker.setMap(null);
+  function renderStaticRouteMap(route, error) {
+    destroyMap();
+    state.mapProvider = 'static';
+    prepareMapCanvas('경로 전용 보기를 준비하는 중입니다');
+
+    const canvas = $('map-canvas');
+    const loading = $('map-loading');
+    const allPoints = collectRoutePoints(route);
+    if (!allPoints.length) {
+      showMapError(new Error('표시할 경로 좌표가 없습니다.'));
+      return;
+    }
+
+    const projection = buildStaticProjection(allPoints);
+    state.staticProjection = projection;
+    const representative = routeUsesRepresentativeLine(route);
+    const lineColor = route.routeColor || (representative ? '#b7791f' : '#1d4ed8');
+
+    const svgParts = [];
+    (route.routeSegments || []).forEach((segment) => {
+      const points = cleanPoints(segment.points).map((point) => projectStaticPoint(point, projection));
+      if (points.length < 2) return;
+      svgParts.push(`<polyline points="${points.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="none" stroke="${escapeHtml(segment.color || lineColor)}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"${representative ? ' stroke-dasharray="10 10"' : ''}></polyline>`);
+    });
+
+    const stampParts = (route.stamps || [])
+      .filter((stamp) => isFiniteNumber(stamp.lat) && isFiniteNumber(stamp.lng))
+      .map((stamp) => {
+        const p = projectStaticPoint({ lat: Number(stamp.lat), lng: Number(stamp.lng) }, projection);
+        return `<g class="static-stamp"><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="14"></circle><text x="${p.x.toFixed(1)}" y="${(p.y + 4).toFixed(1)}">${escapeHtml(stamp.id || '•')}</text></g>`;
+      })
+      .join('');
+
+    const reason = error?.message || '외부 지도 연결 전용 경로 보기입니다.';
+    canvas.insertAdjacentHTML('afterbegin', `
+      <div id="static-route-map" class="static-route-map">
+        <svg id="static-route-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-label="순례길 경로 전용 보기">
+          <rect x="0" y="0" width="1000" height="1000" rx="30" fill="#efe5d6"></rect>
+          <g class="static-route-line">${svgParts.join('')}</g>
+          <g class="static-stamps">${stampParts}</g>
+          <g id="static-my-marker" class="static-my-marker" hidden><circle r="12"></circle><circle r="22"></circle></g>
+        </svg>
+        <div class="static-map-note">
+          <strong>경로 전용 보기</strong>
+          <span>${escapeHtml(reason)}</span>
+        </div>
+      </div>
+    `);
+    loading.style.display = 'none';
+
+    fitRouteBounds();
+  }
+
+  function prepareMapCanvas(message) {
+    const canvas = $('map-canvas');
+    canvas.innerHTML = `
+      <div id="leaflet-map" class="leaflet-map" aria-label="지도 영역"></div>
+      <div id="map-loading" class="map-loading">
+        <div class="loading-cross">✝</div>
+        <div>${escapeHtml(message || '지도를 불러오는 중입니다')}</div>
+      </div>
+    `;
+  }
+
+  function hideMapLoading() {
+    const loading = $('map-loading');
+    if (loading) loading.style.display = 'none';
+  }
+
+  function destroyMap() {
+    if (state.leafletMap) {
+      state.leafletMap.remove();
+    }
+    state.leafletMap = null;
+    state.routeLayers = [];
+    state.stampLayers = [];
     state.myMarker = null;
+    state.staticProjection = null;
+    state.mapProvider = null;
   }
 
   function fitRouteBounds() {
-    if (!state.map || !state.activeRoute) return;
-    const KM = kakao.maps;
-    const bounds = new KM.LatLngBounds();
-    let count = 0;
-    (state.activeRoute.routeSegments || []).forEach((segment) => {
-      (segment.points || []).forEach((point) => {
-        if (!isFiniteNumber(point.lat) || !isFiniteNumber(point.lng)) return;
-        bounds.extend(new KM.LatLng(Number(point.lat), Number(point.lng)));
-        count += 1;
+    if (!state.activeRoute) return;
+
+    if (state.mapProvider === 'leaflet' && state.leafletMap && window.L?.latLngBounds) {
+      const points = collectRoutePoints(state.activeRoute);
+      if (!points.length) return;
+      const bounds = window.L.latLngBounds(points.map((point) => [point.lat, point.lng]));
+      state.leafletMap.fitBounds(bounds, {
+        paddingTopLeft: [24, 92],
+        paddingBottomRight: [24, 190],
+        maxZoom: 17
       });
-    });
-    if (!count) return;
-    state.map.setBounds(bounds, 86, 24, 170, 24);
+      return;
+    }
+
+    if (state.mapProvider === 'static') {
+      const svg = $('static-route-svg');
+      if (svg) svg.setAttribute('viewBox', '0 0 1000 1000');
+    }
   }
 
   function locateOnce() {
@@ -271,6 +359,7 @@
     state.watchId = null;
     state.following = false;
     const btn = $('follow-btn');
+    if (!btn) return;
     btn.classList.remove('active');
     btn.querySelector('span').textContent = '따라가기';
   }
@@ -290,19 +379,32 @@
   }
 
   function updateMyLocation(coords, options = {}) {
-    if (!state.map || !window.kakao?.maps) return;
-    const KM = kakao.maps;
-    const pos = new KM.LatLng(coords.lat, coords.lng);
-    const markerEl = document.createElement('div');
-    markerEl.className = `my-location-marker${options.following ? ' following' : ''}`;
-    if (!state.myMarker) {
-      state.myMarker = new KM.CustomOverlay({ position: pos, content: markerEl, xAnchor: 0.5, yAnchor: 0.5, zIndex: 20 });
-      state.myMarker.setMap(state.map);
-    } else {
-      state.myMarker.setPosition(pos);
-      state.myMarker.setContent(markerEl);
+    if (state.mapProvider === 'leaflet' && state.leafletMap && window.L?.marker) {
+      const L = window.L;
+      const pos = [coords.lat, coords.lng];
+      const icon = L.divIcon({
+        className: 'leaflet-my-location-wrap',
+        html: `<div class="leaflet-my-location${options.following ? ' following' : ''}"></div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      if (!state.myMarker) {
+        state.myMarker = L.marker(pos, { icon, zIndexOffset: 1000 }).addTo(state.leafletMap);
+      } else {
+        state.myMarker.setLatLng(pos);
+        state.myMarker.setIcon(icon);
+      }
+      if (options.center) state.leafletMap.panTo(pos, { animate: true, duration: 0.35 });
+      return;
     }
-    if (options.center) state.map.panTo(pos);
+
+    if (state.mapProvider === 'static' && state.staticProjection) {
+      const marker = $('static-my-marker');
+      if (!marker) return;
+      const p = projectStaticPoint(coords, state.staticProjection);
+      marker.removeAttribute('hidden');
+      marker.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
+    }
   }
 
   function updateRouteStatus(coords) {
@@ -333,6 +435,7 @@
 
   function setChip(type, text) {
     const chip = $('offroute-chip');
+    if (!chip) return;
     chip.className = `offroute-chip ${type}`;
     chip.textContent = text;
   }
@@ -340,6 +443,7 @@
   function showFlexNote(route) {
     const section = (route.flexibleRouteSections || [])[0];
     const el = $('flex-note');
+    if (!el) return;
     if (section?.message) {
       el.textContent = section.message;
       el.hidden = false;
@@ -356,15 +460,9 @@
     stopFollow();
   }
 
-  function resetMapLoading(message) {
-    const loading = $('map-loading');
-    loading.style.display = 'grid';
-    loading.innerHTML = `<div class="loading-cross">✝</div><div>${escapeHtml(message || '지도를 불러오는 중입니다')}</div>`;
-  }
-
   function showMapError(error) {
     const loading = $('map-loading');
-    const host = location.hostname || '현재 주소';
+    if (!loading) return;
     const message = error?.message || '지도를 불러오지 못했습니다.';
     loading.style.display = 'grid';
     loading.innerHTML = `
@@ -372,15 +470,15 @@
       <div class="map-error-box">
         <strong>지도 열기 실패</strong>
         <p>${escapeHtml(message)}</p>
-        <p class="map-error-small">Kakao Developers → 내 애플리케이션 → 플랫폼 → Web에 <b>${escapeHtml(host)}</b> 도메인을 등록해야 합니다.</p>
+        <p class="map-error-small">새로고침 후에도 안 되면 주소 복사 후 Chrome 주소창에 직접 붙여넣어 주세요.</p>
         <div class="map-error-actions">
           <button id="retry-map-btn" type="button">다시 불러오기</button>
           <button id="error-copy-link-btn" type="button">주소 복사</button>
         </div>
       </div>`;
     $('retry-map-btn')?.addEventListener('click', () => {
-      resetMapLoading('지도를 다시 불러오는 중입니다');
-      loadKakaoMap().then(() => drawRoute(state.activeRoute)).catch(showMapError);
+      prepareMapCanvas('지도를 다시 불러오는 중입니다');
+      openMap(state.activeRoute);
     });
     $('error-copy-link-btn')?.addEventListener('click', copyCurrentUrl);
   }
@@ -389,10 +487,10 @@
     const index = [];
     let distanceSoFar = 0;
     (route.routeSegments || []).forEach((segment) => {
-      const points = (segment.points || []).filter((p) => isFiniteNumber(p.lat) && isFiniteNumber(p.lng));
+      const points = cleanPoints(segment.points);
       for (let i = 0; i < points.length - 1; i += 1) {
-        const a = { lat: Number(points[i].lat), lng: Number(points[i].lng) };
-        const b = { lat: Number(points[i + 1].lat), lng: Number(points[i + 1].lng) };
+        const a = points[i];
+        const b = points[i + 1];
         const d = haversineM(a, b);
         index.push({ a, b, startDistanceM: distanceSoFar, endDistanceM: distanceSoFar + d });
         distanceSoFar += d;
@@ -453,6 +551,48 @@
     return null;
   }
 
+  function collectRoutePoints(route) {
+    const points = [];
+    (route.routeSegments || []).forEach((segment) => {
+      points.push(...cleanPoints(segment.points));
+    });
+    if (!points.length && firstPoint(route)) points.push(firstPoint(route));
+    return points;
+  }
+
+  function cleanPoints(points) {
+    return (points || [])
+      .filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng))
+      .map((point) => ({ lat: Number(point.lat), lng: Number(point.lng) }));
+  }
+
+  function buildStaticProjection(points) {
+    const projected = points.map((point) => mercatorPoint(point));
+    const minX = Math.min(...projected.map((p) => p.x));
+    const maxX = Math.max(...projected.map((p) => p.x));
+    const minY = Math.min(...projected.map((p) => p.y));
+    const maxY = Math.max(...projected.map((p) => p.y));
+    return { minX, maxX, minY, maxY, pad: 80 };
+  }
+
+  function projectStaticPoint(point, projection) {
+    const p = mercatorPoint(point);
+    const width = Math.max(projection.maxX - projection.minX, 0.000001);
+    const height = Math.max(projection.maxY - projection.minY, 0.000001);
+    const scale = Math.min((1000 - projection.pad * 2) / width, (1000 - projection.pad * 2) / height);
+    const x = projection.pad + (p.x - projection.minX) * scale + ((1000 - projection.pad * 2) - width * scale) / 2;
+    const y = projection.pad + (p.y - projection.minY) * scale + ((1000 - projection.pad * 2) - height * scale) / 2;
+    return { x: clamp(x, 20, 980), y: clamp(y, 20, 980) };
+  }
+
+  function mercatorPoint(point) {
+    const lat = clamp(point.lat, -85, 85);
+    const lng = point.lng;
+    const x = lng;
+    const y = -Math.log(Math.tan(Math.PI / 4 + toRad(lat) / 2));
+    return { x, y };
+  }
+
   function toCoords(position) {
     return { lat: position.coords.latitude, lng: position.coords.longitude };
   }
@@ -501,9 +641,9 @@
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault();
       deferredPrompt = event;
-      $('install-btn').hidden = false;
+      if ($('install-btn')) $('install-btn').hidden = false;
     });
-    $('install-btn').addEventListener('click', async () => {
+    $('install-btn')?.addEventListener('click', async () => {
       if (!deferredPrompt) return;
       deferredPrompt.prompt();
       await deferredPrompt.userChoice.catch(() => null);
@@ -514,15 +654,11 @@
 
   function setupChromeOpenPanel() {
     const panel = $('chrome-open-panel');
+    if (!panel) return;
     const context = detectAndroidBrowserContext();
+    panel.hidden = !context.shouldShowChromePanel;
 
-    if (context.shouldShowChromePanel) {
-      panel.hidden = false;
-    } else {
-      panel.hidden = true;
-    }
-
-    $('open-chrome-btn').addEventListener('click', openCurrentPageInChrome);
+    $('open-chrome-btn')?.addEventListener('click', openCurrentPageInChrome);
     $('copy-link-btn')?.addEventListener('click', copyCurrentUrl);
     $('close-chrome-panel')?.addEventListener('click', () => { panel.hidden = true; });
   }
