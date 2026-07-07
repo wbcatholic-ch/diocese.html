@@ -3,6 +3,8 @@
 
   const $ = (id) => document.getElementById(id);
   const AUTO_CENTER_RETURN_DELAY_MS = 15000;
+  const STATUS_SHEET_COMPACT = 'compact';
+  const STATUS_SHEET_EXPANDED = 'expanded';
   const NAVIGATION_EXPIRE_MS = 8 * 60 * 60 * 1000;
   const TEMP_STATE_KEY = 'gildongmu.pilgrimageRouteNavigation.temp.v1';
   const ON_ROUTE_M = 45;
@@ -30,6 +32,9 @@
     autoCenterPaused: false,
     autoCenterResumeTimer: null,
     mapInteractionHandlersReady: false,
+    statusSheetMode: STATUS_SHEET_COMPACT,
+    statusSheetPointerStartY: null,
+    statusSheetDragMoved: false,
     navigationModel: createEmptyNavigationModel(),
     pendingRestore: null
   };
@@ -42,6 +47,7 @@
     registerPwa();
     setupChromeOpenPanel();
     setupButtons();
+    setupStatusSheet();
     setupNavigationLifecycle();
     renderRouteList();
     restoreNavigationIfValid();
@@ -62,6 +68,65 @@
     $('follow-btn')?.addEventListener('click', startFollow);
     $('direction-btn')?.addEventListener('click', toggleRouteDirection);
     $('end-follow-btn')?.addEventListener('click', confirmEndNavigation);
+  }
+
+  function setupStatusSheet() {
+    const handle = $('sheet-handle');
+    if (!handle || !$('status-sheet')) return;
+    setStatusSheetMode(STATUS_SHEET_COMPACT);
+    handle.addEventListener('click', () => {
+      if (state.statusSheetDragMoved) {
+        state.statusSheetDragMoved = false;
+        return;
+      }
+      toggleStatusSheetMode();
+    });
+    handle.addEventListener('pointerdown', (event) => {
+      state.statusSheetPointerStartY = event.clientY;
+      state.statusSheetDragMoved = false;
+      if (typeof handle.setPointerCapture === 'function') {
+        try { handle.setPointerCapture(event.pointerId); } catch (_) {}
+      }
+    });
+    handle.addEventListener('pointerup', (event) => {
+      finishStatusSheetDrag(event.clientY);
+      if (typeof handle.releasePointerCapture === 'function') {
+        try { handle.releasePointerCapture(event.pointerId); } catch (_) {}
+      }
+    });
+    handle.addEventListener('pointercancel', () => {
+      state.statusSheetPointerStartY = null;
+    });
+  }
+
+  function finishStatusSheetDrag(endY) {
+    if (!Number.isFinite(state.statusSheetPointerStartY)) return;
+    const deltaY = endY - state.statusSheetPointerStartY;
+    state.statusSheetPointerStartY = null;
+    if (Math.abs(deltaY) < 22) return;
+    state.statusSheetDragMoved = true;
+    setStatusSheetMode(deltaY < 0 ? STATUS_SHEET_EXPANDED : STATUS_SHEET_COMPACT);
+  }
+
+  function toggleStatusSheetMode() {
+    setStatusSheetMode(state.statusSheetMode === STATUS_SHEET_EXPANDED ? STATUS_SHEET_COMPACT : STATUS_SHEET_EXPANDED);
+  }
+
+  function setStatusSheetMode(mode) {
+    const sheet = $('status-sheet');
+    const handle = $('sheet-handle');
+    const label = $('sheet-handle-label');
+    if (!sheet) return;
+    const nextMode = mode === STATUS_SHEET_EXPANDED ? STATUS_SHEET_EXPANDED : STATUS_SHEET_COMPACT;
+    state.statusSheetMode = nextMode;
+    sheet.dataset.sheetMode = nextMode;
+    if (handle) {
+      const expanded = nextMode === STATUS_SHEET_EXPANDED;
+      handle.setAttribute('aria-expanded', String(expanded));
+      handle.setAttribute('aria-label', expanded ? '정보카드 내리기' : '정보카드 올리기');
+      handle.title = expanded ? '정보카드 내리기' : '정보카드 올리기';
+    }
+    if (label) label.textContent = nextMode === STATUS_SHEET_EXPANDED ? '지도 더 보기' : '정보 보기';
   }
 
   function setupNavigationLifecycle() {
@@ -120,6 +185,7 @@
     state.following = Boolean(options.restoreState?.following);
     resumeAutoCenter({ skipPan: true });
     rebuildNavigationModel();
+    setStatusSheetMode(STATUS_SHEET_COMPACT);
 
     $('route-list-view').hidden = true;
     $('map-view').hidden = false;
@@ -286,6 +352,7 @@
     setTimeout(() => {
       if (state.map?.relayout) state.map.relayout();
       if (!state.lastCoords) fitRouteBounds();
+      else refreshDirectionArrowsAfterMapMove();
     }, 80);
   }
 
@@ -334,6 +401,7 @@
     const bounds = new KM.LatLngBounds();
     state.navigationModel.points.forEach((point) => bounds.extend(new KM.LatLng(point.lat, point.lng)));
     state.map.setBounds(bounds, 86, 24, 170, 24);
+    refreshDirectionArrowsAfterMapMove();
   }
 
   function locateOnce() {
@@ -453,7 +521,10 @@
     if (!state.map || state.mapInteractionHandlersReady || !window.kakao?.maps?.event) return;
     const events = kakao.maps.event;
     events.addListener(state.map, 'dragstart', () => pauseAutoCenterForManualMapUse(false));
-    events.addListener(state.map, 'dragend', () => pauseAutoCenterForManualMapUse(true));
+    events.addListener(state.map, 'dragend', () => {
+      renderDirectionArrows();
+      pauseAutoCenterForManualMapUse(true);
+    });
     events.addListener(state.map, 'zoom_start', () => pauseAutoCenterForManualMapUse(false));
     events.addListener(state.map, 'zoom_changed', () => {
       renderDirectionArrows();
@@ -510,7 +581,10 @@
       state.myMarker.setPosition(pos);
       state.myMarker.setContent(markerEl);
     }
-    if (options.center) state.map.panTo(pos);
+    if (options.center) {
+      state.map.panTo(pos);
+      refreshDirectionArrowsAfterMapMove();
+    }
   }
 
   function updateRouteStatus(coords) {
@@ -796,32 +870,137 @@
   function renderDirectionArrows() {
     clearDirectionArrows();
     if (!state.map || !window.kakao?.maps || !state.navigationModel.totalDistanceM) return;
-    const count = getArrowCountForZoom();
-    if (count <= 0) return;
-    const total = state.navigationModel.totalDistanceM;
-    for (let i = 1; i <= count; i += 1) {
-      const distance = total * (i / (count + 1));
-      const point = getPointAtDistance(distance);
-      const bearing = getBearingAtDistance(distance);
-      const content = document.createElement('div');
-      content.className = 'direction-arrow';
-      content.style.transform = `rotate(${bearing}deg)`;
-      content.textContent = '▲';
-      const overlay = new kakao.maps.CustomOverlay({
-        position: new kakao.maps.LatLng(point.lat, point.lng),
-        content,
-        xAnchor: 0.5,
-        yAnchor: 0.5,
-        zIndex: 12
-      });
-      overlay.setMap(state.map);
-      state.arrowOverlays.push(overlay);
-    }
+    getArrowDistancesForCurrentView().forEach((distance) => renderDirectionArrowAtDistance(distance));
+  }
+
+  function renderDirectionArrowAtDistance(distance) {
+    const point = getPointAtDistance(distance);
+    const bearing = getBearingAtDistance(distance);
+    const content = document.createElement('div');
+    content.className = 'direction-arrow';
+    content.style.transform = `rotate(${bearing}deg)`;
+    content.textContent = '▲';
+    const overlay = new kakao.maps.CustomOverlay({
+      position: new kakao.maps.LatLng(point.lat, point.lng),
+      content,
+      xAnchor: 0.5,
+      yAnchor: 0.5,
+      zIndex: 12
+    });
+    overlay.setMap(state.map);
+    state.arrowOverlays.push(overlay);
   }
 
   function clearDirectionArrows() {
     state.arrowOverlays.forEach((overlay) => overlay.setMap(null));
     state.arrowOverlays = [];
+  }
+
+  function refreshDirectionArrowsAfterMapMove() {
+    window.setTimeout(renderDirectionArrows, 180);
+  }
+
+  function getArrowDistancesForCurrentView() {
+    const total = state.navigationModel.totalDistanceM;
+    const desiredCount = getArrowCountForZoom();
+    if (!total || desiredCount <= 0) return [];
+
+    const visibleDistances = getVisibleArrowDistances();
+    if (visibleDistances.length) {
+      return pickEvenlySpacedDistances(visibleDistances, Math.min(desiredCount, visibleDistances.length));
+    }
+
+    const fallback = [];
+    for (let i = 1; i <= desiredCount; i += 1) {
+      fallback.push(total * (i / (desiredCount + 1)));
+    }
+    return fallback;
+  }
+
+  function getVisibleArrowDistances() {
+    const bounds = state.map?.getBounds?.();
+    const center = getMapCenterPoint();
+    const candidates = [];
+    if (!bounds || !center) return candidates;
+
+    state.navigationModel.segments.forEach((segment) => {
+      if (!segmentCanTouchBounds(segment, bounds)) return;
+      const projected = projectPointToSegment(center, segment.a, segment.b);
+      const projectedDistance = segment.startDistanceM + (segment.endDistanceM - segment.startDistanceM) * projected.t;
+      const midpoint = interpolatePoint(segment.a, segment.b, 0.5);
+      const midpointDistance = (segment.startDistanceM + segment.endDistanceM) / 2;
+
+      if (pointIsInMapBounds(projected.point, bounds)) {
+        candidates.push(projectedDistance);
+      } else if (pointIsInMapBounds(midpoint, bounds)) {
+        candidates.push(midpointDistance);
+      } else if (pointIsInMapBounds(segment.a, bounds)) {
+        candidates.push(segment.startDistanceM);
+      } else if (pointIsInMapBounds(segment.b, bounds)) {
+        candidates.push(segment.endDistanceM);
+      }
+    });
+
+    return candidates.sort((a, b) => a - b);
+  }
+
+  function pickEvenlySpacedDistances(distances, count) {
+    const unique = [];
+    distances.forEach((distance) => {
+      const rounded = Math.round(distance);
+      if (!unique.length || Math.abs(unique[unique.length - 1] - rounded) >= 3) unique.push(rounded);
+    });
+    if (!unique.length) return [];
+    const safeCount = Math.max(1, Math.min(count, unique.length));
+    if (safeCount === 1) return [unique[Math.floor(unique.length / 2)]];
+    const selected = [];
+    for (let i = 0; i < safeCount; i += 1) {
+      const index = Math.round((unique.length - 1) * (i / (safeCount - 1)));
+      const value = unique[index];
+      if (!selected.includes(value)) selected.push(value);
+    }
+    return selected;
+  }
+
+  function getMapCenterPoint() {
+    const center = state.map?.getCenter?.();
+    if (!center || typeof center.getLat !== 'function' || typeof center.getLng !== 'function') return null;
+    return { lat: center.getLat(), lng: center.getLng() };
+  }
+
+  function pointIsInMapBounds(point, bounds) {
+    if (!point || !bounds) return false;
+    try {
+      if (typeof bounds.contain === 'function') {
+        return bounds.contain(new kakao.maps.LatLng(point.lat, point.lng));
+      }
+    } catch (_) {}
+    const edges = getBoundsEdges(bounds);
+    if (!edges) return false;
+    return point.lat >= edges.south && point.lat <= edges.north && point.lng >= edges.west && point.lng <= edges.east;
+  }
+
+  function segmentCanTouchBounds(segment, bounds) {
+    if (pointIsInMapBounds(segment.a, bounds) || pointIsInMapBounds(segment.b, bounds)) return true;
+    const edges = getBoundsEdges(bounds);
+    if (!edges) return false;
+    const minLat = Math.min(segment.a.lat, segment.b.lat);
+    const maxLat = Math.max(segment.a.lat, segment.b.lat);
+    const minLng = Math.min(segment.a.lng, segment.b.lng);
+    const maxLng = Math.max(segment.a.lng, segment.b.lng);
+    return maxLat >= edges.south && minLat <= edges.north && maxLng >= edges.west && minLng <= edges.east;
+  }
+
+  function getBoundsEdges(bounds) {
+    const sw = bounds?.getSouthWest?.();
+    const ne = bounds?.getNorthEast?.();
+    if (!sw || !ne || typeof sw.getLat !== 'function' || typeof ne.getLat !== 'function') return null;
+    return {
+      south: sw.getLat(),
+      west: sw.getLng(),
+      north: ne.getLat(),
+      east: ne.getLng()
+    };
   }
 
   function getArrowCountForZoom() {
