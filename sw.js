@@ -1,14 +1,14 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v49-dot-black-primary-intro-20260708';
+const CACHE_NAME = 'pilgrimage-route-nav-v50-compact-cards-navy-official-20260708';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260708-v49-dot-black-primary-intro',
-  './js/route-nav.js?v=20260708-v49-dot-black-primary-intro',
-  './routes/hanti-route-data-v1.js?v=20260708-v49-dot-black-primary-intro',
-  './routes/seoul-pilgrimage-routes.js?v=20260708-v49-dot-black-primary-intro',
-  './routes/nimui-gil-routes.js?v=20260708-v49-dot-black-primary-intro',
-  './routes/test-route-data-v1.js?v=20260708-v49-dot-black-primary-intro',
+  './css/route-nav.css?v=20260708-v50-compact-cards-navy-official',
+  './js/route-nav.js?v=20260708-v50-compact-cards-navy-official',
+  './routes/hanti-route-data-v1.js?v=20260708-v50-compact-cards-navy-official',
+  './routes/seoul-pilgrimage-routes.js?v=20260708-v50-compact-cards-navy-official',
+  './routes/nimui-gil-routes.js?v=20260708-v50-compact-cards-navy-official',
+  './routes/test-route-data-v1.js?v=20260708-v50-compact-cards-navy-official',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',

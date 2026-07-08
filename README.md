@@ -133,3 +133,10 @@
 - `코스소개` 버튼을 기본 강조색인 파란색 배경, 흰색 글자로 변경했습니다.
 - 캐시 버전: `pilgrimage-route-nav-v49-dot-black-primary-intro-20260708`
 
+
+## v50 수정 사항
+- 첫 화면 전국 순례길 목록 카드 높이를 줄였습니다.
+- 상세 화면 코스 카드 높이와 카드 간격을 줄였습니다.
+- 상세 화면 하단 `공식 홈페이지 / 상세보기` 버튼은 진한 남색 배경으로 변경하고, 버튼 높이는 더 크게 조정했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v50-compact-cards-navy-official-20260708`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v50compact`
