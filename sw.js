@@ -1,14 +1,14 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v38-nimui-start-finish-course-split-20260708';
+const CACHE_NAME = 'pilgrimage-route-nav-v41-wonju-course-intro-links-20260708';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260708-v38-nimui-start-finish-course-split',
-  './js/route-nav.js?v=20260708-v38-nimui-start-finish-course-split',
-  './routes/hanti-route-data-v1.js?v=20260708-v38-nimui-start-finish-course-split',
-  './routes/seoul-pilgrimage-routes.js?v=20260708-v38-nimui-start-finish-course-split',
-  './routes/nimui-gil-routes.js?v=20260708-v38-nimui-start-finish-course-split',
-  './routes/test-route-data-v1.js?v=20260708-v38-nimui-start-finish-course-split',
+  './css/route-nav.css?v=20260708-v41-wonju-course-intro-links',
+  './js/route-nav.js?v=20260708-v41-wonju-course-intro-links',
+  './routes/hanti-route-data-v1.js?v=20260708-v41-wonju-course-intro-links',
+  './routes/seoul-pilgrimage-routes.js?v=20260708-v41-wonju-course-intro-links',
+  './routes/nimui-gil-routes.js?v=20260708-v41-wonju-course-intro-links',
+  './routes/test-route-data-v1.js?v=20260708-v41-wonju-course-intro-links',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',

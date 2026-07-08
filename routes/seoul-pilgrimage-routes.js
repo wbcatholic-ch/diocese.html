@@ -16,6 +16,7 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     "startName": "명동 대성당",
     "finishName": "가회동 성당",
     "sourceNote": "서울순례길 1코스.gpx 기준 실제 GPX 경로선",
+    "courseIntroUrl": "https://martyrs.or.kr/_web/mpilgrims/aboutcourse.html?cidx=6",
     "routeGroup": "서울순례길",
     "features": {
       "showRouteLine": true,
@@ -3456,6 +3457,7 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     "startName": "가회동 성당",
     "finishName": "중림동 약현 성당",
     "sourceNote": "서울순례길 2코스.gpx 기준 실제 GPX 경로선",
+    "courseIntroUrl": "https://martyrs.or.kr/_web/mpilgrims/aboutcourse.html?cidx=7",
     "routeGroup": "서울순례길",
     "features": {
       "showRouteLine": true,
@@ -5772,6 +5774,7 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     "startName": "중림동 약현 성당",
     "finishName": "삼성산 성지",
     "sourceNote": "서울순례길 3코스.gpx 기준 실제 GPX 경로선",
+    "courseIntroUrl": "https://martyrs.or.kr/_web/mpilgrims/aboutcourse.html?cidx=8",
     "routeGroup": "서울순례길",
     "features": {
       "showRouteLine": true,
@@ -17241,6 +17244,7 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     "startName": "우포도청 터",
     "finishName": "절두산 순교 성지",
     "sourceNote": "김대건신부 치명 순교길.gpx 기준 실제 GPX 경로선",
+    "courseIntroUrl": "https://martyrs.or.kr/_web/mpilgrims/aboutcourse.html?cidx=109",
     "routeGroup": "서울순례길",
     "courseLabel": "김대건 신부 치명 순교길",
     "features": {

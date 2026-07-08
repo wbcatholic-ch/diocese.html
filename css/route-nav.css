@@ -284,23 +284,68 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-option-area > .route-option-grid { padding: 0; }
 .route-option-grid.single-column { grid-template-columns: 1fr; }
 .route-option-btn {
-  min-height: 66px;
+  min-height: 82px;
   border: 1.5px solid #d8c6aa;
   border-radius: 18px;
   background: #fff;
   color: #172033;
-  padding: 11px 13px;
+  padding: 0;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+  box-shadow: 0 5px 14px rgba(15,23,42,.08);
+}
+.route-option-btn.has-course-intro { grid-template-columns: minmax(0, 1fr) 74px; }
+.route-option-main {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 14px 15px;
   text-align: left;
   display: grid;
   align-content: center;
-  gap: 3px;
+  gap: 5px;
   cursor: pointer;
-  box-shadow: 0 5px 14px rgba(15,23,42,.08);
+  font-family: inherit;
 }
-.route-option-btn strong { font-size: 17px; font-weight: 950; letter-spacing: -.055em; color: var(--blue); }
-.route-option-btn span { font-size: 13px; font-weight: 900; letter-spacing: -.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.route-option-btn em { font-style: normal; font-size: 12px; color: var(--muted); font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.route-option-btn:active { transform: translateY(1px); }
+.route-option-main strong { font-size: 18px; font-weight: 950; letter-spacing: -.055em; color: var(--blue); }
+.route-option-main span { font-size: 13px; font-weight: 900; letter-spacing: -.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.route-option-main em { font-style: normal; font-size: 13px; color: var(--muted); font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.route-option-course-intro {
+  width: 58px;
+  height: 58px;
+  align-self: center;
+  justify-self: center;
+  border: 1.5px solid #c6d3e6;
+  border-radius: 15px;
+  background: #f8fbff;
+  color: #0B1D3B;
+  font-size: 12px;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -.065em;
+  word-break: keep-all;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 10px rgba(11, 29, 59, .10);
+}
+.route-option-course-intro::after { content: '↗'; display: block; margin-top: 2px; font-size: 12px; line-height: 1; }
+.route-option-btn.route-option-full {
+  min-height: 86px;
+  border-color: #0B1D3B;
+  background: linear-gradient(135deg, #0B1D3B 0%, #163568 100%);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(11, 29, 59, .20);
+}
+.route-option-btn.route-option-full .route-option-main strong,
+.route-option-btn.route-option-full .route-option-main span,
+.route-option-btn.route-option-full .route-option-main em { color: #fff; }
+.route-option-main:active,
+.route-option-course-intro:active { transform: translateY(1px); }
 .route-card-main { display: flex; gap: 13px; align-items: center; padding: 16px; }
 .route-icon { width: 52px; height: 52px; flex: 0 0 auto; border-radius: 18px; display: grid; place-items: center; background: #eaf2ff; font-size: 24px; }
 .route-copy { min-width: 0; flex: 1; }

@@ -40,6 +40,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "en": "Looking Back Path",
       "distanceLabel": "10.5km",
       "durationLabel": "4시간 30분",
+      "courseIntroUrl": "https://hantigil.or.kr/content/23?class=one",
       "stampIds": ["1-1", "1-2", "1-3", "1-4"]
     },
     {
@@ -49,6 +50,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "en": "Emptying Path",
       "distanceLabel": "9.5km",
       "durationLabel": "4시간",
+      "courseIntroUrl": "https://hantigil.or.kr/content/23?class=one",
       "stampIds": ["2-1", "2-2", "2-3"]
     },
     {
@@ -58,6 +60,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "en": "Path of Repentance",
       "distanceLabel": "9km",
       "durationLabel": "4시간",
+      "courseIntroUrl": "https://hantigil.or.kr/content/23?class=one",
       "stampIds": ["3-1", "3-2", "3-3", "3-4"]
     },
     {
@@ -67,6 +70,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "en": "Path of Forgiveness",
       "distanceLabel": "8.5km",
       "durationLabel": "4시간",
+      "courseIntroUrl": "https://hantigil.or.kr/content/23?class=one",
       "stampIds": ["4-1", "4-2", "4-3", "4-4"]
     },
     {
@@ -76,6 +80,7 @@ window.PILGRIMAGE_ROUTE_HANTI = {
       "en": "Road of Love",
       "distanceLabel": "8.1km",
       "durationLabel": "3시간 30분",
+      "courseIntroUrl": "https://hantigil.or.kr/content/23?class=one",
       "stampIds": ["5-1", "5-2", "5-3", "5-4", "5-5"]
     }
   ],

@@ -456,6 +456,7 @@
       label: `${course.courseNo || ''}코스 ${course.name || ''}`.trim(),
       title: '',
       meta: [course.distanceLabel, course.durationLabel].filter(Boolean).join(' · '),
+      introUrl: course.courseIntroUrl || '',
       route: createHantiCourseRoute(route, course)
     })) : [];
     return {
@@ -471,6 +472,7 @@
           label: '한티가는길 전체',
           title: '',
           meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
+          variant: 'full-route',
           route
         },
         ...courseOptions
@@ -487,6 +489,7 @@
         label: '천주교 서울순례길 1~3코스 전체',
         title: '',
         meta: '44.1km · 1~3코스',
+        variant: 'full-route',
         route: createSeoulFullRoute(fullCourseRoutes)
       });
     }
@@ -495,6 +498,7 @@
         label: seoulRouteOptionLabel(route),
         title: '',
         meta: seoulRouteOfficialMeta(route),
+        introUrl: route.courseIntroUrl || '',
         route
       });
     });
@@ -532,6 +536,7 @@
         label: route.shortName || route.name,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
         meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
+        introUrl: route.courseIntroUrl || '',
         route
       });
     });
@@ -567,16 +572,34 @@
     `;
     const area = card.querySelector('.route-option-area');
     const renderOption = (option, parent) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'route-option-btn';
-      btn.innerHTML = `
+      const item = document.createElement('div');
+      item.className = `route-option-btn${option.variant === 'full-route' ? ' route-option-full' : ''}${option.introUrl ? ' has-course-intro' : ''}`;
+
+      const mainBtn = document.createElement('button');
+      mainBtn.type = 'button';
+      mainBtn.className = 'route-option-main';
+      mainBtn.innerHTML = `
         <strong>${escapeHtml(option.label || '선택')}</strong>
         ${option.title ? `<span>${escapeHtml(option.title)}</span>` : ''}
         ${option.meta ? `<em>${escapeHtml(option.meta)}</em>` : ''}
       `;
-      btn.addEventListener('click', () => openRoute(option.route));
-      parent.appendChild(btn);
+      mainBtn.addEventListener('click', () => openRoute(option.route));
+      item.appendChild(mainBtn);
+
+      if (option.introUrl) {
+        const introBtn = document.createElement('button');
+        introBtn.type = 'button';
+        introBtn.className = 'route-option-course-intro';
+        introBtn.textContent = '코스소개';
+        introBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openExternalUrl(option.introUrl);
+        });
+        item.appendChild(introBtn);
+      }
+
+      parent.appendChild(item);
     };
     if (Array.isArray(group.sections) && group.sections.length) {
       group.sections.forEach((section) => {
