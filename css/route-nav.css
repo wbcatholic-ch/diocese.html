@@ -264,12 +264,24 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
 .route-group-card { cursor: default; }
 .route-group-card .route-card-main { padding-bottom: 12px; }
+.route-option-area { display: grid; gap: 14px; padding: 0 14px 14px; }
+.route-option-section {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1.5px solid #eadfce;
+  border-radius: 18px;
+  background: rgba(255, 248, 233, .64);
+}
+.route-option-section-head { display: grid; gap: 3px; }
+.route-option-section-head strong { color: #172033; font-size: 15px; font-weight: 950; letter-spacing: -.055em; }
+.route-option-section-head span { color: #7a4f10; font-size: 12px; font-weight: 900; letter-spacing: -.035em; }
 .route-option-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  padding: 0 14px 14px;
 }
+.route-option-area > .route-option-grid { padding: 0; }
 .route-option-grid.single-column { grid-template-columns: 1fr; }
 .route-option-btn {
   min-height: 66px;

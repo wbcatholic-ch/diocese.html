@@ -28,7 +28,7 @@
 
 작업 원칙: 패치성 덧붙임 없이 `routes/nimui-gil-routes.js`, `js/route-nav.js`, `sw.js`, `index.html`, `README.md`의 owner 위치에서 직접 수정했습니다.
 
-- 캐시 버전: `pilgrimage-route-nav-v37-nimui-official-table-2-split-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v38-nimui-start-finish-course-split-20260708`
 
 
 ## V37 수정

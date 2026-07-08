@@ -516,27 +516,34 @@
       ['1길 최양업 신부님의 길', '1길 최양업 신부님의 길 · 전체 길이 122.6km'],
       ['2길 최해성 요한의 길', '2길 최해성 요한의 길 · 전체 길이 37.8km']
     ]);
-    const detailLines = [];
+    const sections = [];
     orderedRoutes.forEach((route) => {
       const groupName = route.parentCourseGroup || '님의 길';
-      const line = groupSummaryMap.get(groupName) || groupName;
-      if (!detailLines.includes(line)) detailLines.push(line);
+      let section = sections.find((item) => item.title === groupName);
+      if (!section) {
+        section = {
+          title: groupName,
+          summary: groupSummaryMap.get(groupName) || groupName,
+          options: []
+        };
+        sections.push(section);
+      }
+      section.options.push({
+        label: route.shortName || route.name,
+        title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
+        meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
+        route
+      });
     });
     return {
       kind: 'group',
       id: 'nimui-route-group',
       icon: '✝️',
       title: '원주교구 순례길 ‘님의 길’',
-      meta: '상세 코스를 선택하세요.',
-      detailLines,
+      meta: '길별 상세 코스를 선택하세요.',
       foot: `${orderedRoutes.length}개 코스 연결`,
       optionLayout: 'single',
-      options: orderedRoutes.map((route) => ({
-        label: route.shortName || route.name,
-        title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
-        meta: [route.parentCourseGroup, route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
-        route
-      }))
+      sections
     };
   }
 
@@ -554,12 +561,12 @@
         </div>
       </div>
       ${Array.isArray(group.detailLines) && group.detailLines.length ? `<ul class="trail-detail-lines">${group.detailLines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>` : ''}
-      <div class="route-option-grid${group.optionLayout === 'single' ? ' single-column' : ''}"></div>
+      <div class="route-option-area"></div>
       ${group.officialUrl ? `<div class="route-detail-actions"><button type="button" class="route-detail-link" data-url="${escapeHtml(group.officialUrl)}">공식 홈페이지 / 상세보기</button></div>` : ''}
       <div class="route-foot route-group-foot"><span>${escapeHtml(group.foot || '')}</span></div>
     `;
-    const grid = card.querySelector('.route-option-grid');
-    (group.options || []).forEach((option) => {
+    const area = card.querySelector('.route-option-area');
+    const renderOption = (option, parent) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'route-option-btn';
@@ -569,8 +576,29 @@
         ${option.meta ? `<em>${escapeHtml(option.meta)}</em>` : ''}
       `;
       btn.addEventListener('click', () => openRoute(option.route));
-      grid.appendChild(btn);
-    });
+      parent.appendChild(btn);
+    };
+    if (Array.isArray(group.sections) && group.sections.length) {
+      group.sections.forEach((section) => {
+        const sectionEl = document.createElement('section');
+        sectionEl.className = 'route-option-section';
+        sectionEl.innerHTML = `
+          <div class="route-option-section-head">
+            <strong>${escapeHtml(section.title || '')}</strong>
+            ${section.summary ? `<span>${escapeHtml(section.summary)}</span>` : ''}
+          </div>
+          <div class="route-option-grid${group.optionLayout === 'single' ? ' single-column' : ''}"></div>
+        `;
+        const grid = sectionEl.querySelector('.route-option-grid');
+        (section.options || []).forEach((option) => renderOption(option, grid));
+        area.appendChild(sectionEl);
+      });
+    } else {
+      const grid = document.createElement('div');
+      grid.className = `route-option-grid${group.optionLayout === 'single' ? ' single-column' : ''}`;
+      area.appendChild(grid);
+      (group.options || []).forEach((option) => renderOption(option, grid));
+    }
     card.querySelector('[data-url]')?.addEventListener('click', (event) => openExternalUrl(event.currentTarget.dataset.url));
     list.appendChild(card);
   }

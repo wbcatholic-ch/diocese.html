@@ -9336,8 +9336,8 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
     "distanceLabel": "23.5km",
     "durationLabel": "6시간",
     "courseSummaryLabel": "23.5km · 6시간",
-    "startName": "아홉고개길 시작",
-    "finishName": "아홉고개길 도착",
+    "startName": "옛 구재공소",
+    "finishName": "문막성당",
     "sourceNote": "nimui-gil-1-3-nine-pass-road.gpx 기준 실제 GPX 경로선",
     "features": {
       "showRouteLine": true,
@@ -9351,7 +9351,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "start",
         "order": 1,
-        "name": "아홉고개길 시작",
+        "name": "옛 구재공소",
         "role": "start",
         "lat": 37.40922795,
         "lng": 127.8032491
@@ -9359,7 +9359,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "finish",
         "order": 2,
-        "name": "아홉고개길 도착",
+        "name": "문막성당",
         "role": "finish",
         "lat": 37.37429325,
         "lng": 127.79370339
@@ -17507,8 +17507,8 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
     "distanceLabel": "21.6km",
     "durationLabel": "5시간",
     "courseSummaryLabel": "21.6km · 5시간",
-    "startName": "서지강변길 출발지",
-    "finishName": "서지강변길 도착지",
+    "startName": "문막성당",
+    "finishName": "서지마을",
     "sourceNote": "nimui-gil-1-4-seoji-gangbyeon.gpx 기준 실제 GPX 경로선",
     "features": {
       "showRouteLine": true,
@@ -17522,7 +17522,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "start",
         "order": 1,
-        "name": "서지강변길 출발지",
+        "name": "문막성당",
         "role": "start",
         "lat": 37.3107807,
         "lng": 127.81894117
@@ -17530,7 +17530,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "finish",
         "order": 2,
-        "name": "서지강변길 도착지",
+        "name": "서지마을",
         "role": "finish",
         "lat": 37.2191186,
         "lng": 127.81734207
@@ -25474,8 +25474,8 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
     "distanceLabel": "19.9km",
     "durationLabel": "5시간",
     "courseSummaryLabel": "19.9km · 5시간",
-    "startName": "서고개길 시작",
-    "finishName": "서고개길 도착",
+    "startName": "서지마을",
+    "finishName": "귀래공소",
     "sourceNote": "nimui-gil-1-5-seogogae.gpx 기준 실제 GPX 경로선",
     "features": {
       "showRouteLine": true,
@@ -25489,7 +25489,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "start",
         "order": 1,
-        "name": "서고개길 시작",
+        "name": "서지마을",
         "role": "start",
         "lat": 37.21809328,
         "lng": 127.82109641
@@ -25497,7 +25497,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "finish",
         "order": 2,
-        "name": "서고개길 도착",
+        "name": "귀래공소",
         "role": "finish",
         "lat": 37.17413099,
         "lng": 127.8875944
@@ -32921,8 +32921,8 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
     "distanceLabel": "16.4km",
     "durationLabel": "4시간",
     "courseSummaryLabel": "16.4km · 4시간",
-    "startName": "꽃댕이길 시작",
-    "finishName": "꽃댕이길 도착",
+    "startName": "귀래공소",
+    "finishName": "화당리 순교자공원",
     "sourceNote": "nimui-gil-1-6-kkotdaengi.gpx 기준 실제 GPX 경로선",
     "features": {
       "showRouteLine": true,
@@ -32936,7 +32936,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "start",
         "order": 1,
-        "name": "꽃댕이길 시작",
+        "name": "귀래공소",
         "role": "start",
         "lat": 37.1739932,
         "lng": 127.88766003
@@ -32944,7 +32944,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "finish",
         "order": 2,
-        "name": "꽃댕이길 도착",
+        "name": "화당리 순교자공원",
         "role": "finish",
         "lat": 37.17066135,
         "lng": 127.98890144
@@ -39100,8 +39100,8 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
     "distanceLabel": "15.3km",
     "durationLabel": "4시간",
     "courseSummaryLabel": "15.3km · 4시간",
-    "startName": "양업길 시작",
-    "finishName": "양업길 도착",
+    "startName": "화당리 순교자공원",
+    "finishName": "배론성지",
     "sourceNote": "nimui-gil-1-7-yangeop.gpx 기준 실제 GPX 경로선",
     "features": {
       "showRouteLine": true,
@@ -39115,7 +39115,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "start",
         "order": 1,
-        "name": "양업길 시작",
+        "name": "화당리 순교자공원",
         "role": "start",
         "lat": 37.17044942,
         "lng": 127.98880328
@@ -39123,7 +39123,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
       {
         "id": "finish",
         "order": 2,
-        "name": "양업길 도착",
+        "name": "배론성지",
         "role": "finish",
         "lat": 37.16141452,
         "lng": 128.08359766
