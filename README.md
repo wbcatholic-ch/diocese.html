@@ -156,3 +156,9 @@
 - 이미지 생성 없이 실제 CSS owner(`css/route-nav.css`)에서 직접 수정했습니다.
 - 캐시 버전: `pilgrimage-route-nav-v52-align-detail-lines-20260708`
 - GitHub 업로드 후 확인용 쿼리: `?fresh=v52alignlines`
+
+## v53 수정 사항
+- 상세 페이지 내부 카드 테두리를 한 단계 더 굵게 조정했습니다.
+- 대상: 코스 카드, 전체코스 보기 카드, 길 구분 헤더, 안내 박스.
+- 캐시 버전: `pilgrimage-route-nav-v53-detail-card-border-20260708`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v53detailborder`
