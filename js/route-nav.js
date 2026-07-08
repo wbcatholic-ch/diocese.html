@@ -299,7 +299,7 @@
 
   function renderNationalTrailList() {
     const list = $('route-list');
-    updateRouteListHero('전국 순례길', 'CATHOLIC PILGRIMAGE', true);
+    updateRouteListHero('', '', false);
     if (!list) return;
     list.innerHTML = '';
     NATIONAL_TRAIL_CATALOG.forEach((trail) => {
@@ -364,12 +364,6 @@
     updateRouteListHero('', '', false);
     if (!list) return;
     list.innerHTML = '';
-    const back = document.createElement('button');
-    back.type = 'button';
-    back.className = 'trail-detail-back';
-    back.textContent = '‹ 전국 가톨릭 순례길';
-    back.addEventListener('click', closeTrailDetail);
-    list.appendChild(back);
     if (!trail) return;
 
     const group = buildTrailDetailGroup(trail);
@@ -382,9 +376,7 @@
 
   function updateRouteListHero(title, description, visible = true) {
     const hero = document.querySelector('.hero-card');
-    const tabs = document.querySelector('.national-tabs');
     if (hero) hero.hidden = !visible;
-    if (tabs) tabs.hidden = !visible;
     if ($('route-list-title')) $('route-list-title').textContent = title;
     if ($('route-list-desc')) $('route-list-desc').textContent = description;
   }
@@ -422,17 +414,18 @@
     const card = document.createElement('section');
     card.className = 'route-card route-group-card route-detail-card';
     card.innerHTML = `
-      <div class="route-card-main">
+      <div class="route-card-main route-detail-title-row">
         <div class="route-icon">${escapeHtml(trail.icon || '🧭')}</div>
         <div class="route-copy">
           <div class="route-name-row"><h3 class="route-name">${escapeHtml(trail.title)}</h3></div>
-          <div class="route-meta">${escapeHtml(trail.diocese || '')}</div>
         </div>
+        <button type="button" class="route-detail-close-btn" aria-label="상세 닫기">×</button>
       </div>
       <div class="trail-detail-note">${escapeHtml(trail.description || '상세 코스 데이터는 준비 중입니다.')}</div>
       ${trail.officialUrl ? `<div class="route-detail-actions"><button type="button" class="route-detail-link" data-url="${escapeHtml(trail.officialUrl)}">공식 홈페이지 / 상세보기</button></div>` : ''}
     `;
     card.querySelector('[data-url]')?.addEventListener('click', (event) => openExternalUrl(event.currentTarget.dataset.url));
+    card.querySelector('.route-detail-close-btn')?.addEventListener('click', closeTrailDetail);
     list.appendChild(card);
   }
 
@@ -556,14 +549,14 @@
     const card = document.createElement('section');
     card.className = 'route-card route-group-card route-detail-card';
     card.innerHTML = `
-      <div class="route-card-main">
+      <div class="route-card-main route-detail-title-row">
         <div class="route-icon">${escapeHtml(group.icon || '🧭')}</div>
         <div class="route-copy">
           <div class="route-name-row">
             <h3 class="route-name">${escapeHtml(group.title || '순례길')}</h3>
           </div>
-          <div class="route-meta">${escapeHtml(group.meta || '')}</div>
         </div>
+        <button type="button" class="route-detail-close-btn" aria-label="상세 닫기">×</button>
       </div>
       ${Array.isArray(group.detailLines) && group.detailLines.length ? `<ul class="trail-detail-lines">${group.detailLines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>` : ''}
       <div class="route-option-area"></div>
@@ -608,7 +601,6 @@
         sectionEl.innerHTML = `
           <div class="route-option-section-head">
             <strong>${escapeHtml(section.title || '')}</strong>
-            ${section.summary ? `<span>${escapeHtml(section.summary)}</span>` : ''}
           </div>
           <div class="route-option-grid${group.optionLayout === 'single' ? ' single-column' : ''}"></div>
         `;
@@ -623,6 +615,7 @@
       (group.options || []).forEach((option) => renderOption(option, grid));
     }
     card.querySelector('[data-url]')?.addEventListener('click', (event) => openExternalUrl(event.currentTarget.dataset.url));
+    card.querySelector('.route-detail-close-btn')?.addEventListener('click', closeTrailDetail);
     list.appendChild(card);
   }
 
