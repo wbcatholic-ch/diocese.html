@@ -288,6 +288,7 @@
 
   function renderNationalTrailList() {
     const list = $('route-list');
+    $('route-list-view')?.classList.remove('detail-mode');
     updateRouteListHero('전국 가톨릭 순례길', '목록을 누르면 상세 코스로 이동합니다.', true);
     if (!list) return;
     list.innerHTML = '';
@@ -348,6 +349,7 @@
   function renderTrailDetail(trailId) {
     const list = $('route-list');
     const trail = NATIONAL_TRAIL_CATALOG.find((item) => item.id === trailId);
+    $('route-list-view')?.classList.add('detail-mode');
     updateRouteListHero('', '', false);
     if (!list) return;
     list.innerHTML = '';

@@ -28,7 +28,7 @@
 
 작업 원칙: 패치성 덧붙임 없이 `routes/nimui-gil-routes.js`, `js/route-nav.js`, `sw.js`, `index.html`, `README.md`의 owner 위치에서 직접 수정했습니다.
 
-- 캐시 버전: `pilgrimage-route-nav-v46-standard-header-blue-list-detail-gray-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
 
 
 ## V37 수정
@@ -61,7 +61,7 @@
 - `코스소개` 버튼은 각 코스의 원주교구 님의 길 공식 소개 페이지로 연결됩니다.
 - 카드 본문 클릭은 기존처럼 앱 내 순례길 내비게이션을 시작하고, `코스소개` 버튼 클릭은 공식 소개 페이지만 열도록 분리했습니다.
 - 현재 앱에 아직 들어오지 않은 3-1~3-5 코스는 화면에 표시하지 않았습니다. 추후 GPX와 코스 데이터를 추가할 때 course_10~course_14 URL을 연결하면 됩니다.
-- 캐시 버전: `pilgrimage-route-nav-v46-standard-header-blue-list-detail-gray-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
 
 
 
@@ -74,7 +74,7 @@
 - 상세 카드 제목 영역과 님의 길 1길/2길 구분 제목은 진한 배경으로 처리하고, 제목 아래 보조 설명은 표시하지 않도록 정리했습니다.
 - 전체 경로 버튼과 코스 버튼은 어두운 남색 배경 대신 밝은 배경으로 변경했습니다.
 - `코스소개` 버튼 아래 화살표 표시는 제거하고, 카드 본문 클릭과 코스소개 클릭은 계속 분리되어 동작합니다.
-- 캐시 버전: `pilgrimage-route-nav-v46-standard-header-blue-list-detail-gray-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
 
 
 ## v43 수정 사항
@@ -84,7 +84,7 @@
 - 순례길 상세 코스 카드를 중첩된 박스/iframe처럼 보이게 하던 안쪽 테두리와 여백을 줄이고, 코스 카드 폭을 넓혔습니다.
 - 코스 카드 글자 크기를 리스트 카드 기준에 맞춰 키우고, 출발지~도착지와 거리/시간이 답답하게 잘리지 않도록 줄바꿈 가능하게 수정했습니다.
 - 코스 카드 높이와 `코스소개` 버튼 터치 영역을 키워, 순례길처럼 정보가 많은 카드가 자연스럽게 보이도록 조정했습니다.
-- 캐시 버전: `pilgrimage-route-nav-v46-standard-header-blue-list-detail-gray-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
 
 ## v44 수정 사항
 
@@ -92,7 +92,7 @@
 - 상세 화면 제목 영역과 코스 구역 제목의 과한 남색 배경을 표준 밝은 카드 색상으로 정리했습니다.
 - 코스 카드와 `코스소개` 버튼을 밝은 배경으로 통일해 헤더처럼 보이지 않게 했습니다.
 - v43에서 넓힌 목록/상세 카드 폭과 큰 글자 기준은 유지했습니다.
-- 캐시 버전: `pilgrimage-route-nav-v46-standard-header-blue-list-detail-gray-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
 
 
 
@@ -100,12 +100,20 @@
 - 전국 순례길 첫 목록 카드 하단의 웹사이트 주소 텍스트를 삭제했습니다.
 - 첫 목록 카드 하단 버튼 문구를 `공식 홈페이지 열기`로 적용했습니다.
 - 주소가 사라진 하단 영역에서 버튼이 오른쪽에 자연스럽게 배치되도록 기존 목록 카드 CSS owner를 직접 수정했습니다.
-- 캐시 버전: `pilgrimage-route-nav-v46-standard-header-blue-list-detail-gray-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
 
 
 ## v46 수정 사항
 - 첫 목록 화면 헤더를 가톨릭길동무 표준형에 맞춰 진한 남색 헤더로 정리했습니다.
 - 첫 목록 카드 테두리를 파란색 기준으로 통일했습니다.
 - 상세 화면은 상단 제목 영역만 진한 남색, 내부 전체 배경은 연한 회색, 코스 카드들은 흰색으로 구분했습니다.
-- 캐시 버전: `pilgrimage-route-nav-v46-standard-header-blue-list-detail-gray-20260708`
-- 확인용 쿼리: `?fresh=v46detailgray`
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
+- 확인용 쿼리: `?fresh=v47standardfull`
+
+
+## v47 수정 사항
+- 첫 목록 화면 헤더를 가톨릭길동무 표준형에 맞춰 높이와 글자 크기를 줄였습니다.
+- 상세 화면의 외곽 액자형 카드 느낌을 제거하고, 전체 화면 배경 안에 코스 카드가 들어가는 구조로 정리했습니다.
+- 상세 화면 배경은 중립적인 연회색으로 정리하고, 하단 코스 카드는 흰색 배경으로 통일했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
+- 확인용 쿼리: `?fresh=v47standardfull`
