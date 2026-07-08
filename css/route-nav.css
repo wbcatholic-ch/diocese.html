@@ -328,8 +328,8 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   border: 2px solid #fee2e2;
   box-shadow: 0 0 0 1px rgba(185, 28, 28, .24), 0 2px 5px rgba(185, 28, 28, .22);
 }
-.route-option-main span { font-size: 14px; line-height: 1.32; font-weight: 900; letter-spacing: -.04em; white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; color: #334155; }
-.route-option-main em { font-style: normal; font-size: 14px; line-height: 1.32; color: var(--muted); font-weight: 850; white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; }
+.route-option-main span { display: block; padding-left: 21px; font-size: 14px; line-height: 1.32; font-weight: 900; letter-spacing: -.04em; white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; color: #334155; }
+.route-option-main em { display: block; padding-left: 21px; font-style: normal; font-size: 14px; line-height: 1.32; color: var(--muted); font-weight: 850; white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; }
 .route-option-course-intro {
   width: 64px;
   height: 64px;

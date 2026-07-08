@@ -140,3 +140,19 @@
 - 상세 화면 하단 `공식 홈페이지 / 상세보기` 버튼은 진한 남색 배경으로 변경하고, 버튼 높이는 더 크게 조정했습니다.
 - 캐시 버전: `pilgrimage-route-nav-v50-compact-cards-navy-official-20260708`
 - GitHub 업로드 후 확인용 쿼리: `?fresh=v50compact`
+
+
+## v51 수정 사항
+
+- 목록 카드와 상세 코스 카드의 테두리 두께를 한 단계 더 굵게 조정했습니다.
+- 상세 화면의 코스 구역 카드, 전체코스 카드, 코스소개 버튼, 안내 카드 테두리를 함께 정리했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v51-thicker-card-borders-20260708`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v51border`
+
+
+## v52 수정 사항
+
+- 상세 코스 카드에서 둘째 줄(출발~도착)과 셋째 줄(거리·시간)의 시작점을 첫째 줄 코스 제목 시작점에 맞췄습니다.
+- 이미지 생성 없이 실제 CSS owner(`css/route-nav.css`)에서 직접 수정했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v52-align-detail-lines-20260708`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v52alignlines`
