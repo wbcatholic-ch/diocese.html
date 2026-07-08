@@ -242,7 +242,7 @@
 
   function renderNationalTrailList() {
     const list = $('route-list');
-    updateRouteListHero('전국 가톨릭 순례길', '목록을 누르면 상세 코스로 이동합니다.');
+    updateRouteListHero('전국 가톨릭 순례길', '목록을 누르면 상세 코스로 이동합니다.', true);
     if (!list) return;
     list.innerHTML = '';
     NATIONAL_TRAIL_CATALOG.forEach((trail, index) => {
@@ -278,7 +278,7 @@
   function renderTrailDetail(trailId) {
     const list = $('route-list');
     const trail = NATIONAL_TRAIL_CATALOG.find((item) => item.id === trailId);
-    updateRouteListHero(trail?.title || '순례길 상세', `${trail?.diocese || ''}${trail?.diocese ? ' · ' : ''}상세 코스를 선택하세요.`);
+    updateRouteListHero('', '', false);
     if (!list) return;
     list.innerHTML = '';
     const back = document.createElement('button');
@@ -297,7 +297,9 @@
     renderUnavailableTrailDetail(list, trail);
   }
 
-  function updateRouteListHero(title, description) {
+  function updateRouteListHero(title, description, visible = true) {
+    const hero = document.querySelector('.hero-card');
+    if (hero) hero.hidden = !visible;
     if ($('route-list-title')) $('route-list-title').textContent = title;
     if ($('route-list-desc')) $('route-list-desc').textContent = description;
   }
@@ -421,6 +423,7 @@
       meta: '1길 최양업 신부님의 길',
       detailLines: ['1길 최양업 신부님의 길'],
       foot: `${orderedRoutes.length}개 코스 연결`,
+      optionLayout: 'single',
       options: orderedRoutes.map((route) => ({
         label: route.shortName || route.name,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
@@ -444,9 +447,9 @@
         </div>
       </div>
       ${Array.isArray(group.detailLines) && group.detailLines.length ? `<ul class="trail-detail-lines">${group.detailLines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>` : ''}
-      <div class="route-option-grid"></div>
+      <div class="route-option-grid${group.optionLayout === 'single' ? ' single-column' : ''}"></div>
       ${group.officialUrl ? `<div class="route-detail-actions"><button type="button" class="route-detail-link" data-url="${escapeHtml(group.officialUrl)}">공식 홈페이지 / 상세보기</button></div>` : ''}
-      <div class="route-foot"><span>${escapeHtml(group.foot || '')}</span><strong>코스 선택</strong></div>
+      <div class="route-foot route-group-foot"><span>${escapeHtml(group.foot || '')}</span></div>
     `;
     const grid = card.querySelector('.route-option-grid');
     (group.options || []).forEach((option) => {

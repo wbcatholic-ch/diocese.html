@@ -2,6 +2,14 @@
 
 가톨릭길동무 본앱에 나중에 병합하기 위해 분리한 순례길 내비게이션 전용 PWA입니다.
 
+
+## V30 상세 코스 카드 정리
+
+- 순례길 상세 화면에서는 상단 안내 헤더 카드를 숨겨 지도/목록 진입 흐름을 간결하게 정리했습니다.
+- 원주교구 순례길 `님의 길` 상세 코스는 각 코스가 한 줄에 하나씩 보이도록 정리했습니다.
+- 상세 카드 하단에서는 `코스 선택` 문구를 삭제하고, 연결 가능한 코스 수만 표시합니다.
+- 패치성 덧붙임 없이 목록/상세 렌더링 owner인 `js/route-nav.js`와 카드 스타일 owner인 `css/route-nav.css`에서 직접 수정했습니다.
+
 ## 수정 원칙
 
 - 패치식 덧붙임 수정 금지
@@ -93,7 +101,7 @@
 
 ## 캐시 버전
 
-`pilgrimage-route-nav-v29-nimui-1-2-replaced-20260708`
+`pilgrimage-route-nav-v30-detail-card-layout-20260708`
 
 GitHub Pages 업로드 후 아래처럼 확인하세요.
 
@@ -108,7 +116,7 @@ GitHub Pages 업로드 후 아래처럼 확인하세요.
 - 표시 정보: `21.4km · 5시간`.
 - 업로드된 `님의길1-4-1.gpx`와 `님의길1-4-2.gpx`를 하나의 경로로 연결해 `gpx/nimui-gil-1-4-seoji-gangbyeon.gpx`에 저장했습니다.
 - 데이터 owner인 `routes/nimui-gil-routes.js`에서 직접 코스 데이터와 GPX 경로를 연결했습니다.
-- 캐시 버전: `pilgrimage-route-nav-v29-nimui-1-2-replaced-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v30-detail-card-layout-20260708`
 - 테스트 URL: `?fresh=v29nimui12`
 
 
@@ -118,5 +126,5 @@ GitHub Pages 업로드 후 아래처럼 확인하세요.
 - 프로젝트 저장 경로는 기존 owner 경로인 `gpx/nimui-gil-1-2-ne-gongso.gpx`를 유지했습니다.
 - 데이터 owner인 `routes/nimui-gil-routes.js`에서 `1-2 네 공소길`의 경로 points와 시작/종료 지점 좌표를 새 GPX 기준으로 직접 교체했습니다.
 - 표시 정보는 기존 요청값인 `15.4km · 4시간`을 유지했습니다.
-- 캐시 버전: `pilgrimage-route-nav-v29-nimui-1-2-replaced-20260708`
+- 캐시 버전: `pilgrimage-route-nav-v30-detail-card-layout-20260708`
 - 테스트 URL: `?fresh=v29nimui12`
