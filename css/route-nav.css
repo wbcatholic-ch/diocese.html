@@ -36,6 +36,102 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .hero-card h2 { margin: 12px 0 8px; font-size: 24px; letter-spacing: -.07em; }
 .hero-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; word-break: keep-all; }
 .route-list { display: grid; gap: 12px; }
+
+.trail-catalog-card {
+  width: 100%;
+  min-height: 72px;
+  border: 2px solid var(--line);
+  border-radius: 21px;
+  background: linear-gradient(180deg, #fffdf8, #faf4eb);
+  box-shadow: 0 8px 22px rgba(31, 42, 68, .08);
+  padding: 13px 14px;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+.trail-catalog-card:active { transform: translateY(1px); }
+.trail-index {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #fff7e8;
+  color: #7a4f10;
+  border: 1px solid #ddb979;
+  font-size: 14px;
+  font-weight: 950;
+}
+.trail-icon { font-size: 22px; line-height: 1; }
+.trail-copy { min-width: 0; display: grid; gap: 3px; }
+.trail-copy strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
+  font-weight: 950;
+  letter-spacing: -.06em;
+}
+.trail-copy em { color: var(--muted); font-style: normal; font-size: 13px; font-weight: 850; }
+.trail-arrow { color: #b7791f; font-size: 27px; font-weight: 950; }
+.trail-detail-back {
+  width: max-content;
+  border: 1.5px solid #d8c6aa;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #172033;
+  padding: 9px 13px;
+  font-size: 14px;
+  font-weight: 950;
+  box-shadow: 0 5px 14px rgba(15,23,42,.08);
+  cursor: pointer;
+}
+.route-detail-card { overflow: hidden; }
+.trail-detail-lines {
+  margin: 0 14px 13px;
+  padding: 12px 14px;
+  list-style: none;
+  border-radius: 16px;
+  background: #fff8e9;
+  border: 1px solid #ead2a8;
+  color: #3b2b11;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+.trail-detail-note {
+  margin: 0 14px 13px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #fff8e9;
+  border: 1px solid #ead2a8;
+  color: #5f4730;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+.route-detail-actions {
+  padding: 0 14px 14px;
+}
+.route-detail-link {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 16px;
+  background: #0B1D3B;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(11,29,59,.18);
+}
 .route-card { width: 100%; text-align: left; padding: 0; overflow: hidden; border-width: 2px; cursor: pointer; background: linear-gradient(180deg, #fffdf8, #faf4eb); }
 
 .route-group-card { cursor: default; }

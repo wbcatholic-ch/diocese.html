@@ -14,9 +14,87 @@
   const MAX_TRACK_POINTS = 5000;
   const SEOUL_FALLBACK = { lat: 37.56, lng: 126.98 };
 
+  const NATIONAL_TRAIL_CATALOG = [
+    {
+      id: 'hanti',
+      title: '한티가는길',
+      diocese: '대구대교구',
+      icon: '🧭',
+      dataGroup: '한티가는길',
+      officialUrl: 'https://www.hantigil.or.kr/',
+      description: '가실성당에서 한티순교성지까지 이어지는 순례길입니다.'
+    },
+    {
+      id: 'seoul',
+      title: '천주교 서울 순례길',
+      diocese: '서울대교구',
+      icon: '⛪',
+      dataGroup: '서울순례길',
+      officialUrl: 'https://martyrs.or.kr/_web/mpilgrims/about.html',
+      description: '천주교 서울 순례길 1~3코스와 김대건 신부 치명 순교길을 별도로 선택합니다.',
+      detailLines: [
+        '1~3코스 총 44.1km',
+        '1코스 8.7km · 3시간 40분',
+        '2코스 5.9km · 2시간 30분',
+        '3코스 29.5km · 8시간',
+        '김대건 신부 치명 순교길 12.7km · 4~5시간'
+      ]
+    },
+    {
+      id: 'suwon-didim',
+      title: '성지순례길 ‘디딤길’',
+      diocese: '수원교구',
+      icon: '👣',
+      officialUrl: 'https://www.casuwon.or.kr/holyland/pilgrimage',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'wonju-nimui',
+      title: '원주교구 순례길 ‘님의 길’',
+      diocese: '원주교구',
+      icon: '✝️',
+      dataGroup: '님의 길',
+      officialUrl: 'https://sunraegil.seoji.net/',
+      description: '1길 최양업 신부님의 길의 1-1, 1-2 코스를 먼저 연결했습니다.'
+    },
+    {
+      id: 'jeonju',
+      title: '천주교 순례길',
+      diocese: '전주교구',
+      icon: '🛤️',
+      officialUrl: 'https://www.jcatholic.or.kr/theme/main/pages/pilgrimage05.html',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'andong',
+      title: '신부님과 함께 걷는 순례길',
+      diocese: '안동교구',
+      icon: '🚶',
+      officialUrl: 'https://www.acatholic.or.kr/sub4/sub2.asp',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'gwangju',
+      title: '순례길',
+      diocese: '광주대교구',
+      icon: '🌿',
+      officialUrl: 'https://www.gjcatholic.or.kr/holyland/martyr',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'jeju-santo',
+      title: 'Holy Journey SANTO VIAGGIO',
+      diocese: '제주교구',
+      icon: '🌊',
+      officialUrl: 'https://santoviaggio.com/',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    }
+  ];
+
   const state = {
     routes: [],
     activeRoute: null,
+    activeTrailCatalogId: null,
     routeDirection: 'forward',
     map: null,
     kakaoReady: false,
@@ -155,42 +233,123 @@
   }
 
   function renderRouteList() {
-    const list = $('route-list');
-    if (!list) return;
-    list.innerHTML = '';
-    if (!state.routes.length) {
-      list.innerHTML = '<div class="notice-card"><strong>순례길 데이터가 없습니다</strong><p>routes 폴더에 순례길 데이터 파일을 추가하세요.</p></div>';
+    if (state.activeTrailCatalogId) {
+      renderTrailDetail(state.activeTrailCatalogId);
       return;
     }
-    buildRouteMenuItems(state.routes).forEach((item) => {
-      if (item.kind === 'group') renderRouteGroupCard(list, item);
-      else renderSingleRouteCard(list, item.route);
+    renderNationalTrailList();
+  }
+
+  function renderNationalTrailList() {
+    const list = $('route-list');
+    updateRouteListHero('전국 가톨릭 순례길', '목록을 누르면 상세 코스로 이동합니다.');
+    if (!list) return;
+    list.innerHTML = '';
+    NATIONAL_TRAIL_CATALOG.forEach((trail, index) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'trail-catalog-card';
+      card.innerHTML = `
+        <span class="trail-index">${index + 1}</span>
+        <span class="trail-icon">${escapeHtml(trail.icon || '🧭')}</span>
+        <span class="trail-copy">
+          <strong>${escapeHtml(trail.title)}</strong>
+          <em>${escapeHtml(trail.diocese || '')}</em>
+        </span>
+        <span class="trail-arrow" aria-hidden="true">›</span>
+      `;
+      card.addEventListener('click', () => openTrailDetail(trail.id));
+      list.appendChild(card);
     });
+  }
+
+  function openTrailDetail(trailId) {
+    state.activeTrailCatalogId = trailId;
+    renderRouteList();
+    $('route-list-view')?.scrollTo?.({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeTrailDetail() {
+    state.activeTrailCatalogId = null;
+    renderRouteList();
+    $('route-list-view')?.scrollTo?.({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderTrailDetail(trailId) {
+    const list = $('route-list');
+    const trail = NATIONAL_TRAIL_CATALOG.find((item) => item.id === trailId);
+    updateRouteListHero(trail?.title || '순례길 상세', `${trail?.diocese || ''}${trail?.diocese ? ' · ' : ''}상세 코스를 선택하세요.`);
+    if (!list) return;
+    list.innerHTML = '';
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'trail-detail-back';
+    back.textContent = '‹ 전국 가톨릭 순례길';
+    back.addEventListener('click', closeTrailDetail);
+    list.appendChild(back);
+    if (!trail) return;
+
+    const group = buildTrailDetailGroup(trail);
+    if (group) {
+      renderRouteGroupCard(list, group);
+      return;
+    }
+    renderUnavailableTrailDetail(list, trail);
+  }
+
+  function updateRouteListHero(title, description) {
+    if ($('route-list-title')) $('route-list-title').textContent = title;
+    if ($('route-list-desc')) $('route-list-desc').textContent = description;
+  }
+
+  function buildTrailDetailGroup(trail) {
+    if (trail.id === 'hanti') {
+      const route = state.routes.find((item) => item.id === 'hanti' || item.routeGroup === '한티가는길');
+      if (!route) return null;
+      return { ...buildHantiRouteGroup(route), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
+    }
+    if (trail.id === 'seoul') {
+      const routes = state.routes.filter((route) => route?.routeGroup === '서울순례길');
+      if (!routes.length) return null;
+      return { ...buildSeoulRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
+    }
+    if (trail.id === 'wonju-nimui') {
+      const routes = state.routes.filter((route) => route?.routeGroup === '님의 길');
+      if (!routes.length) return null;
+      return { ...buildNimuiRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
+    }
+    return null;
+  }
+
+  function renderUnavailableTrailDetail(list, trail) {
+    const card = document.createElement('section');
+    card.className = 'route-card route-group-card route-detail-card';
+    card.innerHTML = `
+      <div class="route-card-main">
+        <div class="route-icon">${escapeHtml(trail.icon || '🧭')}</div>
+        <div class="route-copy">
+          <div class="route-name-row"><h3 class="route-name">${escapeHtml(trail.title)}</h3></div>
+          <div class="route-meta">${escapeHtml(trail.diocese || '')}</div>
+        </div>
+      </div>
+      <div class="trail-detail-note">${escapeHtml(trail.description || '상세 코스 데이터는 준비 중입니다.')}</div>
+      ${trail.officialUrl ? `<div class="route-detail-actions"><button type="button" class="route-detail-link" data-url="${escapeHtml(trail.officialUrl)}">공식 홈페이지 / 상세보기</button></div>` : ''}
+    `;
+    card.querySelector('[data-url]')?.addEventListener('click', (event) => openExternalUrl(event.currentTarget.dataset.url));
+    list.appendChild(card);
   }
 
   function buildRouteMenuItems(routes) {
     const items = [];
-    const consumed = new Set();
-    let seoulGroupAdded = false;
+    const hantiRoute = routes.find((route) => route?.id === 'hanti' || route?.routeGroup === '한티가는길');
     const seoulRoutes = routes.filter((route) => route?.routeGroup === '서울순례길');
-
+    const nimuiRoutes = routes.filter((route) => route?.routeGroup === '님의 길');
+    if (hantiRoute) items.push(buildHantiRouteGroup(hantiRoute));
+    if (seoulRoutes.length) items.push(buildSeoulRouteGroup(seoulRoutes));
+    if (nimuiRoutes.length) items.push(buildNimuiRouteGroup(nimuiRoutes));
     routes.forEach((route) => {
-      if (!route || consumed.has(route.id)) return;
-      if (route.id === 'hanti' || route.routeGroup === '한티가는길') {
-        items.push(buildHantiRouteGroup(route));
-        consumed.add(route.id);
-        return;
-      }
-      if (route.routeGroup === '서울순례길') {
-        if (!seoulGroupAdded) {
-          items.push(buildSeoulRouteGroup(seoulRoutes));
-          seoulRoutes.forEach((seoulRoute) => consumed.add(seoulRoute.id));
-          seoulGroupAdded = true;
-        }
-        return;
-      }
+      if (!route || route.id === 'hanti' || route.routeGroup === '한티가는길' || route.routeGroup === '서울순례길' || route.routeGroup === '님의 길') return;
       items.push({ kind: 'route', route });
-      consumed.add(route.id);
     });
     return items;
   }
@@ -229,7 +388,7 @@
       options.push({
         label: '천주교 서울순례길 1~3코스 전체',
         title: '',
-        meta: `${fullCourseRoutes.length}개 코스`,
+        meta: '44.1km · 1~3코스',
         route: createSeoulFullRoute(fullCourseRoutes)
       });
     }
@@ -237,7 +396,7 @@
       options.push({
         label: seoulRouteOptionLabel(route),
         title: '',
-        meta: route.distanceLabel || '',
+        meta: seoulRouteOfficialMeta(route),
         route
       });
     });
@@ -245,16 +404,35 @@
       kind: 'group',
       id: 'seoul-route-group',
       icon: '⛪',
-      title: '천주교 서울순례길',
-      meta: '전체는 1~3코스만 포함합니다. 김대건 신부 치명 순례길은 별도 선택하세요.',
+      title: '천주교 서울 순례길',
+      meta: '1~3코스 전체와 김대건 신부 치명 순교길을 별도로 선택하세요.',
       foot: `${orderedRoutes.length}개 순례길`,
       options
     };
   }
 
+  function buildNimuiRouteGroup(routes) {
+    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    return {
+      kind: 'group',
+      id: 'nimui-route-group',
+      icon: '✝️',
+      title: '원주교구 순례길 ‘님의 길’',
+      meta: '1길 최양업 신부님의 길',
+      detailLines: ['1길 최양업 신부님의 길'],
+      foot: `${orderedRoutes.length}개 코스 연결`,
+      options: orderedRoutes.map((route) => ({
+        label: route.shortName || route.name,
+        title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
+        meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
+        route
+      }))
+    };
+  }
+
   function renderRouteGroupCard(list, group) {
     const card = document.createElement('section');
-    card.className = 'route-card route-group-card';
+    card.className = 'route-card route-group-card route-detail-card';
     card.innerHTML = `
       <div class="route-card-main">
         <div class="route-icon">${escapeHtml(group.icon || '🧭')}</div>
@@ -265,8 +443,10 @@
           <div class="route-meta">${escapeHtml(group.meta || '')}</div>
         </div>
       </div>
+      ${Array.isArray(group.detailLines) && group.detailLines.length ? `<ul class="trail-detail-lines">${group.detailLines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>` : ''}
       <div class="route-option-grid"></div>
-      <div class="route-foot"><span>${escapeHtml(group.foot || '')}</span><strong>선택</strong></div>
+      ${group.officialUrl ? `<div class="route-detail-actions"><button type="button" class="route-detail-link" data-url="${escapeHtml(group.officialUrl)}">공식 홈페이지 / 상세보기</button></div>` : ''}
+      <div class="route-foot"><span>${escapeHtml(group.foot || '')}</span><strong>코스 선택</strong></div>
     `;
     const grid = card.querySelector('.route-option-grid');
     (group.options || []).forEach((option) => {
@@ -281,6 +461,7 @@
       btn.addEventListener('click', () => openRoute(option.route));
       grid.appendChild(btn);
     });
+    card.querySelector('[data-url]')?.addEventListener('click', (event) => openExternalUrl(event.currentTarget.dataset.url));
     list.appendChild(card);
   }
 
@@ -308,6 +489,11 @@
     `;
     btn.addEventListener('click', () => openRoute(route));
     list.appendChild(btn);
+  }
+
+  function openExternalUrl(url) {
+    if (!url) return;
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   function createHantiCourseRoute(baseRoute, course) {
@@ -378,7 +564,7 @@
       lineType: 'gpx',
       dataQuality: 'actual-gpx',
       routeGroup: '서울순례길',
-      distanceLabel: `${orderedRoutes.length}개 코스`,
+      distanceLabel: '44.1km · 1~3코스',
       startName: orderedRoutes[0]?.startName || '출발지',
       finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
       features: {
@@ -438,11 +624,21 @@
     return 99;
   }
 
+
+  function seoulRouteOfficialMeta(route) {
+    const text = seoulRouteSearchText(route);
+    if (/1\s*코스/.test(text)) return '8.7km · 3시간 40분';
+    if (/2\s*코스/.test(text)) return '5.9km · 2시간 30분';
+    if (/3\s*코스/.test(text)) return '29.5km · 8시간';
+    if (isKimDaegeonSeoulRoute(route)) return '12.7km · 4~5시간';
+    return [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · ') || route.distanceLabel || '';
+  }
+
   function seoulRouteOptionLabel(route) {
     const text = seoulRouteSearchText(route);
     const match = text.match(/(\d+)\s*코스/);
     if (match) return route?.shortName || `${match[1]}코스`;
-    if (isKimDaegeonSeoulRoute(route)) return '김대건 신부 치명 순례길';
+    if (isKimDaegeonSeoulRoute(route)) return '김대건 신부 치명 순교길';
     return route?.shortName || '선택';
   }
 

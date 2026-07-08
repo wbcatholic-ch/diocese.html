@@ -1,5 +1,5 @@
 // 서울대교구 순례길 데이터
-// 서울순례길 1·2·3코스와 서울순례길 김대건 신부 치명 순례길은 업로드된 GPX 파일의 실제 경로선을 사용합니다.
+// 서울순례길 1·2·3코스와 서울순례길 김대건 신부 치명 순교길은 업로드된 GPX 파일의 실제 경로선을 사용합니다.
 
 window.PILGRIMAGE_ROUTES = window.PILGRIMAGE_ROUTES || [];
 window.PILGRIMAGE_ROUTE_SEOUL = [
@@ -17230,8 +17230,8 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
   },
   {
     "id": "kim-daegun-martyr-road",
-    "name": "서울순례길 · 김대건 신부 치명 순례길",
-    "shortName": "김대건 신부 치명 순례길",
+    "name": "서울순례길 · 김대건 신부 치명 순교길",
+    "shortName": "김대건 신부 치명 순교길",
     "region": "서울대교구",
     "type": "pilgrimage_route",
     "mode": "route_navigation",
@@ -17242,7 +17242,7 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     "finishName": "절두산 순교 성지",
     "sourceNote": "김대건신부 치명 순교길.gpx 기준 실제 GPX 경로선",
     "routeGroup": "서울순례길",
-    "courseLabel": "김대건 신부 치명 순례길",
+    "courseLabel": "김대건 신부 치명 순교길",
     "features": {
       "showRouteLine": true,
       "showStampMarkers": true,
@@ -17291,7 +17291,7 @@ window.PILGRIMAGE_ROUTE_SEOUL = [
     "routeSegments": [
       {
         "id": "kim-daegun-martyr-gpx",
-        "name": "김대건 신부 치명 순례길 GPX 경로",
+        "name": "김대건 신부 치명 순교길 GPX 경로",
         "type": "gpx",
         "sourceFile": "김대건신부 치명 순교길.gpx",
         "points": [

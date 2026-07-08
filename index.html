@@ -14,7 +14,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
   <link rel="apple-touch-icon" href="icons/icon-512x512.png">
-  <link rel="stylesheet" href="css/route-nav.css?v=20260707-v26-auto-location">
+  <link rel="stylesheet" href="css/route-nav.css?v=20260708-v27-national-nimui">
   <script>
     window.APP_CONFIG = {
       KAKAO_JS_KEY: '07f7989e29fdfb425fff924f36fb3ec0'
@@ -26,15 +26,10 @@
     <main class="main-layout">
       <section id="route-list-view" class="route-list-view" aria-label="순례길 목록">
         <div class="hero-card">
-          <div class="hero-badge">독립 테스트</div>
-          <h2>순례길을 선택하세요</h2>
-          <p>기존 앱의 성지·성당·피정 지도와 일반 길찾기·카카오내비 기능은 제거하고, 순례길 전용 지도와 경로 따라가기 기능만 분리했습니다.</p>
+          <h2 id="route-list-title">전국 가톨릭 순례길</h2>
+          <p id="route-list-desc">목록을 누르면 상세 코스로 이동합니다.</p>
         </div>
         <div id="route-list" class="route-list"></div>
-        <div class="notice-card">
-          <strong>GitHub Pages 테스트 전 확인</strong>
-          <p>모든 지도 기준은 가톨릭길동무 본앱과 동일하게 Kakao Map으로 유지합니다. 도메인 등록이 되어 있어도 예전 서비스워커 캐시가 남으면 지도가 멈출 수 있으므로 새 버전 업로드 후 새로고침해 주세요.</p>
-        </div>
       </section>
 
       <section id="map-view" class="map-view" aria-label="순례길 지도" hidden>
@@ -113,9 +108,10 @@
     </div>
   </div>
 
-  <script src="routes/hanti-route-data-v1.js?v=20260707-v26-auto-location"></script>
-  <script src="routes/seoul-pilgrimage-routes.js?v=20260707-v26-auto-location"></script>
-  <script src="routes/test-route-data-v1.js?v=20260707-v26-auto-location"></script>
-  <script src="js/route-nav.js?v=20260707-v26-auto-location"></script>
+  <script src="routes/hanti-route-data-v1.js?v=20260708-v27-national-nimui"></script>
+  <script src="routes/seoul-pilgrimage-routes.js?v=20260708-v27-national-nimui"></script>
+  <script src="routes/nimui-gil-routes.js?v=20260708-v27-national-nimui"></script>
+  <script src="routes/test-route-data-v1.js?v=20260708-v27-national-nimui"></script>
+  <script src="js/route-nav.js?v=20260708-v27-national-nimui"></script>
 </body>
 </html>

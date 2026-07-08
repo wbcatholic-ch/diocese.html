@@ -1,13 +1,16 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v26-auto-location-20260707';
+const CACHE_NAME = 'pilgrimage-route-nav-v27-national-nimui-20260708';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260707-v26-auto-location',
-  './js/route-nav.js?v=20260707-v26-auto-location',
-  './routes/hanti-route-data-v1.js?v=20260707-v26-auto-location',
-  './routes/seoul-pilgrimage-routes.js?v=20260707-v26-auto-location',
-  './routes/test-route-data-v1.js?v=20260707-v26-auto-location',
+  './css/route-nav.css?v=20260708-v27-national-nimui',
+  './js/route-nav.js?v=20260708-v27-national-nimui',
+  './routes/hanti-route-data-v1.js?v=20260708-v27-national-nimui',
+  './routes/seoul-pilgrimage-routes.js?v=20260708-v27-national-nimui',
+  './routes/nimui-gil-routes.js?v=20260708-v27-national-nimui',
+  './routes/test-route-data-v1.js?v=20260708-v27-national-nimui',
+  './gpx/nimui-gil-1-1-big-cheomnye.gpx',
+  './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'
