@@ -1,17 +1,18 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v30-detail-card-layout-20260708';
+const CACHE_NAME = 'pilgrimage-route-nav-v32-604-list-nimui-1-5-20260708';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260708-v30-detail-card-layout',
-  './js/route-nav.js?v=20260708-v30-detail-card-layout',
-  './routes/hanti-route-data-v1.js?v=20260708-v30-detail-card-layout',
-  './routes/seoul-pilgrimage-routes.js?v=20260708-v30-detail-card-layout',
-  './routes/nimui-gil-routes.js?v=20260708-v30-detail-card-layout',
-  './routes/test-route-data-v1.js?v=20260708-v30-detail-card-layout',
+  './css/route-nav.css?v=20260708-v32-604-list-nimui-1-5',
+  './js/route-nav.js?v=20260708-v32-604-list-nimui-1-5',
+  './routes/hanti-route-data-v1.js?v=20260708-v32-604-list-nimui-1-5',
+  './routes/seoul-pilgrimage-routes.js?v=20260708-v32-604-list-nimui-1-5',
+  './routes/nimui-gil-routes.js?v=20260708-v32-604-list-nimui-1-5',
+  './routes/test-route-data-v1.js?v=20260708-v32-604-list-nimui-1-5',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-4-seoji-gangbyeon.gpx',
+  './gpx/nimui-gil-1-5-seogogae.gpx',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'

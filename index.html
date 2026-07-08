@@ -14,7 +14,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
   <link rel="apple-touch-icon" href="icons/icon-512x512.png">
-  <link rel="stylesheet" href="css/route-nav.css?v=20260708-v30-detail-card-layout">
+  <link rel="stylesheet" href="css/route-nav.css?v=20260708-v32-604-list-nimui-1-5">
   <script>
     window.APP_CONFIG = {
       KAKAO_JS_KEY: '07f7989e29fdfb425fff924f36fb3ec0'
@@ -25,11 +25,20 @@
   <div id="app-shell">
     <main class="main-layout">
       <section id="route-list-view" class="route-list-view" aria-label="순례길 목록">
-        <div class="hero-card">
-          <h2 id="route-list-title">전국 가톨릭 순례길</h2>
-          <p id="route-list-desc">목록을 누르면 상세 코스로 이동합니다.</p>
+        <div class="hero-card national-hero">
+          <div class="national-logo" aria-hidden="true">✝</div>
+          <div class="national-hero-copy">
+            <h2 id="route-list-title">전국 순례길</h2>
+            <p id="route-list-desc">CATHOLIC PILGRIMAGE</p>
+          </div>
+          <button id="national-close-btn" class="national-close-btn" type="button" aria-label="전국 순례길 닫기">×</button>
         </div>
-        <div id="route-list" class="route-list"></div>
+        <div class="national-tabs" role="tablist" aria-label="전국 순례길 보기 전환">
+          <button id="national-map-tab" class="national-tab" type="button" aria-disabled="true">지도</button>
+          <button class="national-tab active" type="button" aria-selected="true">목록</button>
+        </div>
+        <p class="national-guide">목록을 누르면 상세 코스로 이동합니다.</p>
+        <div id="route-list" class="route-list national-card-list"></div>
       </section>
 
       <section id="map-view" class="map-view" aria-label="순례길 지도" hidden>
@@ -108,10 +117,10 @@
     </div>
   </div>
 
-  <script src="routes/hanti-route-data-v1.js?v=20260708-v30-detail-card-layout"></script>
-  <script src="routes/seoul-pilgrimage-routes.js?v=20260708-v30-detail-card-layout"></script>
-  <script src="routes/nimui-gil-routes.js?v=20260708-v30-detail-card-layout"></script>
-  <script src="routes/test-route-data-v1.js?v=20260708-v30-detail-card-layout"></script>
-  <script src="js/route-nav.js?v=20260708-v30-detail-card-layout"></script>
+  <script src="routes/hanti-route-data-v1.js?v=20260708-v32-604-list-nimui-1-5"></script>
+  <script src="routes/seoul-pilgrimage-routes.js?v=20260708-v32-604-list-nimui-1-5"></script>
+  <script src="routes/nimui-gil-routes.js?v=20260708-v32-604-list-nimui-1-5"></script>
+  <script src="routes/test-route-data-v1.js?v=20260708-v32-604-list-nimui-1-5"></script>
+  <script src="js/route-nav.js?v=20260708-v32-604-list-nimui-1-5"></script>
 </body>
 </html>

@@ -19,18 +19,24 @@
       id: 'hanti',
       title: '한티가는길',
       diocese: '대구대교구',
-      icon: '🧭',
+      icon: '⛰️',
       dataGroup: '한티가는길',
-      officialUrl: 'https://www.hantigil.or.kr/',
+      location: '경북 칠곡 (가실성당~한티순교성지)',
+      officialUrl: 'https://hantigil.or.kr/index',
+      urlLabel: 'hantigil.or.kr/index',
+      highlight: true,
+      myDiocese: true,
       description: '가실성당에서 한티순교성지까지 이어지는 순례길입니다.'
     },
     {
       id: 'seoul',
       title: '천주교 서울 순례길',
       diocese: '서울대교구',
-      icon: '⛪',
+      icon: '✝️',
       dataGroup: '서울순례길',
+      location: '서울시',
       officialUrl: 'https://martyrs.or.kr/_web/mpilgrims/about.html',
+      urlLabel: 'martyrs.or.kr/_web/mpilgrims/...',
       description: '천주교 서울 순례길 1~3코스와 김대건 신부 치명 순교길을 별도로 선택합니다.',
       detailLines: [
         '1~3코스 총 44.1km',
@@ -44,49 +50,91 @@
       id: 'suwon-didim',
       title: '성지순례길 ‘디딤길’',
       diocese: '수원교구',
-      icon: '👣',
+      icon: '🙏',
+      location: '경기 수원시',
       officialUrl: 'https://www.casuwon.or.kr/holyland/pilgrimage',
+      urlLabel: 'www.casuwon.or.kr/holyland/...',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
       id: 'wonju-nimui',
       title: '원주교구 순례길 ‘님의 길’',
       diocese: '원주교구',
-      icon: '✝️',
+      icon: '🌿',
       dataGroup: '님의 길',
-      officialUrl: 'https://sunraegil.seoji.net/',
-      description: '1길 최양업 신부님의 길의 1-1, 1-2 코스를 먼저 연결했습니다.'
-    },
-    {
-      id: 'jeonju',
-      title: '천주교 순례길',
-      diocese: '전주교구',
-      icon: '🛤️',
-      officialUrl: 'https://www.jcatholic.or.kr/theme/main/pages/pilgrimage05.html',
-      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
-    },
-    {
-      id: 'andong',
-      title: '신부님과 함께 걷는 순례길',
-      diocese: '안동교구',
-      icon: '🚶',
-      officialUrl: 'https://www.acatholic.or.kr/sub4/sub2.asp',
-      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+      location: '강원 원주·횡성, 충북 제천',
+      officialUrl: 'https://sunraegil.seoji.net/course/all',
+      urlLabel: 'sunraegil.seoji.net/course/all',
+      description: '1길 최양업 신부님의 길의 연결 가능한 GPX 코스를 선택합니다.'
     },
     {
       id: 'gwangju',
-      title: '순례길',
+      title: '광주대교구 순례길',
       diocese: '광주대교구',
-      icon: '🌿',
-      officialUrl: 'https://www.gjcatholic.or.kr/holyland/martyr',
+      icon: '🕊️',
+      location: '전남 나주·영광',
+      officialUrl: 'https://www.gjcatholic.or.kr/holyland/pilgrimage/noan_naju',
+      urlLabel: 'www.gjcatholic.or.kr/...',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
       id: 'jeju-santo',
-      title: 'Holy Journey SANTO VIAGGIO',
+      title: '천주교 제주교구 순례길',
       diocese: '제주교구',
       icon: '🌊',
-      officialUrl: 'https://santoviaggio.com/',
+      location: '제주',
+      officialUrl: 'http://santoviaggio.com/',
+      urlLabel: 'santoviaggio.com',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'andong',
+      title: '사제와 함께하는 도보순례',
+      diocese: '안동교구',
+      icon: '👣',
+      location: '경북 문경·상주',
+      officialUrl: 'https://www.acatholic.or.kr/sub4/sub2.asp',
+      urlLabel: 'www.acatholic.or.kr/sub4/...',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'jeonju',
+      title: '전주교구 교우촌 도보순례',
+      diocese: '전주교구',
+      icon: '🌾',
+      location: '전북 전주·완주',
+      officialUrl: 'https://www.jcatholic.or.kr/theme/main/pages/pilgrimage01.html',
+      urlLabel: 'www.jcatholic.or.kr/...',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'boryeong-galmaemot',
+      title: '보령 갈매못 성지순례길',
+      diocese: '보령시',
+      icon: '🌅',
+      location: '충남 보령',
+      officialUrl: 'https://www.brcn.go.kr/tour/sub02_02_02.do',
+      urlLabel: 'www.brcn.go.kr/tour/...',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'naepo',
+      title: '내포 천주교 순례길',
+      diocese: '사단법인 내포문화숲길',
+      icon: '🌲',
+      location: '충남 예산·서산',
+      officialUrl: 'https://naepotrail.org/course/catholic',
+      urlLabel: 'naepotrail.org/course/catholic',
+      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+    },
+    {
+      id: 'beogeunae',
+      title: '버그내순례길',
+      diocese: '당진시청',
+      icon: '🏞️',
+      location: '충남 당진',
+      officialUrl: 'https://beogeunae.dangjin.go.kr/pil1.html',
+      urlLabel: 'beogeunae.dangjin.go.kr/pil1.html',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     }
   ];
@@ -144,6 +192,7 @@
   }
 
   function setupButtons() {
+    $('national-close-btn')?.addEventListener('click', closeNationalList);
     $('back-to-list')?.addEventListener('click', handleBackToList);
     $('fit-route-btn')?.addEventListener('click', () => {
       noteManualMapControl('전체 경로 확인');
@@ -153,6 +202,14 @@
     $('follow-btn')?.addEventListener('click', handleFollowControl);
     $('direction-btn')?.addEventListener('click', toggleRouteDirection);
     $('end-follow-btn')?.addEventListener('click', confirmEndNavigation);
+  }
+
+  function closeNationalList() {
+    if (history.length > 1) {
+      history.back();
+      return;
+    }
+    try { window.close(); } catch (_) {}
   }
 
   function setupStatusSheet() {
@@ -242,23 +299,49 @@
 
   function renderNationalTrailList() {
     const list = $('route-list');
-    updateRouteListHero('전국 가톨릭 순례길', '목록을 누르면 상세 코스로 이동합니다.', true);
+    updateRouteListHero('전국 순례길', 'CATHOLIC PILGRIMAGE', true);
     if (!list) return;
     list.innerHTML = '';
-    NATIONAL_TRAIL_CATALOG.forEach((trail, index) => {
-      const card = document.createElement('button');
-      card.type = 'button';
-      card.className = 'trail-catalog-card';
+    NATIONAL_TRAIL_CATALOG.forEach((trail) => {
+      const card = document.createElement('article');
+      card.className = `national-trail-card${trail.highlight ? ' featured' : ''}`;
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `${trail.title} 상세 코스 보기`);
+      const urlLabel = trail.urlLabel || compactUrlLabel(trail.officialUrl);
       card.innerHTML = `
-        <span class="trail-index">${index + 1}</span>
-        <span class="trail-icon">${escapeHtml(trail.icon || '🧭')}</span>
-        <span class="trail-copy">
-          <strong>${escapeHtml(trail.title)}</strong>
-          <em>${escapeHtml(trail.diocese || '')}</em>
-        </span>
-        <span class="trail-arrow" aria-hidden="true">›</span>
+        <div class="national-trail-body">
+          <div class="national-trail-badges">
+            <span class="diocese-pill">${escapeHtml(trail.diocese || '')}</span>
+            ${trail.myDiocese ? '<span class="my-diocese-pill">나의 교구</span>' : ''}
+          </div>
+          <div class="national-trail-main">
+            <span class="national-trail-icon" aria-hidden="true">${escapeHtml(trail.icon || '🧭')}</span>
+            <span class="national-trail-copy">
+              <strong>${escapeHtml(trail.title)}</strong>
+              <em>📍 ${escapeHtml(trail.location || trail.diocese || '')}</em>
+            </span>
+          </div>
+        </div>
+        <div class="national-trail-foot">
+          <span class="national-url">${escapeHtml(urlLabel)}</span>
+          <button type="button" class="national-website-btn" data-url="${escapeHtml(trail.officialUrl || '')}">웹사이트 열기</button>
+        </div>
       `;
-      card.addEventListener('click', () => openTrailDetail(trail.id));
+      card.addEventListener('click', (event) => {
+        if (event.target.closest('.national-website-btn')) return;
+        openTrailDetail(trail.id);
+      });
+      card.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        openTrailDetail(trail.id);
+      });
+      card.querySelector('.national-website-btn')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openExternalUrl(event.currentTarget.dataset.url);
+      });
       list.appendChild(card);
     });
   }
@@ -299,9 +382,21 @@
 
   function updateRouteListHero(title, description, visible = true) {
     const hero = document.querySelector('.hero-card');
+    const tabs = document.querySelector('.national-tabs');
     if (hero) hero.hidden = !visible;
+    if (tabs) tabs.hidden = !visible;
     if ($('route-list-title')) $('route-list-title').textContent = title;
     if ($('route-list-desc')) $('route-list-desc').textContent = description;
+  }
+
+  function compactUrlLabel(url) {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url);
+      return `${parsed.host}${parsed.pathname}`.replace(/\/$/, '');
+    } catch (_) {
+      return String(url).replace(/^https?:\/\//, '').replace(/\/$/, '');
+    }
   }
 
   function buildTrailDetailGroup(trail) {
@@ -370,6 +465,7 @@
       title: route.name || '한티가는길',
       meta: '전체 코스 또는 1~5코스를 선택하세요.',
       foot: `${route.courseSummaryLabel || '5개 코스'} · ${route.distanceLabel || ''}`,
+      optionLayout: 'single',
       options: [
         {
           label: '한티가는길 전체',
@@ -409,6 +505,7 @@
       title: '천주교 서울 순례길',
       meta: '1~3코스 전체와 김대건 신부 치명 순교길을 별도로 선택하세요.',
       foot: `${orderedRoutes.length}개 순례길`,
+      optionLayout: 'single',
       options
     };
   }
