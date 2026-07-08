@@ -36,27 +36,27 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   top: 0;
   z-index: 3;
   margin: 0 -10px 0;
-  padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 16px;
-  min-height: 112px;
+  padding: calc(15px + env(safe-area-inset-top, 0px)) 18px 15px;
+  min-height: 108px;
   border: 0;
   border-radius: 0;
-  background: #111a3a;
+  background: #0B1D3B;
   color: #fff;
-  box-shadow: 0 2px 0 #d7be8a;
+  box-shadow: 0 3px 0 rgba(29, 78, 216, .85);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
 }
 .national-logo {
-  width: 70px;
-  height: 70px;
+  width: 68px;
+  height: 68px;
   display: grid;
   place-items: center;
   border-radius: 20px;
-  background: rgba(255,255,255,.11);
-  border: 1.5px solid rgba(255,255,255,.22);
-  font-size: 48px;
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.26);
+  font-size: 46px;
   line-height: 1;
   font-weight: 900;
 }
@@ -81,9 +81,9 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   width: 62px;
   height: 62px;
   border-radius: 999px;
-  border: 2px solid #c7a66f;
-  background: transparent;
-  color: #d5a24f;
+  border: 2px solid rgba(255,255,255,.45);
+  background: rgba(255,255,255,.08);
+  color: #fff;
   font-size: 44px;
   line-height: 1;
   font-weight: 900;
@@ -92,14 +92,14 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-list { display: grid; gap: 14px; }
 .national-card-list { padding: calc(10px + env(safe-area-inset-top, 0px)) 0 14px; }
 .national-trail-card {
-  border: 2px solid #ded2bd;
+  border: 2px solid #1d4ed8;
   border-radius: 24px;
   background: rgba(255, 253, 248, .98);
   box-shadow: 0 10px 26px rgba(31, 42, 68, .08);
   overflow: hidden;
   cursor: pointer;
 }
-.national-trail-card.featured { border-color: #b7791f; box-shadow: 0 10px 28px rgba(183, 121, 31, .13); }
+.national-trail-card.featured { border-color: #1d4ed8; box-shadow: 0 10px 28px rgba(29, 78, 216, .14); }
 .national-trail-card:active { transform: translateY(1px); }
 .national-trail-body { padding: 18px 18px 16px; }
 .national-trail-badges { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
@@ -169,43 +169,43 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   cursor: pointer;
   box-shadow: 0 5px 12px rgba(29, 78, 216, .10);
 }
-.route-detail-card { overflow: hidden; }
+.route-detail-card { overflow: hidden; background: #eef2f7; border-color: #d7dee8; }
 
 .route-detail-card .route-detail-title-row {
   margin: 0;
   padding: 16px 16px;
-  background: var(--panel);
-  color: var(--text);
-  border-bottom: 1.5px solid #eadfce;
+  background: #0B1D3B;
+  color: #fff;
+  border-bottom: 0;
 }
 .route-detail-card .route-detail-title-row .route-icon {
-  background: #eaf2ff;
-  border: 1.5px solid #dbeafe;
-  color: var(--text);
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.26);
+  color: #fff;
 }
-.route-detail-card .route-detail-title-row .route-name { color: var(--text); }
+.route-detail-card .route-detail-title-row .route-name { color: #fff; }
 .route-detail-close-btn {
-  width: 46px;
-  height: 46px;
+  width: 54px;
+  height: 54px;
   flex: 0 0 auto;
   border-radius: 999px;
-  border: 1.5px solid #d8c6aa;
-  background: #fffdf8;
-  color: #172033;
-  font-size: 31px;
+  border: 2px solid rgba(255,255,255,.45);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 36px;
   line-height: 1;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(15,23,42,.08);
+  box-shadow: none;
 }
 .trail-detail-lines {
-  margin: 0 14px 13px;
+  margin: 16px 14px 13px;
   padding: 12px 14px;
   list-style: none;
   border-radius: 16px;
-  background: #fff8e9;
-  border: 1px solid #ead2a8;
-  color: #3b2b11;
+  background: #fff;
+  border: 1px solid #d7dee8;
+  color: #172033;
   display: grid;
   gap: 6px;
   font-size: 13px;
@@ -213,18 +213,19 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   line-height: 1.35;
 }
 .trail-detail-note {
-  margin: 0 14px 13px;
+  margin: 16px 14px 13px;
   padding: 12px 14px;
   border-radius: 16px;
-  background: #fff8e9;
-  border: 1px solid #ead2a8;
-  color: #5f4730;
+  background: #fff;
+  border: 1px solid #d7dee8;
+  color: #334155;
   font-size: 13px;
   font-weight: 800;
   line-height: 1.45;
 }
 .route-detail-actions {
   padding: 0 14px 14px;
+  background: #eef2f7;
 }
 .route-detail-link {
   width: 100%;
@@ -242,7 +243,7 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
 .route-group-card { cursor: default; }
 .route-group-card .route-card-main { padding-bottom: 12px; }
-.route-option-area { display: grid; gap: 14px; padding: 0 8px 16px; }
+.route-option-area { display: grid; gap: 14px; padding: 16px 8px 16px; background: #eef2f7; }
 .route-option-section {
   display: grid;
   gap: 12px;
@@ -255,8 +256,8 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-option-section-head {
   display: grid;
   padding: 13px 16px;
-  background: #fff8e9;
-  border: 1.5px solid #ead2a8;
+  background: #fff;
+  border: 1.5px solid #d7dee8;
   border-radius: 17px;
 }
 .route-option-section-head strong { color: #172033; font-size: 17px; line-height: 1.24; font-weight: 950; letter-spacing: -.055em; }
@@ -269,9 +270,9 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-option-grid.single-column { grid-template-columns: 1fr; }
 .route-option-btn {
   min-height: 108px;
-  border: 1.7px solid #d8c6aa;
+  border: 1.7px solid #d7dee8;
   border-radius: 20px;
-  background: #fffdf8;
+  background: #fff;
   color: #172033;
   padding: 0;
   text-align: left;
@@ -323,7 +324,7 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-option-btn.route-option-full {
   min-height: 108px;
   border-color: #93b4e8;
-  background: linear-gradient(180deg, #f7fbff 0%, #eaf3ff 100%);
+  background: #fff;
   color: #172033;
   box-shadow: 0 8px 18px rgba(29, 78, 216, .12);
 }
@@ -341,7 +342,7 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-card.representative { border-color: rgba(183, 121, 31, .35); }
 .route-card.representative .route-icon { background: #fff7e8; }
 .route-meta { margin-top: 5px; font-size: 13px; color: var(--muted); letter-spacing: -.04em; }
-.route-foot { display: flex; justify-content: space-between; gap: 10px; padding: 12px 16px; background: #f3eadc; border-top: 1px solid #eadfce; color: #475569; font-size: 13px; font-weight: 800; }
+.route-foot { display: flex; justify-content: space-between; gap: 10px; padding: 12px 16px; background: #f8fafc; border-top: 1px solid #d7dee8; color: #475569; font-size: 13px; font-weight: 800; }
 .route-foot strong { color: var(--blue); }
 .route-group-foot { justify-content: center; font-weight: 900; text-align: center; }
 .notice-card { margin-top: 16px; padding: 15px 16px; font-size: 13px; color: var(--muted); line-height: 1.55; }
