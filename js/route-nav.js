@@ -65,7 +65,7 @@
       location: '강원 원주·횡성, 충북 제천',
       officialUrl: 'https://sunraegil.seoji.net/course/all',
       urlLabel: 'sunraegil.seoji.net/course/all',
-      description: '1길 최양업 신부님의 길의 연결 가능한 GPX 코스를 선택합니다.'
+      description: '님의 길의 연결 가능한 GPX 코스를 선택합니다.'
     },
     {
       id: 'gwangju',
@@ -512,19 +512,29 @@
 
   function buildNimuiRouteGroup(routes) {
     const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    const groupSummaryMap = new Map([
+      ['1길 최양업 신부님의 길', '1길 최양업 신부님의 길 · 전체 길이 122.6km'],
+      ['2길 최해성 요한의 길', '2길 최해성 요한의 길 · 전체 길이 37.8km']
+    ]);
+    const detailLines = [];
+    orderedRoutes.forEach((route) => {
+      const groupName = route.parentCourseGroup || '님의 길';
+      const line = groupSummaryMap.get(groupName) || groupName;
+      if (!detailLines.includes(line)) detailLines.push(line);
+    });
     return {
       kind: 'group',
       id: 'nimui-route-group',
       icon: '✝️',
       title: '원주교구 순례길 ‘님의 길’',
-      meta: '1길 최양업 신부님의 길',
-      detailLines: ['1길 최양업 신부님의 길'],
+      meta: '상세 코스를 선택하세요.',
+      detailLines,
       foot: `${orderedRoutes.length}개 코스 연결`,
       optionLayout: 'single',
       options: orderedRoutes.map((route) => ({
         label: route.shortName || route.name,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
-        meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
+        meta: [route.parentCourseGroup, route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
         route
       }))
     };
