@@ -1,16 +1,17 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v27-national-nimui-20260708';
+const CACHE_NAME = 'pilgrimage-route-nav-v29-nimui-1-2-replaced-20260708';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260708-v27-national-nimui',
-  './js/route-nav.js?v=20260708-v27-national-nimui',
-  './routes/hanti-route-data-v1.js?v=20260708-v27-national-nimui',
-  './routes/seoul-pilgrimage-routes.js?v=20260708-v27-national-nimui',
-  './routes/nimui-gil-routes.js?v=20260708-v27-national-nimui',
-  './routes/test-route-data-v1.js?v=20260708-v27-national-nimui',
+  './css/route-nav.css?v=20260708-v29-nimui-1-2-replaced',
+  './js/route-nav.js?v=20260708-v29-nimui-1-2-replaced',
+  './routes/hanti-route-data-v1.js?v=20260708-v29-nimui-1-2-replaced',
+  './routes/seoul-pilgrimage-routes.js?v=20260708-v29-nimui-1-2-replaced',
+  './routes/nimui-gil-routes.js?v=20260708-v29-nimui-1-2-replaced',
+  './routes/test-route-data-v1.js?v=20260708-v29-nimui-1-2-replaced',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
+  './gpx/nimui-gil-1-4-seoji-gangbyeon.gpx',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'

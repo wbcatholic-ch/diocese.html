@@ -46,6 +46,7 @@
 - 김대건 신부 치명 순교길
 - 원주교구 순례길 `님의 길` 1-1 큰 첨례길
 - 원주교구 순례길 `님의 길` 1-2 네 공소길
+- 원주교구 순례길 `님의 길` 1-4 서지강변길
 
 도원동/회사 근처 테스트 GPX 데이터는 프로젝트 내부에는 남아 있지만, 첫 화면 전국 목록에는 표시하지 않습니다.
 
@@ -74,6 +75,7 @@
 
 - `gpx/nimui-gil-1-1-big-cheomnye.gpx`
 - `gpx/nimui-gil-1-2-ne-gongso.gpx`
+- `gpx/nimui-gil-1-4-seoji-gangbyeon.gpx`
 
 내비게이션용 points는 `routes/nimui-gil-routes.js` 데이터 owner에서 직접 연결했습니다.
 
@@ -91,10 +93,30 @@
 
 ## 캐시 버전
 
-`pilgrimage-route-nav-v27-national-nimui-20260708`
+`pilgrimage-route-nav-v29-nimui-1-2-replaced-20260708`
 
 GitHub Pages 업로드 후 아래처럼 확인하세요.
 
 ```text
-?fresh=v27nationalnimui
+?fresh=v29nimui12
 ```
+
+
+## V28 변경 사항
+
+- 원주교구 순례길 ‘님의 길’ 1길 최양업 신부님의 길 아래 `1-4 서지강변길`을 추가했습니다.
+- 표시 정보: `21.4km · 5시간`.
+- 업로드된 `님의길1-4-1.gpx`와 `님의길1-4-2.gpx`를 하나의 경로로 연결해 `gpx/nimui-gil-1-4-seoji-gangbyeon.gpx`에 저장했습니다.
+- 데이터 owner인 `routes/nimui-gil-routes.js`에서 직접 코스 데이터와 GPX 경로를 연결했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v29-nimui-1-2-replaced-20260708`
+- 테스트 URL: `?fresh=v29nimui12`
+
+
+## V29 변경 사항
+
+- 잘못 업로드되었던 `님의 길 1-2 네 공소길` GPX를 새 업로드 파일로 교체했습니다.
+- 프로젝트 저장 경로는 기존 owner 경로인 `gpx/nimui-gil-1-2-ne-gongso.gpx`를 유지했습니다.
+- 데이터 owner인 `routes/nimui-gil-routes.js`에서 `1-2 네 공소길`의 경로 points와 시작/종료 지점 좌표를 새 GPX 기준으로 직접 교체했습니다.
+- 표시 정보는 기존 요청값인 `15.4km · 4시간`을 유지했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v29-nimui-1-2-replaced-20260708`
+- 테스트 URL: `?fresh=v29nimui12`
