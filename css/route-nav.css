@@ -184,28 +184,29 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-detail-card .route-detail-title-row {
   margin: 0;
   padding: 16px 16px;
-  background: #0B1D3B;
-  color: #fff;
-  border-bottom: 2px solid #d7be8a;
+  background: var(--panel);
+  color: var(--text);
+  border-bottom: 1.5px solid #eadfce;
 }
 .route-detail-card .route-detail-title-row .route-icon {
-  background: rgba(255, 255, 255, .13);
-  border: 1.5px solid rgba(255, 255, 255, .24);
-  color: #fff;
+  background: #eaf2ff;
+  border: 1.5px solid #dbeafe;
+  color: var(--text);
 }
-.route-detail-card .route-detail-title-row .route-name { color: #fff; }
+.route-detail-card .route-detail-title-row .route-name { color: var(--text); }
 .route-detail-close-btn {
   width: 46px;
   height: 46px;
   flex: 0 0 auto;
   border-radius: 999px;
-  border: 1.5px solid rgba(255, 255, 255, .55);
-  background: rgba(255, 255, 255, .10);
-  color: #fff;
+  border: 1.5px solid #d8c6aa;
+  background: #fffdf8;
+  color: #172033;
   font-size: 31px;
   line-height: 1;
   font-weight: 900;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(15,23,42,.08);
 }
 .trail-detail-lines {
   margin: 0 14px 13px;
@@ -264,12 +265,11 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-option-section-head {
   display: grid;
   padding: 13px 16px;
-  background: #0B1D3B;
-  border: 0;
-  border-bottom: 2px solid #d7be8a;
+  background: #fff8e9;
+  border: 1.5px solid #ead2a8;
   border-radius: 17px;
 }
-.route-option-section-head strong { color: #fff; font-size: 17px; line-height: 1.24; font-weight: 950; letter-spacing: -.055em; }
+.route-option-section-head strong { color: #172033; font-size: 17px; line-height: 1.24; font-weight: 950; letter-spacing: -.055em; }
 .route-option-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -279,9 +279,9 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-option-grid.single-column { grid-template-columns: 1fr; }
 .route-option-btn {
   min-height: 108px;
-  border: 1.7px solid #e3c88f;
+  border: 1.7px solid #d8c6aa;
   border-radius: 20px;
-  background: linear-gradient(180deg, #fffefb, #fff6df);
+  background: #fffdf8;
   color: #172033;
   padding: 0;
   text-align: left;
@@ -314,10 +314,10 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   height: 74px;
   align-self: center;
   justify-self: center;
-  border: 1.5px solid #e6bd55;
+  border: 1.5px solid #93b4e8;
   border-radius: 17px;
-  background: #fff2bf;
-  color: #3b2b11;
+  background: #f8fbff;
+  color: #0B1D3B;
   font-size: 13px;
   line-height: 1.12;
   font-weight: 950;
@@ -328,7 +328,7 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(183, 121, 31, .12);
+  box-shadow: 0 4px 10px rgba(29, 78, 216, .10);
 }
 .route-option-btn.route-option-full {
   min-height: 108px;

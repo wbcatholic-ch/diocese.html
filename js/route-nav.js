@@ -299,7 +299,7 @@
 
   function renderNationalTrailList() {
     const list = $('route-list');
-    updateRouteListHero('', '', false);
+    updateRouteListHero('전국 가톨릭 순례길', '목록을 누르면 상세 코스로 이동합니다.', true);
     if (!list) return;
     list.innerHTML = '';
     NATIONAL_TRAIL_CATALOG.forEach((trail) => {
