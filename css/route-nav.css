@@ -150,25 +150,15 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   font-weight: 850;
 }
 .national-trail-foot {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
-  gap: 12px;
   padding: 14px 18px;
   border-top: 1px solid #e7ddcf;
   background: rgba(248, 250, 252, .8);
 }
-.national-url {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #2563eb;
-  font-size: 19px;
-  font-weight: 750;
-}
 .national-website-btn {
-  min-width: 118px;
+  min-width: 148px;
   min-height: 44px;
   border: 1.5px solid #93b4e8;
   border-radius: 18px;
@@ -725,9 +715,8 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   .national-trail-main { gap: 12px; }
   .national-trail-copy strong { font-size: 22px; }
   .national-trail-copy em { font-size: 14px; }
-  .national-trail-foot { padding: 12px 16px; gap: 8px; }
-  .national-url { font-size: 16px; }
-  .national-website-btn { min-width: 104px; min-height: 40px; font-size: 14px; border-radius: 16px; }
+  .national-trail-foot { padding: 12px 16px; }
+  .national-website-btn { min-width: 132px; min-height: 40px; font-size: 14px; border-radius: 16px; }
   .chrome-open-panel { align-items: flex-start; flex-direction: column; }
   .chrome-open-actions { width: 100%; justify-content: flex-start; }
 }

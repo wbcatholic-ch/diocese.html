@@ -1,14 +1,14 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v44-standard-header-detail-colors-20260708';
+const CACHE_NAME = 'pilgrimage-route-nav-v45-official-website-button-20260708';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260708-v44-standard-header-detail-colors',
-  './js/route-nav.js?v=20260708-v44-standard-header-detail-colors',
-  './routes/hanti-route-data-v1.js?v=20260708-v44-standard-header-detail-colors',
-  './routes/seoul-pilgrimage-routes.js?v=20260708-v44-standard-header-detail-colors',
-  './routes/nimui-gil-routes.js?v=20260708-v44-standard-header-detail-colors',
-  './routes/test-route-data-v1.js?v=20260708-v44-standard-header-detail-colors',
+  './css/route-nav.css?v=20260708-v45-official-website-button',
+  './js/route-nav.js?v=20260708-v45-official-website-button',
+  './routes/hanti-route-data-v1.js?v=20260708-v45-official-website-button',
+  './routes/seoul-pilgrimage-routes.js?v=20260708-v45-official-website-button',
+  './routes/nimui-gil-routes.js?v=20260708-v45-official-website-button',
+  './routes/test-route-data-v1.js?v=20260708-v45-official-website-button',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',

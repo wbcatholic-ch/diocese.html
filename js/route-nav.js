@@ -23,7 +23,6 @@
       dataGroup: '한티가는길',
       location: '경북 칠곡 (가실성당~한티순교성지)',
       officialUrl: 'https://hantigil.or.kr/index',
-      urlLabel: 'hantigil.or.kr/index',
       highlight: true,
       myDiocese: true,
       description: '가실성당에서 한티순교성지까지 이어지는 순례길입니다.'
@@ -36,7 +35,6 @@
       dataGroup: '서울순례길',
       location: '서울시',
       officialUrl: 'https://martyrs.or.kr/_web/mpilgrims/about.html',
-      urlLabel: 'martyrs.or.kr/_web/mpilgrims/...',
       description: '천주교 서울 순례길 1~3코스와 김대건 신부 치명 순교길을 별도로 선택합니다.',
       detailLines: [
         '1~3코스 총 44.1km',
@@ -53,7 +51,6 @@
       icon: '🙏',
       location: '경기 수원시',
       officialUrl: 'https://www.casuwon.or.kr/holyland/pilgrimage',
-      urlLabel: 'www.casuwon.or.kr/holyland/...',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
@@ -64,7 +61,6 @@
       dataGroup: '님의 길',
       location: '강원 원주·횡성, 충북 제천',
       officialUrl: 'https://sunraegil.seoji.net/course/all',
-      urlLabel: 'sunraegil.seoji.net/course/all',
       description: '님의 길의 연결 가능한 GPX 코스를 선택합니다.'
     },
     {
@@ -74,7 +70,6 @@
       icon: '🕊️',
       location: '전남 나주·영광',
       officialUrl: 'https://www.gjcatholic.or.kr/holyland/pilgrimage/noan_naju',
-      urlLabel: 'www.gjcatholic.or.kr/...',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
@@ -84,7 +79,6 @@
       icon: '🌊',
       location: '제주',
       officialUrl: 'http://santoviaggio.com/',
-      urlLabel: 'santoviaggio.com',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
@@ -94,7 +88,6 @@
       icon: '👣',
       location: '경북 문경·상주',
       officialUrl: 'https://www.acatholic.or.kr/sub4/sub2.asp',
-      urlLabel: 'www.acatholic.or.kr/sub4/...',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
@@ -104,7 +97,6 @@
       icon: '🌾',
       location: '전북 전주·완주',
       officialUrl: 'https://www.jcatholic.or.kr/theme/main/pages/pilgrimage01.html',
-      urlLabel: 'www.jcatholic.or.kr/...',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
@@ -114,7 +106,6 @@
       icon: '🌅',
       location: '충남 보령',
       officialUrl: 'https://www.brcn.go.kr/tour/sub02_02_02.do',
-      urlLabel: 'www.brcn.go.kr/tour/...',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
@@ -124,7 +115,6 @@
       icon: '🌲',
       location: '충남 예산·서산',
       officialUrl: 'https://naepotrail.org/course/catholic',
-      urlLabel: 'naepotrail.org/course/catholic',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     },
     {
@@ -134,7 +124,6 @@
       icon: '🏞️',
       location: '충남 당진',
       officialUrl: 'https://beogeunae.dangjin.go.kr/pil1.html',
-      urlLabel: 'beogeunae.dangjin.go.kr/pil1.html',
       description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
     }
   ];
@@ -308,7 +297,6 @@
       card.tabIndex = 0;
       card.setAttribute('role', 'button');
       card.setAttribute('aria-label', `${trail.title} 상세 코스 보기`);
-      const urlLabel = trail.urlLabel || compactUrlLabel(trail.officialUrl);
       card.innerHTML = `
         <div class="national-trail-body">
           <div class="national-trail-badges">
@@ -324,8 +312,7 @@
           </div>
         </div>
         <div class="national-trail-foot">
-          <span class="national-url">${escapeHtml(urlLabel)}</span>
-          <button type="button" class="national-website-btn" data-url="${escapeHtml(trail.officialUrl || '')}">웹사이트 열기</button>
+          <button type="button" class="national-website-btn" data-url="${escapeHtml(trail.officialUrl || '')}">공식 홈페이지 열기</button>
         </div>
       `;
       card.addEventListener('click', (event) => {
@@ -381,15 +368,6 @@
     if ($('route-list-desc')) $('route-list-desc').textContent = description;
   }
 
-  function compactUrlLabel(url) {
-    if (!url) return '';
-    try {
-      const parsed = new URL(url);
-      return `${parsed.host}${parsed.pathname}`.replace(/\/$/, '');
-    } catch (_) {
-      return String(url).replace(/^https?:\/\//, '').replace(/\/$/, '');
-    }
-  }
 
   function buildTrailDetailGroup(trail) {
     if (trail.id === 'hanti') {
