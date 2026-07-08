@@ -124,3 +124,12 @@
 - 중복 override 없이 `js/route-nav.js`, `css/route-nav.css`, `index.html`, `sw.js` owner 위치에서 직접 수정했습니다.
 - 캐시 버전: `pilgrimage-route-nav-v48-hanti-full-label-red-dot-20260708`
 - 확인용 쿼리: `?fresh=v48hantidot`
+
+## v49 수정 사항
+
+- 상세 코스 카드 제목 앞의 빨간 동그라미 포인트를 더 크고 선명하게 조정했습니다.
+- 빨간 동그라미가 제목 첫 줄의 시작 높이에 맞도록 정렬했습니다.
+- 상세 코스 카드 제목 글자색을 검정 계열로 변경했습니다.
+- `코스소개` 버튼을 기본 강조색인 파란색 배경, 흰색 글자로 변경했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v49-dot-black-primary-intro-20260708`
+

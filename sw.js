@@ -1,14 +1,14 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v48-hanti-full-label-red-dot-20260708';
+const CACHE_NAME = 'pilgrimage-route-nav-v49-dot-black-primary-intro-20260708';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260708-v48-hanti-full-label-red-dot',
-  './js/route-nav.js?v=20260708-v48-hanti-full-label-red-dot',
-  './routes/hanti-route-data-v1.js?v=20260708-v48-hanti-full-label-red-dot',
-  './routes/seoul-pilgrimage-routes.js?v=20260708-v48-hanti-full-label-red-dot',
-  './routes/nimui-gil-routes.js?v=20260708-v48-hanti-full-label-red-dot',
-  './routes/test-route-data-v1.js?v=20260708-v48-hanti-full-label-red-dot',
+  './css/route-nav.css?v=20260708-v49-dot-black-primary-intro',
+  './js/route-nav.js?v=20260708-v49-dot-black-primary-intro',
+  './routes/hanti-route-data-v1.js?v=20260708-v49-dot-black-primary-intro',
+  './routes/seoul-pilgrimage-routes.js?v=20260708-v49-dot-black-primary-intro',
+  './routes/nimui-gil-routes.js?v=20260708-v49-dot-black-primary-intro',
+  './routes/test-route-data-v1.js?v=20260708-v49-dot-black-primary-intro',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',
