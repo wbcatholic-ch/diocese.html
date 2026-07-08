@@ -315,7 +315,18 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   cursor: pointer;
   font-family: inherit;
 }
-.route-option-main strong { font-size: 20px; line-height: 1.25; font-weight: 950; letter-spacing: -.055em; color: var(--blue); word-break: keep-all; }
+.route-option-main strong { position: relative; display: block; padding-left: 16px; font-size: 20px; line-height: 1.25; font-weight: 950; letter-spacing: -.055em; color: var(--blue); word-break: keep-all; }
+.route-option-main strong::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #e53935;
+  box-shadow: 0 0 0 2px rgba(229, 57, 53, .12);
+}
 .route-option-main span { font-size: 15px; line-height: 1.32; font-weight: 900; letter-spacing: -.04em; white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; color: #334155; }
 .route-option-main em { font-style: normal; font-size: 15px; line-height: 1.32; color: var(--muted); font-weight: 850; white-space: normal; overflow: visible; text-overflow: clip; word-break: keep-all; }
 .route-option-course-intro {

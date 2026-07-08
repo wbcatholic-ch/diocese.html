@@ -442,7 +442,7 @@
       optionLayout: 'single',
       options: [
         {
-          label: '한티가는길 전체',
+          label: '한티가는길 전체코스 보기',
           title: '',
           meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
           variant: 'full-route',

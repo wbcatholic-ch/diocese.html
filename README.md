@@ -41,7 +41,7 @@
 ## v39 수정 사항
 
 - 상세 코스 선택 카드의 기본 높이를 조금 키워 터치 영역을 넓혔습니다.
-- `한티가는길 전체`, `천주교 서울순례길 1~3코스 전체`처럼 전체 경로 선택 버튼은 별도 색상으로 구분했습니다.
+- `한티가는길 전체코스 보기`, `천주교 서울순례길 1~3코스 전체`처럼 전체 경로 선택 버튼은 별도 색상으로 구분했습니다.
 - 중복 스타일이나 하단 override 없이 `route-option-btn` owner와 경로 그룹 옵션 데이터에서 직접 수정했습니다.
 - 캐시 버전: `pilgrimage-route-nav-v40-course-intro-links-20260708`
 
@@ -117,3 +117,10 @@
 - 상세 화면 배경은 중립적인 연회색으로 정리하고, 하단 코스 카드는 흰색 배경으로 통일했습니다.
 - 캐시 버전: `pilgrimage-route-nav-v47-standard-header-full-detail-neutral-20260708`
 - 확인용 쿼리: `?fresh=v47standardfull`
+
+## v48 수정 사항
+- 한티가는길 상세 화면의 전체 경로 선택명을 `한티가는길 전체코스 보기`로 수정했습니다.
+- 상세 코스 카드 제목 앞에 빨간색 포인트 원을 추가했습니다.
+- 중복 override 없이 `js/route-nav.js`, `css/route-nav.css`, `index.html`, `sw.js` owner 위치에서 직접 수정했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v48-hanti-full-label-red-dot-20260708`
+- 확인용 쿼리: `?fresh=v48hantidot`
