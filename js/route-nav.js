@@ -35,14 +35,7 @@
       dataGroup: '서울순례길',
       location: '서울시',
       officialUrl: 'https://martyrs.or.kr/_web/mpilgrims/about.html',
-      description: '천주교 서울 순례길 1~3코스와 김대건 신부 치명 순교길을 별도로 선택합니다.',
-      detailLines: [
-        '1~3코스 총 44.1km',
-        '1코스 8.7km · 3시간 40분',
-        '2코스 5.9km · 2시간 30분',
-        '3코스 29.5km · 8시간',
-        '김대건 신부 치명 순교길 12.7km · 4~5시간'
-      ]
+      description: '천주교 서울 순례길과 김대건 신부 치명 순교길을 별도로 선택합니다.'
     },
     {
       id: 'suwon-didim',
@@ -459,9 +452,9 @@
     const options = [];
     if (fullCourseRoutes.length > 1) {
       options.push({
-        label: '천주교 서울순례길 1~3코스 전체',
+        label: '천주교 서울순례길 전체코스 보기',
         title: '',
-        meta: '44.1km · 1~3코스',
+        meta: '44.1km',
         variant: 'full-route',
         route: createSeoulFullRoute(fullCourseRoutes)
       });
@@ -480,7 +473,7 @@
       id: 'seoul-route-group',
       icon: '⛪',
       title: '천주교 서울 순례길',
-      meta: '1~3코스 전체와 김대건 신부 치명 순교길을 별도로 선택하세요.',
+      meta: '상세 순례길을 선택하세요.',
       foot: `${orderedRoutes.length}개 순례길`,
       optionLayout: 'single',
       options
@@ -670,7 +663,6 @@
     const routeSegments = [];
     const stamps = [];
     orderedRoutes.forEach((route) => {
-      const coursePrefix = seoulRouteMarkerPrefix(route);
       (route.routeSegments || []).forEach((segment, index) => {
         routeSegments.push({
           ...segment,
@@ -680,25 +672,27 @@
       });
       (route.stamps || []).forEach((stamp) => {
         const rawNo = stamp.order || stamp.id || '';
+        const nextNo = stamps.length + 1;
         stamps.push({
           ...stamp,
           id: `${route.id}-${stamp.id || rawNo}`,
-          displayOrder: coursePrefix ? `${coursePrefix}-${rawNo}` : rawNo,
+          order: nextNo,
+          displayOrder: String(nextNo),
           sourceRouteName: route.shortName || route.name
         });
       });
     });
     return {
       id: 'seoul-pilgrimage-full',
-      name: '천주교 서울순례길 1~3코스 전체',
-      shortName: '서울순례길 1~3코스 전체',
+      name: '천주교 서울순례길 전체코스',
+      shortName: '서울순례길 전체코스',
       region: '서울대교구',
       type: 'pilgrimage_route',
       mode: 'route_navigation',
       lineType: 'gpx',
       dataQuality: 'actual-gpx',
       routeGroup: '서울순례길',
-      distanceLabel: '44.1km · 1~3코스',
+      distanceLabel: '44.1km',
       startName: orderedRoutes[0]?.startName || '출발지',
       finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
       features: {
@@ -764,14 +758,17 @@
     if (/1\s*코스/.test(text)) return '8.7km · 3시간 40분';
     if (/2\s*코스/.test(text)) return '5.9km · 2시간 30분';
     if (/3\s*코스/.test(text)) return '29.5km · 8시간';
-    if (isKimDaegeonSeoulRoute(route)) return '12.7km · 4~5시간';
+    if (isKimDaegeonSeoulRoute(route)) return '12.7km';
     return [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · ') || route.distanceLabel || '';
   }
 
   function seoulRouteOptionLabel(route) {
     const text = seoulRouteSearchText(route);
     const match = text.match(/(\d+)\s*코스/);
-    if (match) return route?.shortName || `${match[1]}코스`;
+    if (match) {
+      const courseName = String(route?.shortName || `${match[1]}코스`).replace(/^\d+\s*코스\s*/, '');
+      return `${match[1]}. ${courseName}`.trim();
+    }
     if (isKimDaegeonSeoulRoute(route)) return '김대건 신부 치명 순교길';
     return route?.shortName || '선택';
   }
@@ -1084,7 +1081,8 @@
         content,
         yAnchor: 0.5,
         xAnchor: 0.5,
-        zIndex: 11
+        zIndex: 11,
+        clickable: true
       });
       overlay.setMap(state.map);
       state.stampMarkers.push(overlay);

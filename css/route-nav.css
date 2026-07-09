@@ -352,15 +352,27 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   box-shadow: 0 6px 14px rgba(29, 78, 216, .24);
 }
 .route-option-btn.route-option-full {
+  position: relative;
   min-height: 92px;
-  border-color: #93b4e8;
-  background: #fff;
+  border-width: 3.5px;
+  border-color: #1d4ed8;
+  background: linear-gradient(180deg, #dbeafe 0%, #ffffff 100%);
   color: #172033;
-  box-shadow: 0 6px 16px rgba(29, 78, 216, .09);
+  box-shadow: 0 10px 22px rgba(29, 78, 216, .2);
 }
-.route-option-btn.route-option-full .route-option-main strong { color: #111827; }
+.route-option-btn.route-option-full::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: #1d4ed8;
+}
+.route-option-btn.route-option-full .route-option-main { padding-left: 23px; }
+.route-option-btn.route-option-full .route-option-main strong { color: #0B1D3B; font-weight: 1000; }
 .route-option-btn.route-option-full .route-option-main span,
-.route-option-btn.route-option-full .route-option-main em { color: #475569; }
+.route-option-btn.route-option-full .route-option-main em { color: #1e3a8a; font-weight: 900; }
 .route-option-main:active,
 .route-option-course-intro:active { transform: translateY(1px); }
 .route-card-main { display: flex; gap: 13px; align-items: center; padding: 16px; }

@@ -1,14 +1,14 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v53-detail-card-border-20260708';
+const CACHE_NAME = 'pilgrimage-route-nav-v56-seoul-top-clean-full-card-20260709';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260708-v53-detail-card-border',
-  './js/route-nav.js?v=20260708-v53-detail-card-border',
-  './routes/hanti-route-data-v1.js?v=20260708-v53-detail-card-border',
-  './routes/seoul-pilgrimage-routes.js?v=20260708-v53-detail-card-border',
-  './routes/nimui-gil-routes.js?v=20260708-v53-detail-card-border',
-  './routes/test-route-data-v1.js?v=20260708-v53-detail-card-border',
+  './css/route-nav.css?v=20260709-v56-seoul-top-clean-full-card',
+  './js/route-nav.js?v=20260709-v56-seoul-top-clean-full-card',
+  './routes/hanti-route-data-v1.js?v=20260709-v56-seoul-top-clean-full-card',
+  './routes/seoul-pilgrimage-routes.js?v=20260709-v56-seoul-top-clean-full-card',
+  './routes/nimui-gil-routes.js?v=20260709-v56-seoul-top-clean-full-card',
+  './routes/test-route-data-v1.js?v=20260709-v56-seoul-top-clean-full-card',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',
