@@ -569,14 +569,28 @@
     };
   }
 
+  const FULL_ROUTE_SECTION_COLORS = [
+    '#1d4ed8', '#2563eb', '#0ea5e9', '#0891b2', '#0f766e', '#16a34a', '#65a30d',
+    '#ca8a04', '#ea580c', '#dc2626', '#db2777', '#9333ea', '#7c3aed', '#4f46e5',
+    '#0369a1', '#15803d', '#b45309', '#be123c'
+  ];
+
+  function fullRouteSectionColor(index) {
+    return FULL_ROUTE_SECTION_COLORS[index % FULL_ROUTE_SECTION_COLORS.length];
+  }
+
   function createNimuiFullRoute(routes, id, name, distanceLabel, durationLabel) {
     const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
     const routeSegments = [];
-    orderedRoutes.forEach((route) => {
+    orderedRoutes.forEach((route, routeIndex) => {
+      const displayColor = fullRouteSectionColor(routeIndex);
       (route.routeSegments || []).forEach((segment, index) => {
         routeSegments.push({
           ...segment,
           id: `${id}-${route.id}-${segment.id || index}`,
+          sourceRouteId: route.id,
+          sourceRouteName: route.shortName || route.name,
+          displayColor,
           points: segment.points || []
         });
       });
@@ -799,11 +813,15 @@
       .sort(compareSeoulRouteOrder);
     const routeSegments = [];
     const stamps = [];
-    orderedRoutes.forEach((route) => {
+    orderedRoutes.forEach((route, routeIndex) => {
+      const displayColor = fullRouteSectionColor(routeIndex);
       (route.routeSegments || []).forEach((segment, index) => {
         routeSegments.push({
           ...segment,
           id: `seoul-full-${route.id}-${segment.id || index}`,
+          sourceRouteId: route.id,
+          sourceRouteName: route.shortName || route.name,
+          displayColor,
           points: segment.points || []
         });
       });
@@ -1213,27 +1231,23 @@
   function renderSegmentedRouteLines(route) {
     clearRouteSegmentPolylines();
     if (!state.map || !window.kakao?.maps) return;
-    const seenDisplaySegments = new Set();
-    (route?.routeSegments || []).forEach((segment) => {
+    (route?.routeSegments || []).forEach((segment, segmentIndex) => {
       const validPoints = (segment.points || [])
         .filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng))
         .map((point) => ({ lat: Number(point.lat), lng: Number(point.lng) }));
       if (validPoints.length < 2) return;
 
-      // 님의 길 통합코스에서는 동일한 길을 정방향·역방향으로 다시 지나는 경우에도
-      // 지도에는 경로선을 한 번만 그린다. 내비게이션용 원본 세그먼트와 방향은 유지한다.
-      if (isNimuiCombinedRoute(route)) {
-        const signature = routeSegmentDisplaySignature(validPoints);
-        if (seenDisplaySegments.has(signature)) return;
-        seenDisplaySegments.add(signature);
-      }
-
+      // 전체코스는 세부 코스별 색상을 유지한다. 같은 길을 반대 방향으로 지나도
+      // 표시용 선만 제거하지 않고 각각 그려, 선택한 코스의 방향 데이터도 보존한다.
+      const isHantiFull = route?.id === 'hanti';
+      const displayColor = segment.displayColor
+        || (isHantiFull ? fullRouteSectionColor(segmentIndex) : '#1d4ed8');
       const path = validPoints.map((point) => new kakao.maps.LatLng(point.lat, point.lng));
       const polyline = new kakao.maps.Polyline({
         map: state.map,
         path,
         strokeWeight: 6,
-        strokeColor: '#1d4ed8',
+        strokeColor: displayColor,
         strokeOpacity: 0.95,
         strokeStyle: 'solid'
       });
@@ -1243,17 +1257,6 @@
 
   function isNimuiCombinedRoute(route) {
     return route?.region === '원주교구' && /-full$/.test(String(route?.id || ''));
-  }
-
-  function routeSegmentDisplaySignature(points) {
-    const sampleStep = Math.max(1, Math.floor(points.length / 80));
-    const sampled = points.filter((_, index) => index % sampleStep === 0 || index === points.length - 1);
-    const encode = (items) => items
-      .map((point) => `${point.lat.toFixed(5)},${point.lng.toFixed(5)}`)
-      .join('|');
-    const forward = encode(sampled);
-    const reverse = encode(sampled.slice().reverse());
-    return forward < reverse ? forward : reverse;
   }
 
   function getRouteLandmarks(route) {
