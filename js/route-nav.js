@@ -817,8 +817,18 @@
   }
 
   function createHantiCourseRoute(baseRoute, course) {
-    const stampIds = Array.isArray(course?.stampIds) ? course.stampIds : [];
-    const stamps = stampIds
+    const courses = Array.isArray(baseRoute?.courses) ? baseRoute.courses : [];
+    const courseIndex = courses.findIndex((item) => item?.id === course?.id || item?.courseNo === course?.courseNo);
+    const stampIds = Array.isArray(course?.stampIds) ? course.stampIds.slice() : [];
+    const nextCourse = courseIndex >= 0 ? courses[courseIndex + 1] : null;
+    const nextStartId = Array.isArray(nextCourse?.stampIds) ? nextCourse.stampIds[0] : null;
+
+    // 한티가는길의 각 코스는 마지막 번호 지점에서 끝나는 것이 아니라
+    // 다음 코스 첫 지점까지 실제 원본 경로를 따라 이어진다.
+    // 1-4→2-1, 2-3→3-1, 3-4→4-1, 4-4→5-1 전환 구간을
+    // 임의 직선이 아닌 원본 GPX 좌표로 포함한다.
+    const navigationStampIds = nextStartId ? [...stampIds, nextStartId] : stampIds;
+    const stamps = navigationStampIds
       .map((id) => (baseRoute.stamps || []).find((stamp) => stamp.id === id))
       .filter(Boolean);
     const startStamp = stamps[0] || null;
@@ -842,10 +852,11 @@
       routeSegments: [{
         id: `${baseRoute.id}-course-${course.courseNo || course.id}-slice`,
         type: 'gpx-slice',
+        displayColor: fullRouteSectionColor(Math.max(0, courseIndex)),
         points
       }],
       courses: undefined,
-      flexibleRouteSections: filterFlexibleSectionsForStamps(baseRoute.flexibleRouteSections, stampIds)
+      flexibleRouteSections: filterFlexibleSectionsForStamps(baseRoute.flexibleRouteSections, navigationStampIds)
     };
   }
 
@@ -1361,29 +1372,21 @@
       const content = overlay.__content;
       if (!content) return;
 
-      // 모든 순례길 공통 규칙
-      // 지나치게 축소한 경우에만 숨기고, 그 외에는 코스 번호와 코스명을 함께 유지한다.
-      // 11~12: 전체 지도를 가리지 않는 아주 작은 전체 코스 정보
-      // 8~10: 작은 전체 코스 정보
-      // 6~7: 조금 더 또렷한 전체 코스 정보
-      // 5 이하: 상세 전체 코스 정보(최대 크기는 제한)
-      if (level >= 13) {
+      // 모든 순례길 공통 기준: 같은 줌에서는 같은 글자 크기와 카드 크기를 사용한다.
+      // 너무 멀리 축소한 경우만 숨기고, 그 외에는 번호와 코스명을 항상 함께 표시한다.
+      if (level >= 14) {
         content.hidden = true;
         return;
       }
       content.hidden = false;
       content.textContent = content.dataset.full || content.dataset.name;
-      if (level >= 11) {
-        content.className = 'course-map-label far-overview';
-      } else if (level >= 8) {
-        content.className = 'course-map-label overview';
-      } else if (level >= 6) {
-        content.className = 'course-map-label compact';
-      } else {
-        content.className = 'course-map-label detail';
-      }
+      if (level >= 12) content.className = 'course-map-label zoom-far';
+      else if (level >= 10) content.className = 'course-map-label zoom-low';
+      else if (level >= 7) content.className = 'course-map-label zoom-mid';
+      else content.className = 'course-map-label zoom-near';
     });
   }
+
 
   function clearRouteSegmentPolylines() {
     state.routeSegmentPolylines.forEach((polyline) => polyline.setMap(null));
@@ -1431,6 +1434,16 @@
 
   function getRouteLandmarks(route) {
     if (!route) return [];
+
+    // 한티가는길은 교구 전체 성지가 아니라 순례길에 직접 해당하는 세 곳만 표시한다.
+    if (route.id === 'hanti' || String(route.id || '').startsWith('hanti__') || route.routeGroup === '한티가는길') {
+      const wanted = ['가실성당', '신나무골', '한티순교성지'];
+      return wanted.map((name) => {
+        const stamp = (route.stamps || []).find((item) => String(item?.name || '').replace(/\s+/g, '') === name.replace(/\s+/g, ''))
+          || (window.PILGRIMAGE_ROUTE_HANTI?.stamps || []).find((item) => String(item?.name || '').replace(/\s+/g, '') === name.replace(/\s+/g, ''));
+        return stamp ? { name, lat: stamp.lat, lng: stamp.lng } : null;
+      }).filter(Boolean);
+    }
 
     // 서울·전주 순례길은 각 코스에 지정된 지점만 성지 마커로 사용한다.
     if (route.region === '서울대교구' || route.region === '전주교구') {
@@ -1611,54 +1624,48 @@
     hideStampInfo();
     const KM = kakao.maps;
     const orderText = stampMarkerText(stamp);
-    const title = `${orderText ? orderText + '. ' : ''}${stamp.name || '순례 지점'}`;
-    const groupText = stamp.category || state.activeRoute?.routeGroup || state.activeRoute?.region || state.activeRoute?.name || '순례길';
+    const title = `${orderText ? orderText + ' ' : ''}${stamp.name || '순례 지점'}`.trim();
+    const content = createUnifiedMapInfoCard(title, '지점 정보 닫기');
+    state.stampInfoOverlay = new KM.CustomOverlay({
+      position,
+      content,
+      xAnchor: 0.5,
+      yAnchor: 1,
+      zIndex: 32
+    });
+    state.stampInfoOverlay.setMap(state.map);
+  }
+
+  function createUnifiedMapInfoCard(title, closeLabel) {
     const content = document.createElement('div');
-    content.className = 'stamp-info-card';
+    content.className = 'stamp-info-card unified-map-info-card';
     content.innerHTML = `
-      <button class="stamp-info-close" type="button" aria-label="지점 정보 닫기">×</button>
-      <div class="stamp-info-title">${escapeHtml(title)}</div>
-      <div class="stamp-info-meta">${escapeHtml(groupText)}</div>
+      <button class="stamp-info-close" type="button" aria-label="${escapeHtml(closeLabel || '정보 닫기')}">×</button>
+      <div class="stamp-info-title">${escapeHtml(title || '')}</div>
     `;
     content.querySelector('.stamp-info-close')?.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
       hideStampInfo();
     });
-    state.stampInfoOverlay = new KM.CustomOverlay({
-      position,
-      content,
-      xAnchor: 0,
-      yAnchor: 0,
-      zIndex: 32
-    });
-    state.stampInfoOverlay.setMap(state.map);
+    return content;
   }
 
 
   function showLandmarkInfo(landmark, position) {
     if (!state.map || !window.kakao?.maps || !landmark) return;
     hideStampInfo();
-    const content = document.createElement('div');
-    content.className = 'stamp-info-card landmark-name-only';
-    content.innerHTML = `
-      <button class="stamp-info-close" type="button" aria-label="성지 정보 닫기">×</button>
-      <div class="stamp-info-title">${escapeHtml(landmark.name || '성지')}</div>
-    `;
-    content.querySelector('.stamp-info-close')?.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      hideStampInfo();
-    });
+    const content = createUnifiedMapInfoCard(landmark.name || '성지', '성지 정보 닫기');
     state.stampInfoOverlay = new kakao.maps.CustomOverlay({
       position,
       content,
-      xAnchor: 0,
-      yAnchor: 0,
+      xAnchor: 0.5,
+      yAnchor: 1,
       zIndex: 32
     });
     state.stampInfoOverlay.setMap(state.map);
   }
+
 
   function hideStampInfo() {
     if (!state.stampInfoOverlay) return;

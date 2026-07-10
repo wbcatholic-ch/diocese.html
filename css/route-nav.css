@@ -738,14 +738,20 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
 .route-marker { transform: translate(-50%, -100%); padding: 6px 8px; border-radius: 999px; background: #172033; color: #fff; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(15,23,42,.3); font-size: 11px; font-weight: 950; white-space: nowrap; }
 .stamp-info-card {
-  min-width: 180px;
-  max-width: 240px;
-  transform: translate(-50%, calc(-100% - 14px));
-  padding: 10px 12px;
-  border-radius: 16px;
+  position: relative;
+  min-width: 96px;
+  width: max-content;
+  max-width: min(210px, calc(100vw - 36px));
+  min-height: 42px;
+  transform: translateY(-14px);
+  padding: 10px 38px 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
   background: rgba(255, 253, 248, .98);
   border: 1.5px solid #d8c6aa;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, .22);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, .20);
   color: #172033;
   pointer-events: auto;
 }
@@ -753,18 +759,40 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -8px;
-  width: 14px;
-  height: 14px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
   transform: translateX(-50%) rotate(45deg);
   background: rgba(255, 253, 248, .98);
   border-right: 1.5px solid #d8c6aa;
   border-bottom: 1.5px solid #d8c6aa;
 }
-.stamp-info-title { font-size: 14px; font-weight: 950; line-height: 1.32; letter-spacing: -.045em; word-break: keep-all; }
-.stamp-info-meta { margin-top: 4px; font-size: 11px; font-weight: 850; color: #7a4f10; }
-.stamp-info-close { position: absolute; right: 7px; top: 5px; width: 24px; height: 24px; border: 0; border-radius: 999px; background: rgba(23, 32, 51, .08); color: #172033; font-weight: 950; line-height: 1; }
-.stamp-info-close + .stamp-info-title { padding-right: 26px; }
+.stamp-info-title {
+  max-width: 170px;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.35;
+  letter-spacing: -.035em;
+  text-align: center;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.stamp-info-close {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, .08);
+  color: #172033;
+  font-size: 16px;
+  font-weight: 950;
+  line-height: 1;
+}
+.unified-map-info-card .stamp-info-title { padding: 0; }
 .my-location-marker { position: relative; width: 19px; height: 19px; border-radius: 50%; background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 5px rgba(37,99,235,.22), 0 4px 12px rgba(15,23,42,.25); }
 .my-location-marker.following::after { content: ""; position: absolute; left: 50%; top: -12px; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 12px solid #2563eb; }
 
@@ -793,23 +821,21 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-badge.test { background: #eef2ff; color: #1d4ed8; border-color: rgba(29, 78, 216, .32); }
 
 .course-map-label {
-  max-width: 156px;
-  padding: 3px 7px;
+  max-width: 178px;
   border: 1.5px solid rgba(255,255,255,.96);
   border-radius: 999px;
-  background: rgba(11,29,59,.86);
+  background: rgba(11,29,59,.88);
   color: #fff;
   box-shadow: 0 2px 7px rgba(0,0,0,.20);
-  font-size: 10px;
   line-height: 1.15;
   font-weight: 900;
+  text-align: center;
   white-space: nowrap;
   pointer-events: none;
-  transform: scale(.94);
   transform-origin: center;
 }
-.course-map-label.far-overview { max-width: 118px; padding: 1px 4px; font-size: 7.5px; opacity: .82; transform: scale(.76); }
-.course-map-label.overview { max-width: 138px; padding: 2px 5px; font-size: 8.5px; opacity: .9; transform: scale(.84); }
-.course-map-label.compact { max-width: 152px; padding: 2px 6px; font-size: 9.5px; transform: scale(.90); }
-.course-map-label.detail { max-width: 168px; padding: 3px 7px; font-size: 11px; transform: scale(.98); }
+.course-map-label.zoom-far { max-width: 132px; padding: 2px 5px; font-size: 8px; opacity: .86; transform: scale(.82); }
+.course-map-label.zoom-low { max-width: 148px; padding: 2px 6px; font-size: 9px; opacity: .92; transform: scale(.88); }
+.course-map-label.zoom-mid { max-width: 164px; padding: 3px 7px; font-size: 10.5px; transform: scale(.94); }
+.course-map-label.zoom-near { max-width: 178px; padding: 3px 8px; font-size: 12px; transform: scale(1); }
 .course-map-label[hidden] { display: none !important; }
