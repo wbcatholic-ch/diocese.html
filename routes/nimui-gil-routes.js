@@ -9370,7 +9370,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
     "courseIntroUrl": "https://sunraegil.seoji.net/course/course_3",
     "startName": "옛 구재공소",
     "finishName": "문막성당",
-    "sourceNote": "nimui-gil-1-3-nine-pass-road.gpx 기준 실제 GPX 경로선",
+    "sourceNote": "nimui-gil-1-3-nine-pass-road.gpx 원본 3개 GPX 세그먼트 기준 경로선",
     "features": {
       "showRouteLine": true,
       "showStampMarkers": true,
@@ -14931,15 +14931,7 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
           {
             "lat": 37.34454857785715,
             "lng": 127.83427852886544
-          }
-        ]
-      },
-      {
-        "id": "nimui-nine-pass-road-gpx-3",
-        "name": "님의 길 1-3 아홉고개길 GPX 경로 3",
-        "type": "gpx",
-        "sourceFile": "gpx/nimui-gil-1-3-nine-pass-road.gpx",
-        "points": [
+          },
           {
             "lat": 37.33834927049254,
             "lng": 127.82667736761672
@@ -17395,8 +17387,8 @@ window.PILGRIMAGE_ROUTE_NIMUI = [
         ]
       },
       {
-        "id": "nimui-nine-pass-road-gpx-4",
-        "name": "님의 길 1-3 아홉고개길 GPX 경로 4",
+        "id": "nimui-nine-pass-road-gpx-3",
+        "name": "님의 길 1-3 아홉고개길 GPX 경로 3",
         "type": "gpx",
         "sourceFile": "gpx/nimui-gil-1-3-nine-pass-road.gpx",
         "points": [

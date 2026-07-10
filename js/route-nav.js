@@ -951,12 +951,13 @@
   function openRoute(route, options = {}) {
     stopLocationWatch();
     state.activeRoute = route;
-    state.routeDirection = normalizeDirection(options.restoreState?.routeDirection || 'forward');
-    state.lastCoords = sanitizeCoords(options.restoreState?.lastCoords) || null;
-    state.walkedTrack = sanitizeTrack(options.restoreState?.walkedTrack || []);
-    state.elapsedActiveMs = sanitizeElapsedMs(options.restoreState?.elapsedActiveMs);
+    const restoredState = validRestoreStateForRoute(route, options.restoreState);
+    state.routeDirection = normalizeDirection(restoredState?.routeDirection || 'forward');
+    state.lastCoords = sanitizeCoords(restoredState?.lastCoords) || null;
+    state.walkedTrack = sanitizeTrack(restoredState?.walkedTrack || []);
+    state.elapsedActiveMs = sanitizeElapsedMs(restoredState?.elapsedActiveMs);
     state.activeSince = null;
-    state.following = Boolean(options.restoreState?.following);
+    state.following = Boolean(restoredState?.following);
     resumeAutoCenter({ skipPan: true });
     rebuildNavigationModel();
     setStatusSheetMode(STATUS_SHEET_COMPACT);
@@ -966,7 +967,7 @@
     activateMapHistory();
     clearMapExitBanner();
     updateRouteHeader();
-    resetStatusForActiveRoute(Boolean(options.restoreState));
+    resetStatusForActiveRoute(Boolean(restoredState));
     updateFollowButtons();
     showFlexNote(route);
     resetMapLoading('지도를 불러오는 중입니다');
@@ -1784,8 +1785,17 @@
     const progress = state.navigationModel.totalDistanceM ? clamp((nearest.distanceAlongM / state.navigationModel.totalDistanceM) * 100, 0, 100) : 0;
     const lineName = routeUsesRepresentativeLine(state.activeRoute) ? '대표 경로선' : 'GPX 경로';
 
-    updateNavigationMetrics({ progress, nextStamp });
-    renderRouteProgressLines(nearest.distanceAlongM);
+    const navigationStarted = hasStartedNavigationSession();
+    if (navigationStarted) {
+      updateNavigationMetrics({ progress, nextStamp });
+      renderRouteProgressLines(nearest.distanceAlongM);
+    } else {
+      const progressEl = $('route-progress');
+      const nextEl = $('next-distance');
+      if (progressEl) progressEl.textContent = '—';
+      if (nextEl) nextEl.textContent = '—';
+      renderRouteProgressLines(null);
+    }
 
     if (state.autoCenterPaused && state.following) return;
 
@@ -2011,6 +2021,10 @@
   function renderWalkedTrack() {
     if (!state.map || !window.kakao?.maps) return;
     const track = state.walkedTrack.filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng));
+    if (!hasStartedNavigationSession() || track.length < 2) {
+      clearPolyline('walkedTrackPolyline');
+      return;
+    }
     setPolylinePath('walkedTrackPolyline', track, {
       strokeWeight: 4,
       strokeColor: '#7a4f10',
@@ -2287,6 +2301,29 @@
       .catch(() => saveNavigationState());
   }
 
+  function routeRevision(route) {
+    const parts = [String(route?.id || '')];
+    (route?.routeSegments || []).forEach((segment) => {
+      const points = (segment.points || []).filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng));
+      const first = points[0];
+      const last = points[points.length - 1];
+      parts.push([
+        String(segment.id || ''),
+        String(points.length),
+        first ? `${Number(first.lat).toFixed(6)},${Number(first.lng).toFixed(6)}` : '',
+        last ? `${Number(last.lat).toFixed(6)},${Number(last.lng).toFixed(6)}` : ''
+      ].join(':'));
+    });
+    return parts.join('|');
+  }
+
+  function validRestoreStateForRoute(route, saved) {
+    if (!saved?.navigationStarted) return null;
+    if (saved.routeId !== route?.id) return null;
+    if (saved.routeRevision !== routeRevision(route)) return null;
+    return saved;
+  }
+
   function restoreNavigationIfValid() {
     const saved = loadTemporaryNavigationState();
     if (!saved) return;
@@ -2295,7 +2332,7 @@
       return;
     }
     const route = findRouteForRestore(saved.routeId);
-    if (!route) {
+    if (!route || !validRestoreStateForRoute(route, saved)) {
       clearTemporaryNavigationState();
       return;
     }
@@ -2313,8 +2350,14 @@
 
   function saveNavigationState() {
     if (!state.activeRoute) return;
+    if (!hasStartedNavigationSession()) {
+      clearTemporaryNavigationState();
+      return;
+    }
     const data = {
       routeId: state.activeRoute.id,
+      routeRevision: routeRevision(state.activeRoute),
+      navigationStarted: true,
       routeDirection: state.routeDirection,
       following: state.following,
       lastCoords: state.lastCoords,
