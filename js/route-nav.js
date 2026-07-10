@@ -759,28 +759,58 @@
   function createHantiFullRoute(baseRoute) {
     const courses = Array.isArray(baseRoute?.courses) ? baseRoute.courses : [];
     if (!courses.length) return { ...baseRoute, preserveSegmentBreaks: true };
+
+    // 한티가는길 전체코스는 각 코스의 마지막 스탬프와 다음 코스의 첫 스탬프
+    // 사이 좌표까지 빠짐없이 분담한다. 스탬프 사이를 단순 잘라내면 코스 끝부분이
+    // 지도에서 끊겨 보이므로, 인접 코스의 경계는 두 스탬프 인덱스의 중간으로 잡는다.
+    const allPoints = flattenRoutePoints({ ...baseRoute, preserveSegmentBreaks: false })
+      .map((point) => ({ lat: Number(point.lat), lng: Number(point.lng) }))
+      .filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng));
+    if (allPoints.length < 2) return { ...baseRoute, preserveSegmentBreaks: true };
+
+    const courseRanges = courses.map((course) => {
+      const stampIds = Array.isArray(course?.stampIds) ? course.stampIds : [];
+      const startStamp = (baseRoute.stamps || []).find((stamp) => stamp.id === stampIds[0]);
+      const finishStamp = (baseRoute.stamps || []).find((stamp) => stamp.id === stampIds[stampIds.length - 1]);
+      return {
+        course,
+        startIndex: findNearestRoutePointIndex(allPoints, startStamp),
+        finishIndex: findNearestRoutePointIndex(allPoints, finishStamp)
+      };
+    });
+
+    const boundaries = [0];
+    for (let index = 0; index < courseRanges.length - 1; index += 1) {
+      const currentFinish = courseRanges[index].finishIndex;
+      const nextStart = courseRanges[index + 1].startIndex;
+      const safeCurrent = Number.isFinite(currentFinish) ? currentFinish : boundaries[index];
+      const safeNext = Number.isFinite(nextStart) ? nextStart : safeCurrent;
+      boundaries.push(Math.max(boundaries[index], Math.round((safeCurrent + safeNext) / 2)));
+    }
+    boundaries.push(allPoints.length - 1);
+
     const routeSegments = [];
     courses.forEach((course, courseIndex) => {
-      const stampIds = Array.isArray(course?.stampIds) ? course.stampIds : [];
-      const startStampId = stampIds[0];
-      const finishStampId = stampIds[stampIds.length - 1];
-      const points = sliceRoutePointsByStamps(baseRoute, startStampId, finishStampId);
+      const from = Math.max(0, Math.min(allPoints.length - 2, boundaries[courseIndex]));
+      const to = Math.max(from + 1, Math.min(allPoints.length - 1, boundaries[courseIndex + 1]));
+      const points = allPoints.slice(from, to + 1);
       if (points.length < 2) return;
       routeSegments.push({
         id: `${baseRoute.id}-full-course-${course.courseNo || course.id || courseIndex + 1}`,
         type: 'gpx-slice',
         sourceRouteName: `${course.courseNo || courseIndex + 1}코스 ${course.name || ''}`.trim(),
         displayColor: fullRouteSectionColor(courseIndex),
-        displayWeight: 7 + ((courses.length - courseIndex - 1) % 3),
+        displayWeight: 8,
         points
       });
     });
+
     return {
       ...baseRoute,
       id: `${baseRoute.id}-full`,
       name: '한티가는길 전체코스',
       shortName: '한티가는길 전체코스',
-      preserveSegmentBreaks: true,
+      preserveSegmentBreaks: false,
       routeSegments,
       courses: undefined
     };
@@ -1270,8 +1300,10 @@
   function splitCourseLabel(text) {
     const raw = String(text || '').trim();
     const match = raw.match(/^((?:\d+-\d+|\d+)\s*(?:코스|길)?)(?:\s+(.+))?$/);
-    if (!match) return { number: raw, full: raw };
-    return { number: match[1].trim(), full: [match[1], match[2]].filter(Boolean).join(' ').trim() };
+    if (!match) return { number: raw, name: raw, full: raw };
+    const number = match[1].trim();
+    const name = String(match[2] || '').trim() || number;
+    return { number, name, full: [number, match[2]].filter(Boolean).join(' ').trim() };
   }
 
   function representativePoint(points) {
@@ -1308,8 +1340,9 @@
       const content = document.createElement('div');
       content.className = 'course-map-label';
       content.dataset.number = labels.number;
+      content.dataset.name = labels.name;
       content.dataset.full = labels.full;
-      content.textContent = labels.full;
+      content.textContent = labels.name;
       const overlay = new kakao.maps.CustomOverlay({
         position: new kakao.maps.LatLng(Number(spec.point.lat), Number(spec.point.lng)),
         content, xAnchor: 0.5, yAnchor: 0.5, zIndex: 17
@@ -1327,15 +1360,27 @@
     state.courseLabelOverlays.forEach((overlay) => {
       const content = overlay.__content;
       if (!content) return;
-      if (level >= 8) {
+
+      // 모든 순례길 공통 규칙
+      // 10 이상: 전체 지도를 가리지 않도록 숨김
+      // 8~9: 코스 이름만 작게 표시
+      // 6~7: 코스 번호 + 이름 표시
+      // 5 이하: 번호 + 이름을 조금 더 또렷하게 표시하되 크기는 제한
+      if (level >= 10) {
         content.hidden = true;
         return;
       }
       content.hidden = false;
-      const numberOnly = level >= 6;
-      content.textContent = numberOnly ? content.dataset.number : content.dataset.full;
-      content.classList.toggle('compact', numberOnly);
-      content.classList.toggle('detail', level <= 4);
+      if (level >= 8) {
+        content.textContent = content.dataset.name || content.dataset.full;
+        content.className = 'course-map-label overview';
+      } else if (level >= 6) {
+        content.textContent = content.dataset.full;
+        content.className = 'course-map-label compact';
+      } else {
+        content.textContent = content.dataset.full;
+        content.className = 'course-map-label detail';
+      }
     });
   }
 
@@ -1506,8 +1551,11 @@
     state.stampMarkers.forEach((item) => {
       const marker = item.marker || item;
       const stamp = item.stamp || {};
-      const isEndpoint = stamp.role === 'start' || stamp.role === 'finish';
-      const visible = isEndpoint || level <= 4;
+      const isWonjuEndpoint = state.activeRoute?.region === '원주교구'
+        && (stamp.role === 'start' || stamp.role === 'finish');
+      // 번호형 지점 마커는 상세 확대에서만 표시한다. 전체 지도에서는 코스명 라벨과
+      // 경로선이 우선 보이도록 하고, 원주교구의 출발/도착 표시는 계속 유지한다.
+      const visible = isWonjuEndpoint || level <= 5;
       marker.setMap(visible ? state.map : null);
     });
   }
