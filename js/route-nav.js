@@ -572,7 +572,6 @@
   function createNimuiFullRoute(routes, id, name, distanceLabel, durationLabel) {
     const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
     const routeSegments = [];
-    const stamps = [];
     orderedRoutes.forEach((route) => {
       (route.routeSegments || []).forEach((segment, index) => {
         routeSegments.push({
@@ -581,19 +580,14 @@
           points: segment.points || []
         });
       });
-      (route.stamps || []).forEach((stamp) => {
-        const previous = stamps[stamps.length - 1];
-        const isSamePlace = previous && Math.abs(previous.lat - stamp.lat) < 0.00002 && Math.abs(previous.lng - stamp.lng) < 0.00002;
-        if (isSamePlace) return;
-        stamps.push({
-          ...stamp,
-          id: `${route.id}-${stamp.id || stamp.order || stamps.length + 1}`,
-          order: stamps.length + 1,
-          displayOrder: String(stamps.length + 1),
-          sourceRouteName: route.shortName || route.name
-        });
-      });
     });
+    const firstRoute = orderedRoutes[0];
+    const lastRoute = orderedRoutes[orderedRoutes.length - 1];
+    const firstPoint = firstRoute?.routeSegments?.[0]?.points?.[0];
+    const lastSegment = lastRoute?.routeSegments?.[lastRoute.routeSegments.length - 1];
+    const lastPoint = lastSegment?.points?.[lastSegment.points.length - 1];
+    const startName = firstRoute?.startName || '출발지';
+    const finishName = lastRoute?.finishName || '도착지';
     return {
       id,
       name,
@@ -606,18 +600,34 @@
       routeGroup: '님의 길',
       distanceLabel,
       durationLabel,
-      startName: orderedRoutes[0]?.startName || '출발지',
-      finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
+      startName,
+      finishName,
       preserveSegmentBreaks: true,
+      landmarkMaxDistanceM: 2000,
       features: {
         showRouteLine: true,
-        showStampMarkers: false,
+        showStampMarkers: true,
         autoStamp: false,
         nextStampDistance: false,
         offRouteAlert: true,
         nearestStampDistance: false
       },
-      stamps: [],
+      stamps: [
+        {
+          id: 'start',
+          role: 'start',
+          name: startName,
+          lat: Number(firstPoint?.lat),
+          lng: Number(firstPoint?.lng)
+        },
+        {
+          id: 'finish',
+          role: 'finish',
+          name: finishName,
+          lat: Number(lastPoint?.lat),
+          lng: Number(lastPoint?.lng)
+        }
+      ],
       routeSegments
     };
   }
@@ -1221,9 +1231,27 @@
 
   function getRouteLandmarks(route) {
     const catalog = window.PILGRIMAGE_LANDMARKS_BY_REGION || {};
-    const regionalLandmarks = catalog[route?.region];
-    if (Array.isArray(regionalLandmarks)) return regionalLandmarks;
-    return Array.isArray(route?.landmarks) ? route.landmarks : [];
+    const regionalLandmarks = Array.isArray(catalog[route?.region])
+      ? catalog[route.region]
+      : (Array.isArray(route?.landmarks) ? route.landmarks : []);
+    if (route?.region !== '원주교구') return regionalLandmarks;
+
+    const routePoints = flattenRoutePoints(route);
+    const routeSegments = buildSegmentIndexFromPoints(routePoints);
+    const maxDistanceM = Number(route.landmarkMaxDistanceM || 2000);
+    const endpointStamps = (route.stamps || []).filter((stamp) => stamp?.role === 'start' || stamp?.role === 'finish');
+
+    return regionalLandmarks.filter((landmark) => {
+      if (!isFiniteNumber(landmark.lat) || !isFiniteNumber(landmark.lng) || !routeSegments.length) return false;
+      const point = { lat: Number(landmark.lat), lng: Number(landmark.lng) };
+      const nearest = findNearestPointOnRoute(point, routeSegments);
+      if (!nearest || !Number.isFinite(nearest.distanceM) || nearest.distanceM > maxDistanceM) return false;
+      return !endpointStamps.some((stamp) => (
+        isFiniteNumber(stamp.lat) &&
+        isFiniteNumber(stamp.lng) &&
+        haversineM(point, { lat: Number(stamp.lat), lng: Number(stamp.lng) }) < 150
+      ));
+    });
   }
 
   function renderLandmarkMarkers(route) {
@@ -1242,12 +1270,7 @@
         zIndex: 19
       });
       if (events?.addListener) {
-        events.addListener(marker, 'click', () => showStampInfo({
-          ...landmark,
-          displayOrder: '',
-          name: landmark.name || '성지',
-          description: landmark.category || '성지·순례지'
-        }, position));
+        events.addListener(marker, 'click', () => showLandmarkInfo(landmark, position));
       }
       state.landmarkMarkers.push(marker);
     });
@@ -1294,6 +1317,10 @@
 
   function stampMarkerText(stamp) {
     if (!stamp) return '';
+    if (state.activeRoute?.region === '원주교구') {
+      if (stamp.role === 'start') return '출발';
+      if (stamp.role === 'finish') return '도착';
+    }
     if (stamp.displayOrder) return String(stamp.displayOrder);
     if (typeof stamp.id === 'string' && stamp.id.includes('-')) return stamp.id;
     if (stamp.order) return String(stamp.order);
@@ -1353,6 +1380,31 @@
       hideStampInfo();
     });
     state.stampInfoOverlay = new KM.CustomOverlay({
+      position,
+      content,
+      xAnchor: 0,
+      yAnchor: 0,
+      zIndex: 32
+    });
+    state.stampInfoOverlay.setMap(state.map);
+  }
+
+
+  function showLandmarkInfo(landmark, position) {
+    if (!state.map || !window.kakao?.maps || !landmark) return;
+    hideStampInfo();
+    const content = document.createElement('div');
+    content.className = 'stamp-info-card landmark-name-only';
+    content.innerHTML = `
+      <button class="stamp-info-close" type="button" aria-label="성지 정보 닫기">×</button>
+      <div class="stamp-info-title">${escapeHtml(landmark.name || '성지')}</div>
+    `;
+    content.querySelector('.stamp-info-close')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      hideStampInfo();
+    });
+    state.stampInfoOverlay = new kakao.maps.CustomOverlay({
       position,
       content,
       xAnchor: 0,
