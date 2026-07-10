@@ -1,14 +1,14 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v63-nimui-3-5-seongsa-20260710';
+const CACHE_NAME = 'pilgrimage-route-nav-v65-wonju-title-navy-20260710';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260710-v63-nimui-3-5',
-  './js/route-nav.js?v=20260710-v63-nimui-3-5',
-  './routes/hanti-route-data-v1.js?v=20260710-v63-nimui-3-5',
-  './routes/seoul-pilgrimage-routes.js?v=20260710-v63-nimui-3-5',
-  './routes/nimui-gil-routes.js?v=20260710-v63-nimui-3-5',
-  './routes/test-route-data-v1.js?v=20260710-v63-nimui-3-5',
+  './css/route-nav.css?v=20260710-v65-wonju-title-navy',
+  './js/route-nav.js?v=20260710-v65-wonju-title-navy',
+  './routes/hanti-route-data-v1.js?v=20260710-v65-wonju-title-navy',
+  './routes/seoul-pilgrimage-routes.js?v=20260710-v65-wonju-title-navy',
+  './routes/nimui-gil-routes.js?v=20260710-v65-wonju-title-navy',
+  './routes/test-route-data-v1.js?v=20260710-v65-wonju-title-navy',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',

@@ -385,7 +385,7 @@
 
   function renderUnavailableTrailDetail(list, trail) {
     const card = document.createElement('section');
-    card.className = 'route-card route-group-card route-detail-card';
+    card.className = `route-card route-group-card route-detail-card${group.id ? ` ${group.id}` : ''}`;
     card.innerHTML = `
       <div class="route-card-main route-detail-title-row">
         <div class="route-icon">${escapeHtml(trail.icon || '🧭')}</div>
