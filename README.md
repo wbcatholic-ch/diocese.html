@@ -1,4 +1,4 @@
-# 순례길 내비게이션 PWA V42
+# 순례길 내비게이션 PWA V62
 
 - 기준 파일: V41 전체 ZIP.
 - 전국 순례길 목록과 카드형 상세 코스 디자인을 유지했습니다.
@@ -186,3 +186,91 @@
 - 한티가는길/서울순례길의 전체코스 보기 카드는 더 잘 보이도록 파란 테두리, 연한 파란 배경, 굵은 왼쪽 포인트 라인으로 강조했습니다.
 - 캐시 버전: `pilgrimage-route-nav-v56-seoul-top-clean-full-card-20260709`
 - GitHub 업로드 후 확인용 쿼리: `?fresh=v56seoulfull`
+
+## v57 수정 사항
+- 전체코스 보기 카드가 과하게 튀던 부분을 완화했습니다.
+- 진한 파란 배경/굵은 왼쪽 라인을 제거하고, 흰색 카드 + 파란 테두리 + 약한 그림자로 정리했습니다.
+- 한티가는길/서울순례길 전체코스 보기 카드는 일반 코스와 구분은 되지만, 화면에서 과도하게 튀지 않도록 조정했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v57-subtle-full-course-card-20260709`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v57subtlefull`
+
+## v58 수정 사항
+- 서울순례길 1~3코스의 지도 지점 번호를 코스별 접두 번호로 복구했습니다.
+  - 1코스: 1-1, 1-2, ...
+  - 2코스: 2-1, 2-2, ...
+  - 3코스: 3-1, 3-2, ...
+- 서울순례길 전체코스도 1~3코스만 묶고, 지점 번호를 순차번호가 아니라 코스별 번호로 표시합니다.
+- 김대건 신부 치명 순교길은 서울순례길 4코스가 아니므로 접두 번호에서 제외하고 별도 코스로 유지합니다.
+- 캐시 버전: `pilgrimage-route-nav-v58-seoul-course-marker-prefix-20260709`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v58seoulprefix`
+
+
+## v59 수정 사항
+
+- 지도 위 순례 지점 번호 클릭이 계속 불안정하던 원인을 정리했습니다.
+- 기존의 `CustomOverlay` 기반 번호 DOM 클릭 보강 방식은 제거하고, `renderStampMarkers()` owner에서 Kakao `Marker` + `MarkerImage` + Kakao click 이벤트 방식으로 단일화했습니다.
+- 지점 번호 마커가 방향 화살표보다 위에 오도록 zIndex를 정리했습니다.
+- 서울순례길 김대건 신부 치명 순교길은 정렬용으로도 4코스처럼 처리하지 않도록 내부 정렬값을 분리했습니다.
+- 배경 복귀 복원 로직에서 상세 구역형 코스(`님의 길` sections)도 찾을 수 있도록 그룹 옵션 탐색 함수를 하나로 정리했습니다.
+- 사용하지 않게 된 `.stamp-marker` CustomOverlay CSS를 제거했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v59-marker-owner-cleanup-20260709`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v59markercleanup`
+
+
+## v60 수정 사항
+
+- 원주교구 님의 길 `2-2 최비르지타 순교길` GPX를 새로 업로드한 `님의길 2-2.gpx` 기준으로 교체했습니다.
+  - 표시: 대안리공소 ~ 원동성당, 21.9km · 5시간
+  - 새 GPX 포인트: 1838개
+- 원주교구 님의 길 `3-1 정규하 신부길`을 추가했습니다.
+  - 표시: 풍수원성당 ~ 영산성당, 20.7km · 5시간
+  - 공식 코스소개: https://sunraegil.seoji.net/course/course_10
+  - GPX: `gpx/nimui-gil-3-1-gyuha-priest-road.gpx`
+  - GPX 포인트: 2141개
+- 님의 길 상세 화면에 `3길 정규하 신부길` 구역을 추가했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v60-nimui-2-2-replace-3-1-20260710`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v60nimui31`
+
+
+## v61 수정 사항
+- 원주교구 님의 길 3길에 `3-2 르메르 신부길`, `3-3 지학순 주교길`을 추가했습니다.
+- 3-2: 영산성당 ~ 원동성당 · 15.5km · 4시간 · 공식 코스소개 `course_11` 연결.
+- 3-3: 원동성당 ~ 금대순례공원 · 11.2km · 4시간 · 공식 코스소개 `course_12` 연결.
+- 업로드 GPX 파일을 각각 프로젝트 `gpx/` 폴더에 보관하고, `routes/nimui-gil-routes.js` 데이터 owner에 실제 points를 직접 연결했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v61-nimui-3-2-3-3-20260710`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v61nimui33`
+
+
+## v62 수정 사항
+
+- 원주교구 순례길 ‘님의 길’ 3길에 `3-4 선종완 신부길`을 추가했습니다.
+  - 구간: 금대순례공원 ~ 용소막성당
+  - 표시: 15.9km · 4시간
+  - 코스소개: https://sunraegil.seoji.net/course/course_13
+  - GPX: `gpx/nimui-gil-3-4-seonjongwan-priest-road.gpx`
+  - GPX 포인트: 1475개
+  - 실제 계산 GPX 거리: 약 15.3km
+- 기존 3길 구역 아래에 3-1, 3-2, 3-3, 3-4 순서로 표시되도록 `routes/nimui-gil-routes.js` owner 데이터에 직접 추가했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v62-nimui-3-4-seonjongwan-20260710`
+
+
+## v63 수정 사항
+
+- 원주교구 순례길 ‘님의 길’ 3길에 `3-5 성사길`을 추가했습니다.
+  - 구간: 용소막성당 ~ 배론성지
+  - 표시: 10.3km · 3시간
+  - 코스소개: https://sunraegil.seoji.net/course/course_14
+  - GPX: `gpx/nimui-gil-3-5-seongsa-road.gpx`
+  - GPX 포인트: 820개
+  - 실제 계산 GPX 거리: 약 11.4km
+- 기존 3길 구역 아래에 3-1, 3-2, 3-3, 3-4, 3-5 순서로 표시되도록 `routes/nimui-gil-routes.js` owner 데이터에 직접 추가했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v63-nimui-3-5-seongsa-20260710`
+- GitHub 업로드 후 확인용 쿼리: `?fresh=v63nimui35`
+
+
+## v64 수정 사항
+- 원주교구 님의 길 상세 화면에 `1길 전체코스 보기`, `2길 전체코스 보기`, `3길 전체코스 보기`, `님의 길 전체코스 보기`를 추가했습니다.
+- 각 전체코스는 개별 GPX 선을 억지로 직선 연결하지 않고 원본 구간별 `routeSegments`를 그대로 묶습니다.
+- 통합 GPX 4개를 `gpx/` 폴더에 추가했습니다: `nimui-gil-road-1-full.gpx`, `nimui-gil-road-2-full.gpx`, `nimui-gil-road-3-full.gpx`, `nimui-gil-all-full.gpx`.
+- 기존 1-1~3-5 개별 코스와 코스소개 버튼은 그대로 유지했습니다.
+- 캐시 버전: `pilgrimage-route-nav-v64-nimui-full-courses-20260710`

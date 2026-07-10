@@ -353,26 +353,20 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 }
 .route-option-btn.route-option-full {
   position: relative;
-  min-height: 92px;
-  border-width: 3.5px;
-  border-color: #1d4ed8;
-  background: linear-gradient(180deg, #dbeafe 0%, #ffffff 100%);
+  min-height: 88px;
+  border-width: 3px;
+  border-color: #2563eb;
+  background: #fff;
   color: #172033;
-  box-shadow: 0 10px 22px rgba(29, 78, 216, .2);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, .13);
 }
 .route-option-btn.route-option-full::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 10px;
-  background: #1d4ed8;
+  content: none;
 }
-.route-option-btn.route-option-full .route-option-main { padding-left: 23px; }
-.route-option-btn.route-option-full .route-option-main strong { color: #0B1D3B; font-weight: 1000; }
+.route-option-btn.route-option-full .route-option-main { padding-left: 15px; }
+.route-option-btn.route-option-full .route-option-main strong { color: #111827; font-weight: 1000; }
 .route-option-btn.route-option-full .route-option-main span,
-.route-option-btn.route-option-full .route-option-main em { color: #1e3a8a; font-weight: 900; }
+.route-option-btn.route-option-full .route-option-main em { color: #334155; font-weight: 900; }
 .route-option-main:active,
 .route-option-course-intro:active { transform: translateY(1px); }
 .route-card-main { display: flex; gap: 13px; align-items: center; padding: 16px; }
@@ -714,8 +708,6 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 .route-marker { transform: translate(-50%, -100%); padding: 6px 8px; border-radius: 999px; background: #172033; color: #fff; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(15,23,42,.3); font-size: 11px; font-weight: 950; white-space: nowrap; }
-.stamp-marker { min-width: 30px; width: auto; height: 30px; padding: 0 5px; border-radius: 50%; display: grid; place-items: center; background: #fff7e8; border: 2px solid #b7791f; color: #7a4f10; font-size: 11px; font-weight: 950; box-shadow: 0 4px 10px rgba(15,23,42,.25); cursor: pointer; user-select: none; }
-.stamp-marker:active { transform: scale(.94); }
 .stamp-info-card {
   min-width: 180px;
   max-width: 240px;
@@ -759,18 +751,6 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   .national-trail-copy strong { font-size: 21px; }
   .national-trail-copy em { font-size: 14px; }
   .national-trail-foot { padding: 9px 15px; }
-  .national-website-btn {
-  min-width: 156px;
-  min-height: 42px;
-  border: 1.5px solid #93b4e8;
-  border-radius: 18px;
-  background: #eaf3ff;
-  color: #0B1D3B;
-  font-size: 15px;
-  font-weight: 950;
-  cursor: pointer;
-  box-shadow: 0 5px 12px rgba(29, 78, 216, .10);
-}
   .chrome-open-panel { align-items: flex-start; flex-direction: column; }
   .chrome-open-actions { width: 100%; justify-content: flex-start; }
 }

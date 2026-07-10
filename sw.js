@@ -1,14 +1,14 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v56-seoul-top-clean-full-card-20260709';
+const CACHE_NAME = 'pilgrimage-route-nav-v63-nimui-3-5-seongsa-20260710';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260709-v56-seoul-top-clean-full-card',
-  './js/route-nav.js?v=20260709-v56-seoul-top-clean-full-card',
-  './routes/hanti-route-data-v1.js?v=20260709-v56-seoul-top-clean-full-card',
-  './routes/seoul-pilgrimage-routes.js?v=20260709-v56-seoul-top-clean-full-card',
-  './routes/nimui-gil-routes.js?v=20260709-v56-seoul-top-clean-full-card',
-  './routes/test-route-data-v1.js?v=20260709-v56-seoul-top-clean-full-card',
+  './css/route-nav.css?v=20260710-v63-nimui-3-5',
+  './js/route-nav.js?v=20260710-v63-nimui-3-5',
+  './routes/hanti-route-data-v1.js?v=20260710-v63-nimui-3-5',
+  './routes/seoul-pilgrimage-routes.js?v=20260710-v63-nimui-3-5',
+  './routes/nimui-gil-routes.js?v=20260710-v63-nimui-3-5',
+  './routes/test-route-data-v1.js?v=20260710-v63-nimui-3-5',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',
@@ -18,6 +18,11 @@ const CORE_ASSETS = [
   './gpx/nimui-gil-1-7-yangeop.gpx',
   './gpx/nimui-gil-2-1-choi-haeseong-john-martyrdom.gpx',
   './gpx/nimui-gil-2-2-choi-birgitta-martyrdom.gpx',
+  './gpx/nimui-gil-3-1-gyuha-priest-road.gpx',
+  './gpx/nimui-gil-3-2-lemer-priest-road.gpx',
+  './gpx/nimui-gil-3-3-jihak-sun-bishop-road.gpx',
+  './gpx/nimui-gil-3-4-seonjongwan-priest-road.gpx',
+  './gpx/nimui-gil-3-5-seongsa-road.gpx',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'

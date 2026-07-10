@@ -465,7 +465,7 @@
         title: '',
         meta: seoulRouteOfficialMeta(route),
         introUrl: route.courseIntroUrl || '',
-        route
+        route: createSeoulDisplayRoute(route)
       });
     });
     return {
@@ -482,9 +482,10 @@
 
   function buildNimuiRouteGroup(routes) {
     const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
-    const groupSummaryMap = new Map([
-      ['1길 최양업 신부님의 길', '1길 최양업 신부님의 길 · 전체 길이 122.6km'],
-      ['2길 최해성 요한의 길', '2길 최해성 요한의 길 · 전체 길이 37.8km']
+    const groupInfoMap = new Map([
+      ['1길 최양업 신부님의 길', { distance: '122.6km', duration: '31시간' }],
+      ['2길 최해성 요한의 길', { distance: '37.8km', duration: '9시간' }],
+      ['3길 정규하 신부길', { distance: '73.6km', duration: '20시간' }]
     ]);
     const sections = [];
     orderedRoutes.forEach((route) => {
@@ -493,11 +494,12 @@
       if (!section) {
         section = {
           title: groupName,
-          summary: groupSummaryMap.get(groupName) || groupName,
-          options: []
+          options: [],
+          routes: []
         };
         sections.push(section);
       }
+      section.routes.push(route);
       section.options.push({
         label: route.shortName || route.name,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
@@ -506,6 +508,19 @@
         route
       });
     });
+
+    sections.forEach((section, index) => {
+      const info = groupInfoMap.get(section.title) || {};
+      section.options.unshift({
+        label: `${index + 1}길 전체코스 보기`,
+        title: `${section.routes[0]?.startName || '출발지'} ~ ${section.routes[section.routes.length - 1]?.finishName || '도착지'}`,
+        meta: [info.distance, info.duration].filter(Boolean).join(' · '),
+        variant: 'full-route',
+        route: createNimuiFullRoute(section.routes, `nimui-road-${index + 1}-full`, `님의 길 ${index + 1}길 전체코스`, info.distance, info.duration)
+      });
+      delete section.routes;
+    });
+
     return {
       kind: 'group',
       id: 'nimui-route-group',
@@ -514,7 +529,66 @@
       meta: '길별 상세 코스를 선택하세요.',
       foot: `${orderedRoutes.length}개 코스 연결`,
       optionLayout: 'single',
+      options: [{
+        label: '님의 길 전체코스 보기',
+        title: '1길·2길·3길 전체 경로',
+        meta: '234.0km · 60시간',
+        variant: 'full-route',
+        route: createNimuiFullRoute(orderedRoutes, 'nimui-road-all-full', '님의 길 전체코스', '234.0km', '60시간')
+      }],
       sections
+    };
+  }
+
+  function createNimuiFullRoute(routes, id, name, distanceLabel, durationLabel) {
+    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    const routeSegments = [];
+    const stamps = [];
+    orderedRoutes.forEach((route) => {
+      (route.routeSegments || []).forEach((segment, index) => {
+        routeSegments.push({
+          ...segment,
+          id: `${id}-${route.id}-${segment.id || index}`,
+          points: segment.points || []
+        });
+      });
+      (route.stamps || []).forEach((stamp) => {
+        const previous = stamps[stamps.length - 1];
+        const isSamePlace = previous && Math.abs(previous.lat - stamp.lat) < 0.00002 && Math.abs(previous.lng - stamp.lng) < 0.00002;
+        if (isSamePlace) return;
+        stamps.push({
+          ...stamp,
+          id: `${route.id}-${stamp.id || stamp.order || stamps.length + 1}`,
+          order: stamps.length + 1,
+          displayOrder: String(stamps.length + 1),
+          sourceRouteName: route.shortName || route.name
+        });
+      });
+    });
+    return {
+      id,
+      name,
+      shortName: name,
+      region: '원주교구',
+      type: 'pilgrimage_route',
+      mode: 'route_navigation',
+      lineType: 'gpx',
+      dataQuality: 'actual-gpx',
+      routeGroup: '님의 길',
+      distanceLabel,
+      durationLabel,
+      startName: orderedRoutes[0]?.startName || '출발지',
+      finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
+      features: {
+        showRouteLine: true,
+        showStampMarkers: true,
+        autoStamp: false,
+        nextStampDistance: true,
+        offRouteAlert: true,
+        nearestStampDistance: true
+      },
+      stamps,
+      routeSegments
     };
   }
 
@@ -568,6 +642,12 @@
       parent.appendChild(item);
     };
     if (Array.isArray(group.sections) && group.sections.length) {
+      if (Array.isArray(group.options) && group.options.length) {
+        const topGrid = document.createElement('div');
+        topGrid.className = `route-option-grid${group.optionLayout === 'single' ? ' single-column' : ''}`;
+        group.options.forEach((option) => renderOption(option, topGrid));
+        area.appendChild(topGrid);
+      }
       group.sections.forEach((section) => {
         const sectionEl = document.createElement('section');
         sectionEl.className = 'route-option-section';
@@ -656,6 +736,23 @@
     };
   }
 
+
+  function createSeoulDisplayRoute(route) {
+    if (!route || isKimDaegeonSeoulRoute(route)) return route;
+    const markerPrefix = seoulRouteMarkerPrefix(route);
+    if (!markerPrefix) return route;
+    return {
+      ...route,
+      stamps: (route.stamps || []).map((stamp) => {
+        const rawNo = stamp.order || stamp.id || '';
+        return {
+          ...stamp,
+          displayOrder: `${markerPrefix}-${rawNo}`
+        };
+      })
+    };
+  }
+
   function createSeoulFullRoute(routes) {
     const orderedRoutes = routes.slice()
       .filter((route) => !isKimDaegeonSeoulRoute(route))
@@ -670,6 +767,7 @@
           points: segment.points || []
         });
       });
+      const markerPrefix = seoulRouteMarkerPrefix(route);
       (route.stamps || []).forEach((stamp) => {
         const rawNo = stamp.order || stamp.id || '';
         const nextNo = stamps.length + 1;
@@ -677,7 +775,7 @@
           ...stamp,
           id: `${route.id}-${stamp.id || rawNo}`,
           order: nextNo,
-          displayOrder: String(nextNo),
+          displayOrder: markerPrefix ? `${markerPrefix}-${rawNo}` : String(rawNo || nextNo),
           sourceRouteName: route.shortName || route.name
         });
       });
@@ -748,7 +846,7 @@
     const text = seoulRouteSearchText(route);
     const match = text.match(/(\d+)\s*코스/);
     if (match) return Number(match[1]);
-    if (isKimDaegeonSeoulRoute(route)) return 4;
+    if (isKimDaegeonSeoulRoute(route)) return 98;
     return 99;
   }
 
@@ -777,7 +875,6 @@
     const text = seoulRouteSearchText(route);
     const match = text.match(/(\d+)\s*코스/);
     if (match) return match[1];
-    if (isKimDaegeonSeoulRoute(route)) return '김';
     return '';
   }
 
@@ -794,9 +891,19 @@
     for (const item of buildRouteMenuItems(state.routes)) {
       if (item.kind === 'route' && item.route?.id === routeId) return item.route;
       if (item.kind === 'group') {
-        const option = (item.options || []).find((candidate) => candidate.route?.id === routeId);
-        if (option) return option.route;
+        const route = findRouteInGroupOptions(item, routeId);
+        if (route) return route;
       }
+    }
+    return null;
+  }
+
+  function findRouteInGroupOptions(group, routeId) {
+    const directOption = (group.options || []).find((option) => option.route?.id === routeId);
+    if (directOption) return directOption.route;
+    for (const section of group.sections || []) {
+      const sectionOption = (section.options || []).find((option) => option.route?.id === routeId);
+      if (sectionOption) return sectionOption.route;
     }
     return null;
   }
@@ -1056,36 +1163,23 @@
   function renderStampMarkers(route) {
     if (!state.map || !window.kakao?.maps) return;
     const KM = kakao.maps;
+    const events = KM.event;
     (route.stamps || []).forEach((stamp) => {
       if (!isFiniteNumber(stamp.lat) || !isFiniteNumber(stamp.lng)) return;
       const position = new KM.LatLng(Number(stamp.lat), Number(stamp.lng));
-      const content = document.createElement('div');
-      content.className = 'stamp-marker';
       const markerText = stampMarkerText(stamp);
-      content.textContent = markerText;
-      content.title = markerText ? `${markerText}. ${stamp.name || ''}` : (stamp.name || '');
-      content.setAttribute('role', 'button');
-      content.setAttribute('tabindex', '0');
-      content.setAttribute('aria-label', content.title || '순례 지점 정보 보기');
-      const openInfo = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        showStampInfo(stamp, position);
-      };
-      content.addEventListener('click', openInfo);
-      content.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') openInfo(event);
-      });
-      const overlay = new KM.CustomOverlay({
+      const marker = new KM.Marker({
+        map: state.map,
         position,
-        content,
-        yAnchor: 0.5,
-        xAnchor: 0.5,
-        zIndex: 11,
-        clickable: true
+        image: createStampMarkerImage(markerText),
+        title: markerText ? `${markerText}. ${stamp.name || ''}` : (stamp.name || ''),
+        clickable: true,
+        zIndex: 18
       });
-      overlay.setMap(state.map);
-      state.stampMarkers.push(overlay);
+      if (events?.addListener) {
+        events.addListener(marker, 'click', () => showStampInfo(stamp, position));
+      }
+      state.stampMarkers.push(marker);
     });
   }
 
@@ -1095,6 +1189,39 @@
     if (typeof stamp.id === 'string' && stamp.id.includes('-')) return stamp.id;
     if (stamp.order) return String(stamp.order);
     return stamp.id ? String(stamp.id) : '';
+  }
+
+  function createStampMarkerImage(text) {
+    const KM = kakao.maps;
+    const label = String(text || '').trim() || '·';
+    const size = stampMarkerSize(label);
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}">
+        <rect x="2" y="2" width="${size.width - 4}" height="${size.height - 4}" rx="${(size.height - 4) / 2}" fill="#fff7e8" stroke="#b7791f" stroke-width="3"/>
+        <text x="${size.width / 2}" y="${size.height / 2 + 4}" text-anchor="middle" font-family="Noto Sans KR, Apple SD Gothic Neo, Arial, sans-serif" font-size="13" font-weight="900" fill="#7a4f10">${escapeSvgText(label)}</text>
+      </svg>`;
+    return new KM.MarkerImage(
+      `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+      new KM.Size(size.width, size.height),
+      { offset: new KM.Point(size.width / 2, size.height / 2) }
+    );
+  }
+
+  function stampMarkerSize(label) {
+    const charCount = Array.from(String(label || '')).length;
+    return {
+      width: Math.max(40, Math.min(64, 24 + charCount * 10)),
+      height: 36
+    };
+  }
+
+  function escapeSvgText(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
   }
 
   function showStampInfo(stamp, position) {
