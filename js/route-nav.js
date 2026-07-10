@@ -85,13 +85,13 @@
     },
     {
       id: 'jeonju',
-      title: '전주교구 순례길 ‘요안루갈다길’',
+      title: '전주교구 순례길',
       diocese: '전주교구',
       icon: '🌾',
-      dataGroup: '요안루갈다길',
+      dataGroup: '전주교구 순례길',
       location: '전북 완주·전주',
       officialUrl: 'https://www.jcatholic.or.kr/theme/main/pages/pilgrimage01.html',
-      description: '초남이 성지에서 치명자산 성지까지 이어지는 22km 순례길입니다.'
+      description: '요안루갈다길·순교자길·치명자길을 선택할 수 있습니다.'
     },
     {
       id: 'boryeong-galmaemot',
@@ -138,6 +138,7 @@
     futurePolyline: null,
     walkedTrackPolyline: null,
     routeSegmentPolylines: [],
+    courseLabelOverlays: [],
     watchId: null,
     following: false,
     lastCoords: null,
@@ -179,10 +180,6 @@
   function setupButtons() {
     $('national-close-btn')?.addEventListener('click', closeNationalList);
     $('back-to-list')?.addEventListener('click', handleBackToList);
-    $('fit-route-btn')?.addEventListener('click', () => {
-      noteManualMapControl('전체 경로 확인');
-      fitRouteBounds();
-    });
     $('my-location-btn')?.addEventListener('click', locateOnce);
     $('follow-btn')?.addEventListener('click', handleFollowControl);
     $('direction-btn')?.addEventListener('click', toggleRouteDirection);
@@ -384,7 +381,7 @@
       return { ...buildNimuiRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
     }
     if (trail.id === 'jeonju') {
-      const routes = state.routes.filter((route) => route?.routeGroup === '요안루갈다길');
+      const routes = state.routes.filter((route) => route?.region === '전주교구');
       if (!routes.length) return null;
       return { ...buildJeonjuRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
     }
@@ -415,13 +412,13 @@
     const hantiRoute = routes.find((route) => route?.id === 'hanti' || route?.routeGroup === '한티가는길');
     const seoulRoutes = routes.filter((route) => route?.routeGroup === '서울순례길');
     const nimuiRoutes = routes.filter((route) => route?.routeGroup === '님의 길');
-    const jeonjuRoutes = routes.filter((route) => route?.routeGroup === '요안루갈다길');
+    const jeonjuRoutes = routes.filter((route) => route?.region === '전주교구');
     if (hantiRoute) items.push(buildHantiRouteGroup(hantiRoute));
     if (seoulRoutes.length) items.push(buildSeoulRouteGroup(seoulRoutes));
     if (nimuiRoutes.length) items.push(buildNimuiRouteGroup(nimuiRoutes));
     if (jeonjuRoutes.length) items.push(buildJeonjuRouteGroup(jeonjuRoutes));
     routes.forEach((route) => {
-      if (!route || route.id === 'hanti' || route.routeGroup === '한티가는길' || route.routeGroup === '서울순례길' || route.routeGroup === '님의 길' || route.routeGroup === '요안루갈다길') return;
+      if (!route || route.id === 'hanti' || route.routeGroup === '한티가는길' || route.routeGroup === '서울순례길' || route.routeGroup === '님의 길' || route.region === '전주교구') return;
       items.push({ kind: 'route', route });
     });
     return items;
@@ -1233,6 +1230,7 @@
     renderWalkedTrack();
     renderLandmarkMarkers(route);
     renderStampMarkers(route);
+    renderCourseLabels(route);
     renderDirectionArrows();
     setTimeout(() => {
       if (state.map?.relayout) state.map.relayout();
@@ -1252,6 +1250,7 @@
     clearPolyline('futurePolyline');
     clearPolyline('walkedTrackPolyline');
     clearRouteSegmentPolylines();
+    clearCourseLabelOverlays();
     if (!options.keepMyLocation && state.myMarker) {
       state.myMarker.setMap(null);
       state.myMarker = null;
@@ -1261,6 +1260,70 @@
   function clearPolyline(key) {
     if (state[key]) state[key].setMap(null);
     state[key] = null;
+  }
+
+  function clearCourseLabelOverlays() {
+    state.courseLabelOverlays.forEach((overlay) => overlay.setMap(null));
+    state.courseLabelOverlays = [];
+  }
+
+  function splitCourseLabel(text) {
+    const raw = String(text || '').trim();
+    const match = raw.match(/^((?:\d+-\d+|\d+)\s*(?:코스|길)?)(?:\s+(.+))?$/);
+    if (!match) return { number: raw, full: raw };
+    return { number: match[1].trim(), full: [match[1], match[2]].filter(Boolean).join(' ').trim() };
+  }
+
+  function representativePoint(points) {
+    const valid = (points || []).filter((point) => isFiniteNumber(point?.lat) && isFiniteNumber(point?.lng));
+    return valid.length ? valid[Math.floor(valid.length / 2)] : null;
+  }
+
+  function renderCourseLabels(route) {
+    clearCourseLabelOverlays();
+    if (!state.map || !window.kakao?.maps || !route) return;
+    const segments = (route.routeSegments || []).filter((segment) => (segment.points || []).length > 1);
+    const labeled = [];
+    segments.forEach((segment, index) => {
+      const labelText = segment.sourceRouteName || (index === 0 ? (route.shortName || route.name) : '');
+      if (!labelText || labeled.includes(labelText)) return;
+      const point = representativePoint(segment.points);
+      if (!point) return;
+      labeled.push(labelText);
+      const labels = splitCourseLabel(labelText);
+      const content = document.createElement('div');
+      content.className = 'course-map-label';
+      content.dataset.number = labels.number;
+      content.dataset.full = labels.full;
+      content.textContent = labels.full;
+      const overlay = new kakao.maps.CustomOverlay({
+        position: new kakao.maps.LatLng(Number(point.lat), Number(point.lng)),
+        content,
+        xAnchor: 0.5,
+        yAnchor: 0.5,
+        zIndex: 17
+      });
+      overlay.__content = content;
+      overlay.setMap(state.map);
+      state.courseLabelOverlays.push(overlay);
+    });
+    updateCourseLabelVisibility();
+  }
+
+  function updateCourseLabelVisibility() {
+    if (!state.map) return;
+    const level = Number(state.map.getLevel?.() || 8);
+    state.courseLabelOverlays.forEach((overlay) => {
+      const content = overlay.__content;
+      if (!content) return;
+      if (level >= 9) {
+        content.hidden = true;
+        return;
+      }
+      content.hidden = false;
+      content.textContent = level >= 7 ? content.dataset.number : content.dataset.full;
+      content.classList.toggle('compact', level >= 7);
+    });
   }
 
   function clearRouteSegmentPolylines() {
@@ -1300,12 +1363,23 @@
   }
 
   function getRouteLandmarks(route) {
-    const catalog = window.PILGRIMAGE_LANDMARKS_BY_REGION || {};
-    const regionalLandmarks = Array.isArray(catalog[route?.region])
-      ? catalog[route.region]
-      : (Array.isArray(route?.landmarks) ? route.landmarks : []);
-    if (route?.region !== '원주교구') return regionalLandmarks;
+    if (!route) return [];
 
+    // 서울·전주 순례길은 각 코스에 지정된 지점만 성지 마커로 사용한다.
+    if (route.region === '서울대교구' || route.region === '전주교구') {
+      return dedupeMapPlaces((route.stamps || []).map((stamp) => ({
+        name: stamp.name,
+        lat: stamp.lat,
+        lng: stamp.lng
+      })));
+    }
+
+    if (Array.isArray(route.landmarks) && route.landmarks.length) {
+      return dedupeMapPlaces(route.landmarks);
+    }
+
+    const catalog = window.PILGRIMAGE_LANDMARKS_BY_REGION || {};
+    const regionalLandmarks = Array.isArray(catalog[route.region]) ? catalog[route.region] : [];
     const routePoints = flattenRoutePoints(route);
     const routeSegments = buildSegmentIndexFromPoints(routePoints);
     const maxDistanceM = Number(route.landmarkMaxDistanceM || 2000);
@@ -1382,6 +1456,7 @@
 
   function renderStampMarkers(route) {
     if (!state.map || !window.kakao?.maps) return;
+    if (route?.region === '서울대교구' || route?.region === '전주교구') return;
     const KM = kakao.maps;
     const events = KM.event;
     (route.stamps || []).forEach((stamp) => {
@@ -1760,6 +1835,7 @@
       pauseAutoCenterForManualMapUse(false);
     });
     events.addListener(state.map, 'zoom_changed', () => {
+      updateCourseLabelVisibility();
       renderDirectionArrows();
       pauseAutoCenterForManualMapUse(true);
     });
