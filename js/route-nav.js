@@ -137,6 +137,7 @@
     traveledPolyline: null,
     futurePolyline: null,
     walkedTrackPolyline: null,
+    routeSegmentPolylines: [],
     watchId: null,
     following: false,
     lastCoords: null,
@@ -493,16 +494,16 @@
     const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
     return {
       kind: 'group',
-      id: 'jeonju-yoan-rugalda-route-group',
+      id: 'jeonju-pilgrimage-route-group',
       icon: '✝️',
-      title: '전주교구 순례길 ‘요안루갈다길’',
-      meta: '초남이 성지에서 치명자산 성지까지 이어지는 순례길입니다.',
-      foot: '6개 성지 · 22km',
+      title: '전주교구 순례길',
+      meta: '걸을 순례길을 선택하세요.',
+      foot: `${orderedRoutes.length}개 순례길`,
       optionLayout: 'single',
       options: orderedRoutes.map((route) => ({
         label: route.shortName || route.name,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
-        meta: route.distanceLabel || '22km',
+        meta: route.distanceLabel || '',
         route
       }))
     };
@@ -607,15 +608,16 @@
       durationLabel,
       startName: orderedRoutes[0]?.startName || '출발지',
       finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
+      preserveSegmentBreaks: true,
       features: {
         showRouteLine: true,
-        showStampMarkers: true,
+        showStampMarkers: false,
         autoStamp: false,
-        nextStampDistance: true,
+        nextStampDistance: false,
         offRouteAlert: true,
-        nearestStampDistance: true
+        nearestStampDistance: false
       },
-      stamps,
+      stamps: [],
       routeSegments
     };
   }
@@ -1180,6 +1182,7 @@
     clearPolyline('traveledPolyline');
     clearPolyline('futurePolyline');
     clearPolyline('walkedTrackPolyline');
+    clearRouteSegmentPolylines();
     if (!options.keepMyLocation && state.myMarker) {
       state.myMarker.setMap(null);
       state.myMarker = null;
@@ -1191,10 +1194,36 @@
     state[key] = null;
   }
 
+  function clearRouteSegmentPolylines() {
+    state.routeSegmentPolylines.forEach((polyline) => polyline.setMap(null));
+    state.routeSegmentPolylines = [];
+  }
+
+  function renderSegmentedRouteLines(route) {
+    clearRouteSegmentPolylines();
+    if (!state.map || !window.kakao?.maps) return;
+    (route?.routeSegments || []).forEach((segment) => {
+      const path = (segment.points || [])
+        .filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng))
+        .map((point) => new kakao.maps.LatLng(Number(point.lat), Number(point.lng)));
+      if (path.length < 2) return;
+      const polyline = new kakao.maps.Polyline({
+        map: state.map,
+        path,
+        strokeWeight: 6,
+        strokeColor: '#1d4ed8',
+        strokeOpacity: 0.95,
+        strokeStyle: 'solid'
+      });
+      state.routeSegmentPolylines.push(polyline);
+    });
+  }
+
   function getRouteLandmarks(route) {
-    if (Array.isArray(route?.landmarks)) return route.landmarks;
     const catalog = window.PILGRIMAGE_LANDMARKS_BY_REGION || {};
-    return Array.isArray(catalog[route?.region]) ? catalog[route.region] : [];
+    const regionalLandmarks = catalog[route?.region];
+    if (Array.isArray(regionalLandmarks)) return regionalLandmarks;
+    return Array.isArray(route?.landmarks) ? route.landmarks : [];
   }
 
   function renderLandmarkMarkers(route) {
@@ -1767,10 +1796,16 @@
 
   function flattenRoutePoints(route) {
     const result = [];
-    (route?.routeSegments || []).forEach((segment) => {
+    (route?.routeSegments || []).forEach((segment, segmentIndex) => {
+      let firstValidPoint = true;
       (segment.points || []).forEach((point) => {
         if (!isFiniteNumber(point.lat) || !isFiniteNumber(point.lng)) return;
-        pushUniquePoint(result, { lat: Number(point.lat), lng: Number(point.lng) });
+        pushUniquePoint(result, {
+          lat: Number(point.lat),
+          lng: Number(point.lng),
+          breakBefore: Boolean(route?.preserveSegmentBreaks && segmentIndex > 0 && firstValidPoint)
+        });
+        firstValidPoint = false;
       });
     });
     return result;
@@ -1782,6 +1817,7 @@
     for (let i = 0; i < points.length - 1; i += 1) {
       const a = points[i];
       const b = points[i + 1];
+      if (b.breakBefore) continue;
       const d = haversineM(a, b);
       if (!Number.isFinite(d) || d <= 0) continue;
       index.push({ a, b, startDistanceM: distanceSoFar, endDistanceM: distanceSoFar + d });
@@ -1847,6 +1883,12 @@
 
   function renderRouteProgressLines(distanceAlongM) {
     if (!state.map || !window.kakao?.maps || !state.navigationModel.points.length) return;
+    if (state.activeRoute?.preserveSegmentBreaks) {
+      clearPolyline('traveledPolyline');
+      clearPolyline('futurePolyline');
+      renderSegmentedRouteLines(state.activeRoute);
+      return;
+    }
     const total = state.navigationModel.totalDistanceM;
     const splitM = Number.isFinite(distanceAlongM) ? clamp(distanceAlongM, 0, total) : 0;
     const traveled = splitM > 0 ? buildPathForDistanceRange(0, splitM) : [];
@@ -2249,7 +2291,7 @@
     if (!point || !isFiniteNumber(point.lat) || !isFiniteNumber(point.lng)) return;
     const last = points[points.length - 1];
     if (last && Math.abs(last.lat - point.lat) < 1e-10 && Math.abs(last.lng - point.lng) < 1e-10) return;
-    points.push({ lat: Number(point.lat), lng: Number(point.lng) });
+    points.push({ lat: Number(point.lat), lng: Number(point.lng), ...(point.breakBefore ? { breakBefore: true } : {}) });
   }
 
   function interpolatePoint(a, b, t) {
