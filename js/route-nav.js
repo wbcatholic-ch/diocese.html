@@ -1212,11 +1212,22 @@
   function renderSegmentedRouteLines(route) {
     clearRouteSegmentPolylines();
     if (!state.map || !window.kakao?.maps) return;
+    const seenDisplaySegments = new Set();
     (route?.routeSegments || []).forEach((segment) => {
-      const path = (segment.points || [])
+      const validPoints = (segment.points || [])
         .filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng))
-        .map((point) => new kakao.maps.LatLng(Number(point.lat), Number(point.lng)));
-      if (path.length < 2) return;
+        .map((point) => ({ lat: Number(point.lat), lng: Number(point.lng) }));
+      if (validPoints.length < 2) return;
+
+      // 님의 길 통합코스에서는 동일한 길을 정방향·역방향으로 다시 지나는 경우에도
+      // 지도에는 경로선을 한 번만 그린다. 내비게이션용 원본 세그먼트와 방향은 유지한다.
+      if (isNimuiCombinedRoute(route)) {
+        const signature = routeSegmentDisplaySignature(validPoints);
+        if (seenDisplaySegments.has(signature)) return;
+        seenDisplaySegments.add(signature);
+      }
+
+      const path = validPoints.map((point) => new kakao.maps.LatLng(point.lat, point.lng));
       const polyline = new kakao.maps.Polyline({
         map: state.map,
         path,
@@ -1227,6 +1238,21 @@
       });
       state.routeSegmentPolylines.push(polyline);
     });
+  }
+
+  function isNimuiCombinedRoute(route) {
+    return route?.region === '원주교구' && /-full$/.test(String(route?.id || ''));
+  }
+
+  function routeSegmentDisplaySignature(points) {
+    const sampleStep = Math.max(1, Math.floor(points.length / 80));
+    const sampled = points.filter((_, index) => index % sampleStep === 0 || index === points.length - 1);
+    const encode = (items) => items
+      .map((point) => `${point.lat.toFixed(5)},${point.lng.toFixed(5)}`)
+      .join('|');
+    const forward = encode(sampled);
+    const reverse = encode(sampled.slice().reverse());
+    return forward < reverse ? forward : reverse;
   }
 
   function getRouteLandmarks(route) {
@@ -1241,7 +1267,7 @@
     const maxDistanceM = Number(route.landmarkMaxDistanceM || 2000);
     const endpointStamps = (route.stamps || []).filter((stamp) => stamp?.role === 'start' || stamp?.role === 'finish');
 
-    return regionalLandmarks.filter((landmark) => {
+    const nearbyLandmarks = regionalLandmarks.filter((landmark) => {
       if (!isFiniteNumber(landmark.lat) || !isFiniteNumber(landmark.lng) || !routeSegments.length) return false;
       const point = { lat: Number(landmark.lat), lng: Number(landmark.lng) };
       const nearest = findNearestPointOnRoute(point, routeSegments);
@@ -1252,6 +1278,24 @@
         haversineM(point, { lat: Number(stamp.lat), lng: Number(stamp.lng) }) < 150
       ));
     });
+
+    return dedupeMapPlaces(nearbyLandmarks);
+  }
+
+  function dedupeMapPlaces(places) {
+    const unique = [];
+    (places || []).forEach((place) => {
+      if (!isFiniteNumber(place?.lat) || !isFiniteNumber(place?.lng)) return;
+      const point = { lat: Number(place.lat), lng: Number(place.lng) };
+      const normalizedName = String(place.name || '').replace(/\s+/g, '').trim();
+      const duplicate = unique.some((saved) => {
+        const savedName = String(saved.name || '').replace(/\s+/g, '').trim();
+        return (normalizedName && savedName === normalizedName) ||
+          haversineM(point, { lat: Number(saved.lat), lng: Number(saved.lng) }) < 80;
+      });
+      if (!duplicate) unique.push(place);
+    });
+    return unique;
   }
 
   function renderLandmarkMarkers(route) {
@@ -1842,16 +1886,17 @@
   }
 
   function getDirectedRoutePoints(route, direction) {
-    const points = flattenRoutePoints(route);
-    return direction === 'reverse' ? points.slice().reverse() : points;
-  }
-
-  function flattenRoutePoints(route) {
+    const sourceSegments = (route?.routeSegments || []).slice();
+    const directedSegments = direction === 'reverse' ? sourceSegments.reverse() : sourceSegments;
     const result = [];
-    (route?.routeSegments || []).forEach((segment, segmentIndex) => {
+
+    directedSegments.forEach((segment, segmentIndex) => {
+      const sourcePoints = (segment.points || []).filter((point) => (
+        isFiniteNumber(point.lat) && isFiniteNumber(point.lng)
+      ));
+      const directedPoints = direction === 'reverse' ? sourcePoints.slice().reverse() : sourcePoints;
       let firstValidPoint = true;
-      (segment.points || []).forEach((point) => {
-        if (!isFiniteNumber(point.lat) || !isFiniteNumber(point.lng)) return;
+      directedPoints.forEach((point) => {
         pushUniquePoint(result, {
           lat: Number(point.lat),
           lng: Number(point.lng),
@@ -1861,6 +1906,10 @@
       });
     });
     return result;
+  }
+
+  function flattenRoutePoints(route) {
+    return getDirectedRoutePoints(route, 'forward');
   }
 
   function buildSegmentIndexFromPoints(points) {
