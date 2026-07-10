@@ -810,7 +810,7 @@
       id: `${baseRoute.id}-full`,
       name: '한티가는길 전체코스',
       shortName: '한티가는길 전체코스',
-      preserveSegmentBreaks: false,
+      preserveSegmentBreaks: true,
       routeSegments,
       courses: undefined
     };
@@ -1362,23 +1362,24 @@
       if (!content) return;
 
       // 모든 순례길 공통 규칙
-      // 10 이상: 전체 지도를 가리지 않도록 숨김
-      // 8~9: 코스 이름만 작게 표시
-      // 6~7: 코스 번호 + 이름 표시
-      // 5 이하: 번호 + 이름을 조금 더 또렷하게 표시하되 크기는 제한
-      if (level >= 10) {
+      // 지나치게 축소한 경우에만 숨기고, 그 외에는 코스 번호와 코스명을 함께 유지한다.
+      // 11~12: 전체 지도를 가리지 않는 아주 작은 전체 코스 정보
+      // 8~10: 작은 전체 코스 정보
+      // 6~7: 조금 더 또렷한 전체 코스 정보
+      // 5 이하: 상세 전체 코스 정보(최대 크기는 제한)
+      if (level >= 13) {
         content.hidden = true;
         return;
       }
       content.hidden = false;
-      if (level >= 8) {
-        content.textContent = content.dataset.name || content.dataset.full;
+      content.textContent = content.dataset.full || content.dataset.name;
+      if (level >= 11) {
+        content.className = 'course-map-label far-overview';
+      } else if (level >= 8) {
         content.className = 'course-map-label overview';
       } else if (level >= 6) {
-        content.textContent = content.dataset.full;
         content.className = 'course-map-label compact';
       } else {
-        content.textContent = content.dataset.full;
         content.className = 'course-map-label detail';
       }
     });
