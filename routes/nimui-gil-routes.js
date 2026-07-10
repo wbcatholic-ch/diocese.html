@@ -1,3 +1,17 @@
+// 원주교구 성지·순례지 공통 마커입니다. 코스 진행용 스탬프와 분리해 표시합니다.
+window.PILGRIMAGE_LANDMARKS_BY_REGION = window.PILGRIMAGE_LANDMARKS_BY_REGION || {};
+window.PILGRIMAGE_LANDMARKS_BY_REGION['원주교구'] = [
+  { id: 'wonju-wondong-cathedral', name: '원동 주교좌성당', category: '순례지', lat: 37.3454470599133, lng: 127.952762266409 },
+  { id: 'wonju-gangwon-gamyeong', name: '강원 감영', category: '순교 사적지', lat: 37.3479725132136, lng: 127.950415153306 },
+  { id: 'wonju-daeanri-gongso', name: '대안리 공소', category: '순례지', lat: 37.3081008216601, lng: 127.880384508464 },
+  { id: 'wonju-baeron-shrine', name: '배론 성지', category: '성지', lat: 37.1606822912409, lng: 128.082448654295 },
+  { id: 'wonju-seoji-village', name: '서지 마을', category: '순교 사적지', lat: 37.21875017411, lng: 127.817379195257 },
+  { id: 'wonju-myojae-shrine', name: '성 남종삼 요한·남상교 아우구스티노 유택지 (묘재)', category: '순교 사적지', lat: 37.1867154129072, lng: 128.100327297881 },
+  { id: 'wonju-seongnaedong-cathedral', name: '성내동 성당', category: '순교 사적지', lat: 37.4439479068828, lng: 129.161794665221 },
+  { id: 'wonju-yongsomak-cathedral', name: '용소막 성당', category: '순례지', lat: 37.212426319126, lng: 128.087867112605 },
+  { id: 'wonju-pungsuwon-cathedral', name: '풍수원 성당', category: '순교 사적지', lat: 37.5291828816656, lng: 127.818677723816 }
+];
+
 window.PILGRIMAGE_ROUTE_NIMUI = [
   {
     "id": "nimui-big-cheomnye",

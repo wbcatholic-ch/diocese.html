@@ -85,12 +85,13 @@
     },
     {
       id: 'jeonju',
-      title: '전주교구 교우촌 도보순례',
+      title: '전주교구 순례길 ‘요안루갈다길’',
       diocese: '전주교구',
       icon: '🌾',
-      location: '전북 전주·완주',
+      dataGroup: '요안루갈다길',
+      location: '전북 완주·전주',
       officialUrl: 'https://www.jcatholic.or.kr/theme/main/pages/pilgrimage01.html',
-      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+      description: '초남이 성지에서 치명자산 성지까지 이어지는 22km 순례길입니다.'
     },
     {
       id: 'boryeong-galmaemot',
@@ -129,6 +130,7 @@
     map: null,
     kakaoReady: false,
     stampMarkers: [],
+    landmarkMarkers: [],
     stampInfoOverlay: null,
     arrowOverlays: [],
     myMarker: null,
@@ -380,6 +382,11 @@
       if (!routes.length) return null;
       return { ...buildNimuiRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
     }
+    if (trail.id === 'jeonju') {
+      const routes = state.routes.filter((route) => route?.routeGroup === '요안루갈다길');
+      if (!routes.length) return null;
+      return { ...buildJeonjuRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
+    }
     return null;
   }
 
@@ -407,11 +414,13 @@
     const hantiRoute = routes.find((route) => route?.id === 'hanti' || route?.routeGroup === '한티가는길');
     const seoulRoutes = routes.filter((route) => route?.routeGroup === '서울순례길');
     const nimuiRoutes = routes.filter((route) => route?.routeGroup === '님의 길');
+    const jeonjuRoutes = routes.filter((route) => route?.routeGroup === '요안루갈다길');
     if (hantiRoute) items.push(buildHantiRouteGroup(hantiRoute));
     if (seoulRoutes.length) items.push(buildSeoulRouteGroup(seoulRoutes));
     if (nimuiRoutes.length) items.push(buildNimuiRouteGroup(nimuiRoutes));
+    if (jeonjuRoutes.length) items.push(buildJeonjuRouteGroup(jeonjuRoutes));
     routes.forEach((route) => {
-      if (!route || route.id === 'hanti' || route.routeGroup === '한티가는길' || route.routeGroup === '서울순례길' || route.routeGroup === '님의 길') return;
+      if (!route || route.id === 'hanti' || route.routeGroup === '한티가는길' || route.routeGroup === '서울순례길' || route.routeGroup === '님의 길' || route.routeGroup === '요안루갈다길') return;
       items.push({ kind: 'route', route });
     });
     return items;
@@ -477,6 +486,25 @@
       foot: `${orderedRoutes.length}개 순례길`,
       optionLayout: 'single',
       options
+    };
+  }
+
+  function buildJeonjuRouteGroup(routes) {
+    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    return {
+      kind: 'group',
+      id: 'jeonju-yoan-rugalda-route-group',
+      icon: '✝️',
+      title: '전주교구 순례길 ‘요안루갈다길’',
+      meta: '초남이 성지에서 치명자산 성지까지 이어지는 순례길입니다.',
+      foot: '6개 성지 · 22km',
+      optionLayout: 'single',
+      options: orderedRoutes.map((route) => ({
+        label: route.shortName || route.name,
+        title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
+        meta: route.distanceLabel || '22km',
+        route
+      }))
     };
   }
 
@@ -1132,6 +1160,7 @@
     rebuildNavigationModel();
     renderRouteProgressLines(null);
     renderWalkedTrack();
+    renderLandmarkMarkers(route);
     renderStampMarkers(route);
     renderDirectionArrows();
     setTimeout(() => {
@@ -1146,6 +1175,8 @@
     hideStampInfo();
     state.stampMarkers.forEach((item) => item.setMap(null));
     state.stampMarkers = [];
+    state.landmarkMarkers.forEach((item) => item.setMap(null));
+    state.landmarkMarkers = [];
     clearPolyline('traveledPolyline');
     clearPolyline('futurePolyline');
     clearPolyline('walkedTrackPolyline');
@@ -1158,6 +1189,55 @@
   function clearPolyline(key) {
     if (state[key]) state[key].setMap(null);
     state[key] = null;
+  }
+
+  function getRouteLandmarks(route) {
+    if (Array.isArray(route?.landmarks)) return route.landmarks;
+    const catalog = window.PILGRIMAGE_LANDMARKS_BY_REGION || {};
+    return Array.isArray(catalog[route?.region]) ? catalog[route.region] : [];
+  }
+
+  function renderLandmarkMarkers(route) {
+    if (!state.map || !window.kakao?.maps) return;
+    const KM = kakao.maps;
+    const events = KM.event;
+    getRouteLandmarks(route).forEach((landmark) => {
+      if (!isFiniteNumber(landmark.lat) || !isFiniteNumber(landmark.lng)) return;
+      const position = new KM.LatLng(Number(landmark.lat), Number(landmark.lng));
+      const marker = new KM.Marker({
+        map: state.map,
+        position,
+        image: createSacredSiteMarkerImage(),
+        title: landmark.name || '성지',
+        clickable: true,
+        zIndex: 19
+      });
+      if (events?.addListener) {
+        events.addListener(marker, 'click', () => showStampInfo({
+          ...landmark,
+          displayOrder: '',
+          name: landmark.name || '성지',
+          description: landmark.category || '성지·순례지'
+        }, position));
+      }
+      state.landmarkMarkers.push(marker);
+    });
+  }
+
+  function createSacredSiteMarkerImage() {
+    const KM = kakao.maps;
+    const width = 28;
+    const height = 34;
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+        <path d="M14 1C7.4 1 2 6.4 2 13c0 8.7 12 20 12 20s12-11.3 12-20C26 6.4 20.6 1 14 1z" fill="#d92332" stroke="#ffffff" stroke-width="2"/>
+        <path d="M12.2 7h3.6v4.1h4.1v3.6h-4.1v7.2h-3.6v-7.2H8.1v-3.6h4.1z" fill="#ffffff"/>
+      </svg>`;
+    return new KM.MarkerImage(
+      `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+      new KM.Size(width, height),
+      { offset: new KM.Point(width / 2, height) }
+    );
   }
 
   function renderStampMarkers(route) {
@@ -1230,7 +1310,7 @@
     const KM = kakao.maps;
     const orderText = stampMarkerText(stamp);
     const title = `${orderText ? orderText + '. ' : ''}${stamp.name || '순례 지점'}`;
-    const groupText = state.activeRoute?.routeGroup || state.activeRoute?.region || state.activeRoute?.name || '순례길';
+    const groupText = stamp.category || state.activeRoute?.routeGroup || state.activeRoute?.region || state.activeRoute?.name || '순례길';
     const content = document.createElement('div');
     content.className = 'stamp-info-card';
     content.innerHTML = `

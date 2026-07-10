@@ -1,14 +1,15 @@
-const CACHE_NAME = 'pilgrimage-route-nav-v65-wonju-title-navy-20260710';
+const CACHE_NAME = 'pilgrimage-route-nav-v67-wonju-sacred-sites-20260710';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './css/route-nav.css?v=20260710-v65-wonju-title-navy',
-  './js/route-nav.js?v=20260710-v65-wonju-title-navy',
-  './routes/hanti-route-data-v1.js?v=20260710-v65-wonju-title-navy',
-  './routes/seoul-pilgrimage-routes.js?v=20260710-v65-wonju-title-navy',
-  './routes/nimui-gil-routes.js?v=20260710-v65-wonju-title-navy',
-  './routes/test-route-data-v1.js?v=20260710-v65-wonju-title-navy',
+  './css/route-nav.css?v=20260710-v67-wonju-sacred-sites',
+  './js/route-nav.js?v=20260710-v67-wonju-sacred-sites',
+  './routes/hanti-route-data-v1.js?v=20260710-v67-wonju-sacred-sites',
+  './routes/seoul-pilgrimage-routes.js?v=20260710-v67-wonju-sacred-sites',
+  './routes/nimui-gil-routes.js?v=20260710-v67-wonju-sacred-sites',
+  './routes/jeonju-pilgrimage-routes.js?v=20260710-v67-wonju-sacred-sites',
+  './routes/test-route-data-v1.js?v=20260710-v67-wonju-sacred-sites',
   './gpx/nimui-gil-1-1-big-cheomnye.gpx',
   './gpx/nimui-gil-1-2-ne-gongso.gpx',
   './gpx/nimui-gil-1-3-nine-pass-road.gpx',
@@ -23,6 +24,7 @@ const CORE_ASSETS = [
   './gpx/nimui-gil-3-3-jihak-sun-bishop-road.gpx',
   './gpx/nimui-gil-3-4-seonjongwan-priest-road.gpx',
   './gpx/nimui-gil-3-5-seongsa-road.gpx',
+  './gpx/jeonju-yoan-rugalda-road.gpx',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/icon-512x512-maskable.png'
