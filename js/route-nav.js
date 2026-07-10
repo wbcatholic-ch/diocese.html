@@ -449,7 +449,7 @@
           title: '',
           meta: [route.distanceLabel, route.durationLabel].filter(Boolean).join(' · '),
           variant: 'full-route',
-          route
+          route: createHantiFullRoute(route)
         },
         ...courseOptions
       ]
@@ -569,10 +569,11 @@
     };
   }
 
+  // 인접 구간끼리 색이 비슷해 보이지 않도록 명도와 색상 계열을 번갈아 배치한다.
   const FULL_ROUTE_SECTION_COLORS = [
-    '#1d4ed8', '#2563eb', '#0ea5e9', '#0891b2', '#0f766e', '#16a34a', '#65a30d',
-    '#ca8a04', '#ea580c', '#dc2626', '#db2777', '#9333ea', '#7c3aed', '#4f46e5',
-    '#0369a1', '#15803d', '#b45309', '#be123c'
+    '#0b3d91', '#f97316', '#15803d', '#c026d3', '#0891b2', '#dc2626',
+    '#7c3aed', '#ca8a04', '#0369a1', '#be123c', '#0f766e', '#ea580c',
+    '#4f46e5', '#65a30d', '#db2777', '#1d4ed8', '#b45309', '#9333ea'
   ];
 
   function fullRouteSectionColor(index) {
@@ -591,6 +592,7 @@
           sourceRouteId: route.id,
           sourceRouteName: route.shortName || route.name,
           displayColor,
+          displayWeight: 7 + ((orderedRoutes.length - routeIndex - 1) % 3),
           points: segment.points || []
         });
       });
@@ -757,6 +759,36 @@
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
+  function createHantiFullRoute(baseRoute) {
+    const courses = Array.isArray(baseRoute?.courses) ? baseRoute.courses : [];
+    if (!courses.length) return { ...baseRoute, preserveSegmentBreaks: true };
+    const routeSegments = [];
+    courses.forEach((course, courseIndex) => {
+      const stampIds = Array.isArray(course?.stampIds) ? course.stampIds : [];
+      const startStampId = stampIds[0];
+      const finishStampId = stampIds[stampIds.length - 1];
+      const points = sliceRoutePointsByStamps(baseRoute, startStampId, finishStampId);
+      if (points.length < 2) return;
+      routeSegments.push({
+        id: `${baseRoute.id}-full-course-${course.courseNo || course.id || courseIndex + 1}`,
+        type: 'gpx-slice',
+        sourceRouteName: `${course.courseNo || courseIndex + 1}코스 ${course.name || ''}`.trim(),
+        displayColor: fullRouteSectionColor(courseIndex),
+        displayWeight: 7 + ((courses.length - courseIndex - 1) % 3),
+        points
+      });
+    });
+    return {
+      ...baseRoute,
+      id: `${baseRoute.id}-full`,
+      name: '한티가는길 전체코스',
+      shortName: '한티가는길 전체코스',
+      preserveSegmentBreaks: true,
+      routeSegments,
+      courses: undefined
+    };
+  }
+
   function createHantiCourseRoute(baseRoute, course) {
     const stampIds = Array.isArray(course?.stampIds) ? course.stampIds : [];
     const stamps = stampIds
@@ -822,6 +854,7 @@
           sourceRouteId: route.id,
           sourceRouteName: route.shortName || route.name,
           displayColor,
+          displayWeight: 7 + ((orderedRoutes.length - routeIndex - 1) % 3),
           points: segment.points || []
         });
       });
@@ -851,6 +884,7 @@
       distanceLabel: '44.1km',
       startName: orderedRoutes[0]?.startName || '출발지',
       finishName: orderedRoutes[orderedRoutes.length - 1]?.finishName || '도착지',
+      preserveSegmentBreaks: true,
       features: {
         showRouteLine: true,
         showStampMarkers: true,
@@ -1103,6 +1137,12 @@
     const representative = routeUsesRepresentativeLine(route) ? ' · 대표선' : '';
     $('map-title').textContent = route.name || '순례길';
     $('map-subtitle').textContent = `${start || '출발지'} → ${finish || '도착지'}${directionText}${representative}`;
+    const distanceBadge = $('map-distance');
+    if (distanceBadge) {
+      const computedKm = computeRouteTotalDistance(route) / 1000;
+      distanceBadge.textContent = route.distanceLabel || (Number.isFinite(computedKm) ? `${computedKm.toFixed(1)}km` : '');
+      distanceBadge.hidden = !distanceBadge.textContent;
+    }
     updateDirectionButton();
   }
 
@@ -1246,7 +1286,7 @@
       const polyline = new kakao.maps.Polyline({
         map: state.map,
         path,
-        strokeWeight: 6,
+        strokeWeight: Number(segment.displayWeight) || 7,
         strokeColor: displayColor,
         strokeOpacity: 0.95,
         strokeStyle: 'solid'

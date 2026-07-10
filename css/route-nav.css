@@ -429,6 +429,20 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .round-btn { width: 40px; height: 40px; border-radius: 999px; font-size: 30px; line-height: 1; padding-bottom: 4px; }
 .head-action { min-width: 52px; height: 38px; border-radius: 14px; font-size: 13px; }
 .map-title-wrap { min-width: 0; flex: 1; }
+.map-distance {
+  flex: 0 0 auto;
+  min-width: 58px;
+  padding: 6px 9px;
+  border: 1px solid rgba(11, 29, 59, .18);
+  border-radius: 999px;
+  background: #eef3fb;
+  color: #0b1d3b;
+  font-size: 12px;
+  font-weight: 950;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .map-title { font-size: 17px; font-weight: 950; letter-spacing: -.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .map-subtitle { margin-top: 2px; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .map-canvas { position: absolute; inset: 0; background: #e6ded2; }
