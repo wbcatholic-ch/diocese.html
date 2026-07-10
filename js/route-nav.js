@@ -1242,7 +1242,7 @@
   function clearMapObjects(options = {}) {
     clearDirectionArrows();
     hideStampInfo();
-    state.stampMarkers.forEach((item) => item.setMap(null));
+    state.stampMarkers.forEach((item) => (item.marker || item).setMap(null));
     state.stampMarkers = [];
     state.landmarkMarkers.forEach((item) => item.setMap(null));
     state.landmarkMarkers = [];
@@ -1279,29 +1279,40 @@
     return valid.length ? valid[Math.floor(valid.length / 2)] : null;
   }
 
+  function routeCourseLabelSpecs(route) {
+    if (Array.isArray(route?.courses) && route.courses.length && Array.isArray(route.stamps)) {
+      return route.courses.map((course) => {
+        const stamps = (course.stampIds || []).map((id) => route.stamps.find((stamp) => stamp.id === id)).filter(Boolean);
+        const point = stamps.length ? stamps[Math.floor(stamps.length / 2)] : null;
+        return point ? { text: `${course.courseNo || ''}코스 ${course.name || ''}`.trim(), point } : null;
+      }).filter(Boolean);
+    }
+    const specs = [];
+    const seen = new Set();
+    (route?.routeSegments || []).forEach((segment, index) => {
+      const text = segment.sourceRouteName || (index === 0 ? (route.shortName || route.name) : '');
+      if (!text || seen.has(text)) return;
+      const point = representativePoint(segment.points);
+      if (!point) return;
+      seen.add(text);
+      specs.push({ text, point });
+    });
+    return specs;
+  }
+
   function renderCourseLabels(route) {
     clearCourseLabelOverlays();
     if (!state.map || !window.kakao?.maps || !route) return;
-    const segments = (route.routeSegments || []).filter((segment) => (segment.points || []).length > 1);
-    const labeled = [];
-    segments.forEach((segment, index) => {
-      const labelText = segment.sourceRouteName || (index === 0 ? (route.shortName || route.name) : '');
-      if (!labelText || labeled.includes(labelText)) return;
-      const point = representativePoint(segment.points);
-      if (!point) return;
-      labeled.push(labelText);
-      const labels = splitCourseLabel(labelText);
+    routeCourseLabelSpecs(route).forEach((spec) => {
+      const labels = splitCourseLabel(spec.text);
       const content = document.createElement('div');
       content.className = 'course-map-label';
       content.dataset.number = labels.number;
       content.dataset.full = labels.full;
       content.textContent = labels.full;
       const overlay = new kakao.maps.CustomOverlay({
-        position: new kakao.maps.LatLng(Number(point.lat), Number(point.lng)),
-        content,
-        xAnchor: 0.5,
-        yAnchor: 0.5,
-        zIndex: 17
+        position: new kakao.maps.LatLng(Number(spec.point.lat), Number(spec.point.lng)),
+        content, xAnchor: 0.5, yAnchor: 0.5, zIndex: 17
       });
       overlay.__content = content;
       overlay.setMap(state.map);
@@ -1316,13 +1327,15 @@
     state.courseLabelOverlays.forEach((overlay) => {
       const content = overlay.__content;
       if (!content) return;
-      if (level >= 9) {
+      if (level >= 8) {
         content.hidden = true;
         return;
       }
       content.hidden = false;
-      content.textContent = level >= 7 ? content.dataset.number : content.dataset.full;
-      content.classList.toggle('compact', level >= 7);
+      const numberOnly = level >= 6;
+      content.textContent = numberOnly ? content.dataset.number : content.dataset.full;
+      content.classList.toggle('compact', numberOnly);
+      content.classList.toggle('detail', level <= 4);
     });
   }
 
@@ -1334,11 +1347,19 @@
   function renderSegmentedRouteLines(route) {
     clearRouteSegmentPolylines();
     if (!state.map || !window.kakao?.maps) return;
+    let previousDisplayEnd = null;
     (route?.routeSegments || []).forEach((segment, segmentIndex) => {
       const validPoints = (segment.points || [])
         .filter((point) => isFiniteNumber(point.lat) && isFiniteNumber(point.lng))
         .map((point) => ({ lat: Number(point.lat), lng: Number(point.lng) }));
       if (validPoints.length < 2) return;
+      // 원본 세그먼트 경계가 수십 m 정도 벌어진 경우에만 표시선을 자연스럽게 잇는다.
+      // 먼 구간은 절대로 직선 연결하지 않는다.
+      if (previousDisplayEnd) {
+        const gapM = haversineM(previousDisplayEnd, validPoints[0]);
+        if (Number.isFinite(gapM) && gapM > 0.5 && gapM <= 120) validPoints.unshift(previousDisplayEnd);
+      }
+      previousDisplayEnd = validPoints[validPoints.length - 1];
 
       // 전체코스는 세부 코스별 색상을 유지한다. 같은 길을 반대 방향으로 지나도
       // 표시용 선만 제거하지 않고 각각 그려, 선택한 코스의 방향 데이터도 보존한다.
@@ -1390,9 +1411,9 @@
       const point = { lat: Number(landmark.lat), lng: Number(landmark.lng) };
       const nearest = findNearestPointOnRoute(point, routeSegments);
       if (!nearest || !Number.isFinite(nearest.distanceM) || nearest.distanceM > maxDistanceM) return false;
+      if (route.region === '원주교구' && /배론\s*성지|풍수원\s*성당/.test(String(landmark.name || ''))) return true;
       return !endpointStamps.some((stamp) => (
-        isFiniteNumber(stamp.lat) &&
-        isFiniteNumber(stamp.lng) &&
+        isFiniteNumber(stamp.lat) && isFiniteNumber(stamp.lng) &&
         haversineM(point, { lat: Number(stamp.lat), lng: Number(stamp.lng) }) < 150
       ));
     });
@@ -1474,7 +1495,20 @@
       if (events?.addListener) {
         events.addListener(marker, 'click', () => showStampInfo(stamp, position));
       }
-      state.stampMarkers.push(marker);
+      state.stampMarkers.push({ marker, stamp });
+    });
+    updateStampMarkerVisibility();
+  }
+
+  function updateStampMarkerVisibility() {
+    if (!state.map) return;
+    const level = Number(state.map.getLevel?.() || 8);
+    state.stampMarkers.forEach((item) => {
+      const marker = item.marker || item;
+      const stamp = item.stamp || {};
+      const isEndpoint = stamp.role === 'start' || stamp.role === 'finish';
+      const visible = isEndpoint || level <= 4;
+      marker.setMap(visible ? state.map : null);
     });
   }
 
@@ -1836,6 +1870,7 @@
     });
     events.addListener(state.map, 'zoom_changed', () => {
       updateCourseLabelVisibility();
+      updateStampMarkerVisibility();
       renderDirectionArrows();
       pauseAutoCenterForManualMapUse(true);
     });
