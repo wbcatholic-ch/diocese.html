@@ -577,6 +577,58 @@
     return FULL_ROUTE_SECTION_COLORS[index % FULL_ROUTE_SECTION_COLORS.length];
   }
 
+  function isCombinedRoute(route) {
+    const id = String(route?.id || '');
+    const name = String(route?.name || route?.shortName || '');
+    return /(?:-full|_full)$/.test(id) || /전체코스/.test(name);
+  }
+
+  function routePaletteIndex(route) {
+    if (!route) return 0;
+
+    if (route.routeGroup === '한티가는길' || String(route.id || '').startsWith('hanti')) {
+      const courseNo = Number(route.selectedCourseNo || String(route.shortName || route.name || '').match(/^(\d+)코스/)?.[1]);
+      return Number.isFinite(courseNo) && courseNo > 0 ? courseNo - 1 : 0;
+    }
+
+    if (route.region === '원주교구' && route.routeGroup === '님의 길') {
+      const ordered = (window.PILGRIMAGE_ROUTE_NIMUI || []).slice()
+        .sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+      const index = ordered.findIndex((item) => item.id === route.id);
+      return index >= 0 ? index : 0;
+    }
+
+    if (route.region === '서울대교구') {
+      const ordered = (window.PILGRIMAGE_ROUTE_SEOUL || []).slice()
+        .filter((item) => !isKimDaegeonSeoulRoute(item))
+        .sort(compareSeoulRouteOrder);
+      const index = ordered.findIndex((item) => item.id === route.id);
+      return index >= 0 ? index : 0;
+    }
+
+    if (route.region === '전주교구') {
+      const ordered = (window.PILGRIMAGE_ROUTE_JEONJU || []).slice();
+      const index = ordered.findIndex((item) => item.id === route.id);
+      return index >= 0 ? index : 0;
+    }
+
+    return 0;
+  }
+
+  function applyIndividualRouteColor(route) {
+    if (!route || isCombinedRoute(route)) return route;
+    const displayColor = fullRouteSectionColor(routePaletteIndex(route));
+    return {
+      ...route,
+      routeDisplayColor: displayColor,
+      routeSegments: (route.routeSegments || []).map((segment) => ({
+        ...segment,
+        displayColor,
+        displayWeight: Number(segment.displayWeight) || 7
+      }))
+    };
+  }
+
   function createNimuiFullRoute(routes, id, name, distanceLabel, durationLabel) {
     const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
     const routeSegments = [];
@@ -1040,6 +1092,7 @@
 
   function openRoute(route, options = {}) {
     stopLocationWatch();
+    route = applyIndividualRouteColor(route);
     state.activeRoute = route;
     const restoredState = validRestoreStateForRoute(route, options.restoreState);
     state.routeDirection = normalizeDirection(restoredState?.routeDirection || 'forward');
@@ -1319,28 +1372,55 @@
 
   function representativePoint(points) {
     const valid = (points || []).filter((point) => isFiniteNumber(point?.lat) && isFiniteNumber(point?.lng));
-    return valid.length ? valid[Math.floor(valid.length / 2)] : null;
+    if (!valid.length) return null;
+    if (valid.length === 1) return valid[0];
+
+    // 좌표 개수의 단순 중앙이 아니라 실제 누적 거리의 중앙점을 사용한다.
+    // 긴 코스가 여러 GPX 세그먼트로 나뉘어 있어도 라벨이 출발점 쪽으로 치우치지 않는다.
+    let totalM = 0;
+    const cumulative = [0];
+    for (let i = 1; i < valid.length; i += 1) {
+      totalM += haversineM(valid[i - 1], valid[i]);
+      cumulative.push(totalM);
+    }
+    if (!Number.isFinite(totalM) || totalM <= 0) return valid[Math.floor(valid.length / 2)];
+    const targetM = totalM / 2;
+    let bestIndex = 0;
+    let bestDiff = Infinity;
+    cumulative.forEach((distanceM, index) => {
+      const diff = Math.abs(distanceM - targetM);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestIndex = index;
+      }
+    });
+    return valid[bestIndex];
   }
 
   function routeCourseLabelSpecs(route) {
     if (Array.isArray(route?.courses) && route.courses.length && Array.isArray(route.stamps)) {
       return route.courses.map((course) => {
         const stamps = (course.stampIds || []).map((id) => route.stamps.find((stamp) => stamp.id === id)).filter(Boolean);
-        const point = stamps.length ? stamps[Math.floor(stamps.length / 2)] : null;
+        const point = representativePoint(stamps);
         return point ? { text: `${course.courseNo || ''}코스 ${course.name || ''}`.trim(), point } : null;
       }).filter(Boolean);
     }
-    const specs = [];
-    const seen = new Set();
+
+    // 같은 세부 코스가 여러 세그먼트로 분리돼 있으면 먼저 한 묶음으로 합친 뒤
+    // 전체 경로의 거리 중앙에 라벨을 둔다. 1-5와 3-1처럼 첫 세그먼트가 짧은 경우도
+    // 코스명이 시작점 근처에 붙지 않는다.
+    const grouped = new Map();
     (route?.routeSegments || []).forEach((segment, index) => {
       const text = segment.sourceRouteName || (index === 0 ? (route.shortName || route.name) : '');
-      if (!text || seen.has(text)) return;
-      const point = representativePoint(segment.points);
-      if (!point) return;
-      seen.add(text);
-      specs.push({ text, point });
+      if (!text) return;
+      if (!grouped.has(text)) grouped.set(text, []);
+      grouped.get(text).push(...(segment.points || []));
     });
-    return specs;
+
+    return Array.from(grouped.entries()).map(([text, points]) => {
+      const point = representativePoint(points);
+      return point ? { text, point } : null;
+    }).filter(Boolean);
   }
 
   function renderCourseLabels(route) {
@@ -1374,13 +1454,14 @@
 
       // 모든 순례길 공통 기준: 같은 줌에서는 같은 글자 크기와 카드 크기를 사용한다.
       // 너무 멀리 축소한 경우만 숨기고, 그 외에는 번호와 코스명을 항상 함께 표시한다.
-      if (level >= 14) {
+      if (level >= 16) {
         content.hidden = true;
         return;
       }
       content.hidden = false;
       content.textContent = content.dataset.full || content.dataset.name;
-      if (level >= 12) content.className = 'course-map-label zoom-far';
+      if (level >= 14) content.className = 'course-map-label zoom-ultra-far';
+      else if (level >= 12) content.className = 'course-map-label zoom-far';
       else if (level >= 10) content.className = 'course-map-label zoom-low';
       else if (level >= 7) content.className = 'course-map-label zoom-mid';
       else content.className = 'course-map-label zoom-near';
@@ -1435,13 +1516,21 @@
   function getRouteLandmarks(route) {
     if (!route) return [];
 
-    // 한티가는길은 교구 전체 성지가 아니라 순례길에 직접 해당하는 세 곳만 표시한다.
+    // 한티가는길은 엑셀에서 생성한 188개 성지 좌표를 기준으로
+    // 가실 성당·신나무골 성지·한티 순교성지만 표시한다.
+    // 경로 진행용 스탬프 좌표를 성지 마커 좌표로 대신 사용하지 않는다.
     if (route.id === 'hanti' || String(route.id || '').startsWith('hanti__') || route.routeGroup === '한티가는길') {
-      const wanted = ['가실성당', '신나무골', '한티순교성지'];
-      return wanted.map((name) => {
-        const stamp = (route.stamps || []).find((item) => String(item?.name || '').replace(/\s+/g, '') === name.replace(/\s+/g, ''))
-          || (window.PILGRIMAGE_ROUTE_HANTI?.stamps || []).find((item) => String(item?.name || '').replace(/\s+/g, '') === name.replace(/\s+/g, ''));
-        return stamp ? { name, lat: stamp.lat, lng: stamp.lng } : null;
+      const catalog = window.PILGRIMAGE_LANDMARKS_BY_REGION || {};
+      const daeguLandmarks = Array.isArray(catalog['대구대교구']) ? catalog['대구대교구'] : [];
+      const wantedAliases = [
+        ['가실성당', '가실 성당'],
+        ['신나무골', '신나무골 성지'],
+        ['한티순교성지', '한티 순교성지']
+      ];
+      const normalize = (value) => String(value || '').replace(/\s+/g, '');
+      return wantedAliases.map((aliases) => {
+        const landmark = daeguLandmarks.find((item) => aliases.some((alias) => normalize(item?.name) === normalize(alias)));
+        return landmark ? { name: landmark.name, lat: landmark.lat, lng: landmark.lng } : null;
       }).filter(Boolean);
     }
 
@@ -1569,7 +1658,12 @@
         && (stamp.role === 'start' || stamp.role === 'finish');
       // 번호형 지점 마커는 상세 확대에서만 표시한다. 전체 지도에서는 코스명 라벨과
       // 경로선이 우선 보이도록 하고, 원주교구의 출발/도착 표시는 계속 유지한다.
-      const visible = isWonjuEndpoint || level <= 5;
+      const isHantiRoute = state.activeRoute?.id === 'hanti'
+        || String(state.activeRoute?.id || '').startsWith('hanti__')
+        || state.activeRoute?.routeGroup === '한티가는길';
+      // 한티가는길의 번호는 기존보다 두 단계 이른 확대 수준부터 보이게 한다.
+      // 다른 순례길의 기존 번호 노출 기준은 유지한다.
+      const visible = isWonjuEndpoint || (isHantiRoute ? level <= 8 : level <= 5);
       marker.setMap(visible ? state.map : null);
     });
   }
@@ -2222,7 +2316,9 @@
     });
     setPolylinePath('futurePolyline', future, {
       strokeWeight: 6,
-      strokeColor: routeUsesRepresentativeLine(state.activeRoute) ? '#b7791f' : '#1d4ed8',
+      strokeColor: routeUsesRepresentativeLine(state.activeRoute)
+        ? '#b7791f'
+        : (state.activeRoute?.routeDisplayColor || '#1d4ed8'),
       strokeOpacity: 0.95,
       strokeStyle: routeUsesRepresentativeLine(state.activeRoute) ? 'shortdash' : 'solid'
     });
