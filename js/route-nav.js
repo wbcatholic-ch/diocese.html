@@ -67,12 +67,14 @@
     },
     {
       id: 'jeju-santo',
-      title: '천주교 제주교구 순례길',
+      title: '천주교 제주교구 순례길 ‘거룩한 여정’',
       diocese: '제주교구',
       icon: '🌊',
+      dataGroup: '제주교구 순례길',
       location: '제주',
       officialUrl: 'http://santoviaggio.com/',
-      description: '상세 GPX 코스는 아직 이 독립 PWA에 연결하지 않았습니다.'
+      description: 'SANTO VIAGGIO의 빛의 길 — 김대건길을 선택할 수 있습니다.',
+      logo: 'icons/jeju-santo-viaggio-logo.png'
     },
     {
       id: 'andong',
@@ -385,6 +387,11 @@
       if (!routes.length) return null;
       return { ...buildJeonjuRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
     }
+    if (trail.id === 'jeju-santo') {
+      const routes = state.routes.filter((route) => route?.region === '제주교구' || route?.routeGroup === '제주교구 순례길');
+      if (!routes.length) return null;
+      return { ...buildJejuRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [], logo: trail.logo };
+    }
     return null;
   }
 
@@ -413,12 +420,14 @@
     const seoulRoutes = routes.filter((route) => route?.routeGroup === '서울순례길');
     const nimuiRoutes = routes.filter((route) => route?.routeGroup === '님의 길');
     const jeonjuRoutes = routes.filter((route) => route?.region === '전주교구');
+    const jejuRoutes = routes.filter((route) => route?.region === '제주교구' || route?.routeGroup === '제주교구 순례길');
     if (hantiRoute) items.push(buildHantiRouteGroup(hantiRoute));
     if (seoulRoutes.length) items.push(buildSeoulRouteGroup(seoulRoutes));
     if (nimuiRoutes.length) items.push(buildNimuiRouteGroup(nimuiRoutes));
     if (jeonjuRoutes.length) items.push(buildJeonjuRouteGroup(jeonjuRoutes));
+    if (jejuRoutes.length) items.push(buildJejuRouteGroup(jejuRoutes));
     routes.forEach((route) => {
-      if (!route || route.id === 'hanti' || route.routeGroup === '한티가는길' || route.routeGroup === '서울순례길' || route.routeGroup === '님의 길' || route.region === '전주교구') return;
+      if (!route || route.id === 'hanti' || route.routeGroup === '한티가는길' || route.routeGroup === '서울순례길' || route.routeGroup === '님의 길' || route.region === '전주교구' || route.region === '제주교구' || route.routeGroup === '제주교구 순례길') return;
       items.push({ kind: 'route', route });
     });
     return items;
@@ -503,6 +512,39 @@
         meta: route.distanceLabel || '',
         route
       }))
+    };
+  }
+
+  function buildJejuRouteGroup(routes) {
+    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    const options = [];
+    if (orderedRoutes.length > 1) {
+      options.push({
+        label: '제주교구 순례길 전체코스 보기',
+        title: '거룩한 여정 4개 코스',
+        meta: '총 46.7km',
+        variant: 'full-route',
+        route: createJejuFullRoute(orderedRoutes)
+      });
+    }
+    orderedRoutes.forEach((route) => {
+      options.push({
+        label: route.shortName || route.name,
+        title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
+        meta: route.distanceLabel || '',
+        route
+      });
+    });
+    return {
+      kind: 'group',
+      id: 'jeju-pilgrimage-route-group',
+      icon: '🌊',
+      logo: 'icons/jeju-santo-viaggio-logo.png',
+      title: '천주교 제주교구 순례길 ‘거룩한 여정’ — SANTO VIAGGIO',
+      meta: '전체지도 또는 걸을 순례길을 선택하세요.',
+      foot: `${orderedRoutes.length}개 순례길`,
+      optionLayout: 'single',
+      options
     };
   }
 
@@ -608,6 +650,13 @@
 
     if (route.region === '전주교구') {
       const ordered = (window.PILGRIMAGE_ROUTE_JEONJU || []).slice();
+      const index = ordered.findIndex((item) => item.id === route.id);
+      return index >= 0 ? index : 0;
+    }
+
+    if (route.region === '제주교구') {
+      const ordered = (window.PILGRIMAGE_ROUTE_JEJU || []).slice()
+        .sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
       const index = ordered.findIndex((item) => item.id === route.id);
       return index >= 0 ? index : 0;
     }
@@ -733,7 +782,7 @@
     card.className = 'route-card route-group-card route-detail-card';
     card.innerHTML = `
       <div class="route-card-main route-detail-title-row">
-        <div class="route-icon">${escapeHtml(group.icon || '🧭')}</div>
+        ${group.logo ? `<div class="route-icon route-logo-icon"><img src="${escapeHtml(group.logo)}" alt=""></div>` : `<div class="route-icon">${escapeHtml(group.icon || '🧭')}</div>`}
         <div class="route-copy">
           <div class="route-name-row">
             <h3 class="route-name">${escapeHtml(group.title || '순례길')}</h3>
@@ -957,6 +1006,51 @@
           displayOrder: `${markerPrefix}-${rawNo}`
         };
       })
+    };
+  }
+
+  function createJejuFullRoute(routes) {
+    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    const routeSegments = [];
+    orderedRoutes.forEach((route, routeIndex) => {
+      const displayColor = fullRouteSectionColor(routeIndex);
+      (route.routeSegments || []).forEach((segment, index) => {
+        routeSegments.push({
+          ...segment,
+          id: `jeju-full-${route.id}-${segment.id || index}`,
+          sourceRouteId: route.id,
+          sourceRouteName: route.shortName || route.name,
+          displayColor,
+          displayWeight: 7 + ((orderedRoutes.length - routeIndex - 1) % 3),
+          points: segment.points || []
+        });
+      });
+    });
+    return {
+      id: 'jeju-santo-viaggio-full',
+      name: '제주교구 순례길 전체코스',
+      shortName: '제주교구 순례길 전체코스',
+      region: '제주교구',
+      type: 'pilgrimage_route',
+      mode: 'route_navigation',
+      lineType: 'gpx',
+      dataQuality: 'actual-gpx',
+      routeGroup: '제주교구 순례길',
+      distanceLabel: '46.7km',
+      startName: '거룩한 여정 4개 코스',
+      finishName: 'SANTO VIAGGIO',
+      preserveSegmentBreaks: true,
+      isOverviewOnly: true,
+      features: {
+        showRouteLine: true,
+        showStampMarkers: false,
+        autoStamp: false,
+        nextStampDistance: false,
+        offRouteAlert: false,
+        nearestStampDistance: false
+      },
+      stamps: [],
+      routeSegments
     };
   }
 

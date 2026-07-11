@@ -860,3 +860,5 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .course-map-label.zoom-mid { max-width: 164px; padding: 3px 7px; font-size: 10.5px; transform: scale(.94); }
 .course-map-label.zoom-near { max-width: 178px; padding: 3px 8px; font-size: 12px; transform: scale(1); }
 .course-map-label[hidden] { display: none !important; }
+
+.route-logo-icon{width:118px;min-width:118px;height:48px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;overflow:hidden}.route-logo-icon img{display:block;max-width:112px;max-height:42px;object-fit:contain}.jeju-pilgrimage-route-group .route-detail-title-row{align-items:center}.jeju-pilgrimage-route-group .route-name{line-height:1.25}
