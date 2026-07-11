@@ -557,7 +557,7 @@
         label: `${index + 1}. ${route.shortName || route.name}`,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
         meta: route.distanceLabel || '',
-        route
+        route: createJejuDisplayRoute(route)
       });
     });
     return {
@@ -1034,8 +1034,23 @@
     };
   }
 
+  function createJejuDisplayRoute(route) {
+    if (!route || route.region !== '제주교구' || isCombinedRoute(route)) return route;
+    const orderedRoutes = (window.PILGRIMAGE_ROUTE_JEJU || []).slice()
+      .sort((a, b) => compareByExplicitOrder(JEJU_ROUTE_ORDER, a, b));
+    const routeIndex = orderedRoutes.findIndex((item) => item.id === route.id);
+    const routeNo = routeIndex >= 0 ? routeIndex + 1 : 1;
+    return {
+      ...route,
+      stamps: (route.stamps || []).map((stamp, stampIndex) => ({
+        ...stamp,
+        displayOrder: `${routeNo}-${stamp.order || stampIndex + 1}`
+      }))
+    };
+  }
+
   function createJejuFullRoute(routes) {
-    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    const orderedRoutes = routes.slice().sort((a, b) => compareByExplicitOrder(JEJU_ROUTE_ORDER, a, b));
     const routeSegments = [];
     orderedRoutes.forEach((route, routeIndex) => {
       const displayColor = fullRouteSectionColor(routeIndex);
@@ -1824,7 +1839,7 @@
       // 숫자형 지점 마커는 상세 줌에서만 표시한다.
       // 전체코스를 한 화면에 보는 수준에서는 경로선과 코스명 라벨이 먼저 보이도록 숨긴다.
       // 한티가는길도 다른 순례길과 같은 상세 줌 기준을 사용해 지도 가림을 방지한다.
-      const visible = isWonjuEndpoint || level <= 5;
+      const visible = isWonjuEndpoint || level <= 7;
       marker.setMap(visible ? state.map : null);
     });
   }
@@ -1878,8 +1893,7 @@
     if (!state.map || !window.kakao?.maps || !stamp) return;
     hideStampInfo();
     const KM = kakao.maps;
-    const orderText = stampMarkerText(stamp);
-    const title = `${orderText ? orderText + ' ' : ''}${stamp.name || '순례 지점'}`.trim();
+    const title = String(stamp.name || '순례 지점').trim();
     const content = createUnifiedMapInfoCard(title, '지점 정보 닫기');
     state.stampInfoOverlay = new KM.CustomOverlay({
       position,

@@ -739,16 +739,16 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-marker { transform: translate(-50%, -100%); padding: 6px 8px; border-radius: 999px; background: #172033; color: #fff; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(15,23,42,.3); font-size: 11px; font-weight: 950; white-space: nowrap; }
 .stamp-info-card {
   position: relative;
-  min-width: 96px;
   width: max-content;
-  max-width: min(210px, calc(100vw - 36px));
-  min-height: 42px;
+  min-width: 118px;
+  max-width: min(260px, calc(100vw - 40px));
+  min-height: 46px;
   transform: translateY(-14px);
-  padding: 10px 38px 10px 14px;
+  padding: 10px 40px 10px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 13px;
+  border-radius: 14px;
   background: rgba(255, 253, 248, .98);
   border: 1.5px solid #d8c6aa;
   box-shadow: 0 8px 22px rgba(15, 23, 42, .20);
@@ -768,20 +768,20 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   border-bottom: 1.5px solid #d8c6aa;
 }
 .stamp-info-title {
-  max-width: 170px;
-  font-size: 14px;
+  width: 100%;
+  max-width: 204px;
+  font-size: 13px;
   font-weight: 900;
-  line-height: 1.35;
-  letter-spacing: -.035em;
+  line-height: 1.42;
+  letter-spacing: -.025em;
   text-align: center;
   word-break: keep-all;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .stamp-info-close {
   position: absolute;
-  right: 7px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 8px;
+  top: 8px;
   width: 24px;
   height: 24px;
   border: 0;
@@ -794,24 +794,19 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 }
 .unified-map-info-card .stamp-info-title { padding: 0; }
 .unified-map-info-card.is-long-title {
-  width: min(210px, calc(100vw - 36px));
-  min-height: 58px;
-  padding-top: 9px;
-  padding-bottom: 9px;
+  width: min(260px, calc(100vw - 40px));
+  min-height: 54px;
+  padding-top: 11px;
+  padding-bottom: 11px;
 }
 .unified-map-info-card.is-long-title .stamp-info-title {
-  width: 100%;
-  max-width: 158px;
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  max-width: 204px;
+  min-height: 0;
+  display: block;
   font-size: 13px;
   line-height: 1.42;
-  text-align: center;
-  word-break: keep-all;
-  overflow-wrap: break-word;
 }
+
 
 .my-location-marker { position: relative; width: 19px; height: 19px; border-radius: 50%; background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 5px rgba(37,99,235,.22), 0 4px 12px rgba(15,23,42,.25); }
 .my-location-marker.following::after { content: ""; position: absolute; left: 50%; top: -12px; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 12px solid #2563eb; }
@@ -864,10 +859,10 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
 .route-logo-icon{width:118px;min-width:118px;height:48px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;overflow:hidden}.route-logo-icon img{display:block;max-width:112px;max-height:42px;object-fit:contain}.jeju-pilgrimage-route-group .route-detail-title-row{align-items:center}.jeju-pilgrimage-route-group .route-name{line-height:1.25}
 
 
-/* v93: first map-entry location choice */
-.initial-location-banner{position:absolute;z-index:40;top:74px;left:50%;transform:translate(-50%,-10px);width:min(calc(100% - 32px),420px);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;background:rgba(255,255,255,.97);border:1px solid rgba(11,29,59,.15);border-radius:14px;box-shadow:0 10px 30px rgba(15,23,42,.22);opacity:0;transition:opacity .18s ease,transform .18s ease}
-.initial-location-banner.show{opacity:1;transform:translate(-50%,0)}
+/* v94: centered first map-entry location choice */
+.initial-location-banner{position:absolute;z-index:90;top:50%;left:50%;transform:translate(-50%,-46%) scale(.96);width:min(calc(100% - 40px),360px);display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:18px;padding:24px 22px 20px;background:rgba(255,255,255,.99);border:2px solid rgba(11,29,59,.16);border-radius:18px;box-shadow:0 0 0 100vmax rgba(15,23,42,.42),0 18px 48px rgba(15,23,42,.32);opacity:0;transition:opacity .18s ease,transform .18s ease}
+.initial-location-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .initial-location-banner[hidden]{display:none!important}
-.initial-location-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.initial-location-copy strong{font-size:14px;line-height:1.3;color:#0b1d3b}.initial-location-copy span{font-size:11px;line-height:1.35;color:#64748b}
-.initial-location-actions{display:flex;gap:7px;flex:0 0 auto}.initial-location-actions button{border:0;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:800;background:#0b1d3b;color:#fff}.initial-location-actions button.secondary{background:#eef2f7;color:#334155}
-@media (max-width:430px){.initial-location-banner{top:68px;padding:11px 12px}.initial-location-copy span{display:none}.initial-location-actions button{padding:8px 10px}}
+.initial-location-copy{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;text-align:center}.initial-location-copy strong{font-size:18px;line-height:1.35;color:#0b1d3b;letter-spacing:-.02em}.initial-location-copy span{font-size:13px;line-height:1.45;color:#64748b}
+.initial-location-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}.initial-location-actions button{min-height:44px;border:0;border-radius:11px;padding:10px 14px;font-size:14px;font-weight:800;background:#0b1d3b;color:#fff}.initial-location-actions button.secondary{background:#eef2f7;color:#334155}
+@media (max-width:430px){.initial-location-banner{width:min(calc(100% - 32px),340px);padding:22px 18px 18px;gap:16px}.initial-location-copy strong{font-size:17px}.initial-location-copy span{font-size:12px}.initial-location-actions button{min-height:42px;padding:9px 12px;font-size:13px}}
