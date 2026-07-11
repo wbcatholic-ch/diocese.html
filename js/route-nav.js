@@ -157,7 +157,9 @@
     statusSheetPointerStartY: null,
     statusSheetDragMoved: false,
     navigationModel: createEmptyNavigationModel(),
-    pendingRestore: null
+    pendingRestore: null,
+    initialLocationChoiceHandled: false,
+    initialLocationAutoMove: false
   };
 
   document.addEventListener('DOMContentLoaded', init);
@@ -183,6 +185,8 @@
     $('national-close-btn')?.addEventListener('click', closeNationalList);
     $('back-to-list')?.addEventListener('click', handleBackToList);
     $('my-location-btn')?.addEventListener('click', locateOnce);
+    $('initial-location-move')?.addEventListener('click', handleInitialLocationMove);
+    $('initial-location-skip')?.addEventListener('click', handleInitialLocationSkip);
     $('follow-btn')?.addEventListener('click', handleFollowControl);
     $('direction-btn')?.addEventListener('click', toggleRouteDirection);
     $('end-follow-btn')?.addEventListener('click', confirmEndNavigation);
@@ -390,7 +394,7 @@
     if (trail.id === 'jeju-santo') {
       const routes = state.routes.filter((route) => route?.region === '제주교구' || route?.routeGroup === '제주교구 순례길');
       if (!routes.length) return null;
-      return { ...buildJejuRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [], logo: trail.logo };
+      return { ...buildJejuRouteGroup(routes), officialUrl: trail.officialUrl, detailLines: trail.detailLines || [] };
     }
     return null;
   }
@@ -497,7 +501,7 @@
   }
 
   function buildJeonjuRouteGroup(routes) {
-    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    const orderedRoutes = routes.slice().sort((a, b) => compareByExplicitOrder(JEONJU_ROUTE_ORDER, a, b));
     return {
       kind: 'group',
       id: 'jeonju-pilgrimage-route-group',
@@ -506,8 +510,8 @@
       meta: '걸을 순례길을 선택하세요.',
       foot: `${orderedRoutes.length}개 순례길`,
       optionLayout: 'single',
-      options: orderedRoutes.map((route) => ({
-        label: route.shortName || route.name,
+      options: orderedRoutes.map((route, index) => ({
+        label: `${index + 1}. ${route.shortName || route.name}`,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
         meta: route.distanceLabel || '',
         route
@@ -515,8 +519,29 @@
     };
   }
 
+  const JEJU_ROUTE_ORDER = [
+    'jeju-light-road-kim-daegun',
+    'jeju-joy-road-hanon-cathedral',
+    'jeju-glory-road-kim-giryang',
+    'jeju-pain-road-jeong-nanju',
+    'jeju-reconciliation-road-new',
+    'jeju-grace-road-isidore'
+  ];
+  const JEONJU_ROUTE_ORDER = [
+    'jeonju-yoan-rugalda-road',
+    'jeonju-martyrs-road',
+    'jeonju-chimyeongja-road'
+  ];
+
+  function compareByExplicitOrder(order, a, b) {
+    const ai = order.indexOf(a?.id);
+    const bi = order.indexOf(b?.id);
+    if (ai !== bi) return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+    return String(a?.shortName || a?.name || '').localeCompare(String(b?.shortName || b?.name || ''), 'ko');
+  }
+
   function buildJejuRouteGroup(routes) {
-    const orderedRoutes = routes.slice().sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+    const orderedRoutes = routes.slice().sort((a, b) => compareByExplicitOrder(JEJU_ROUTE_ORDER, a, b));
     const options = [];
     if (orderedRoutes.length > 1) {
       options.push({
@@ -527,9 +552,9 @@
         route: createJejuFullRoute(orderedRoutes)
       });
     }
-    orderedRoutes.forEach((route) => {
+    orderedRoutes.forEach((route, index) => {
       options.push({
-        label: route.shortName || route.name,
+        label: `${index + 1}. ${route.shortName || route.name}`,
         title: `${route.startName || '출발지'} ~ ${route.finishName || '도착지'}`,
         meta: route.distanceLabel || '',
         route
@@ -539,7 +564,6 @@
       kind: 'group',
       id: 'jeju-pilgrimage-route-group',
       icon: '🌊',
-      logo: 'icons/jeju-santo-viaggio-logo.png',
       title: '천주교 제주교구 순례길 ‘거룩한 여정’ — SANTO VIAGGIO',
       meta: '전체지도 또는 걸을 순례길을 선택하세요.',
       foot: `${orderedRoutes.length}개 순례길`,
@@ -649,14 +673,15 @@
     }
 
     if (route.region === '전주교구') {
-      const ordered = (window.PILGRIMAGE_ROUTE_JEONJU || []).slice();
+      const ordered = (window.PILGRIMAGE_ROUTE_JEONJU || []).slice()
+        .sort((a, b) => compareByExplicitOrder(JEONJU_ROUTE_ORDER, a, b));
       const index = ordered.findIndex((item) => item.id === route.id);
       return index >= 0 ? index : 0;
     }
 
     if (route.region === '제주교구') {
       const ordered = (window.PILGRIMAGE_ROUTE_JEJU || []).slice()
-        .sort((a, b) => String(a.shortName || a.name).localeCompare(String(b.shortName || b.name), 'ko'));
+        .sort((a, b) => compareByExplicitOrder(JEJU_ROUTE_ORDER, a, b));
       const index = ordered.findIndex((item) => item.id === route.id);
       return index >= 0 ? index : 0;
     }
@@ -1253,7 +1278,11 @@
           updateMyLocation(state.lastCoords, { center: state.following, following: state.following });
           updateRouteStatus(state.lastCoords);
         }
-        return requestInitialMapLocation();
+        if (state.initialLocationChoiceHandled) {
+          return state.initialLocationAutoMove ? requestInitialMapLocation() : Promise.resolve();
+        }
+        showInitialLocationBanner();
+        return Promise.resolve();
       })
       .then(() => {
         if (state.following) startFollow({ restored: true });
@@ -1921,6 +1950,33 @@
       const coords = toCoords(position);
       handleLocationUpdate(coords, { center: true, fromWatch: false });
     }).catch(showLocationError);
+  }
+
+  function showInitialLocationBanner() {
+    const banner = $('initial-location-banner');
+    if (!banner || state.initialLocationChoiceHandled) return;
+    banner.hidden = false;
+    requestAnimationFrame(() => banner.classList.add('show'));
+  }
+
+  function hideInitialLocationBanner() {
+    const banner = $('initial-location-banner');
+    if (!banner) return;
+    banner.classList.remove('show');
+    setTimeout(() => { banner.hidden = true; }, 180);
+  }
+
+  function handleInitialLocationMove() {
+    state.initialLocationChoiceHandled = true;
+    state.initialLocationAutoMove = true;
+    hideInitialLocationBanner();
+    requestInitialMapLocation().catch(showLocationError);
+  }
+
+  function handleInitialLocationSkip() {
+    state.initialLocationChoiceHandled = true;
+    state.initialLocationAutoMove = false;
+    hideInitialLocationBanner();
   }
 
   function requestInitialMapLocation() {

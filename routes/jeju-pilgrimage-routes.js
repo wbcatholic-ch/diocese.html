@@ -37,8 +37,8 @@ window.PILGRIMAGE_ROUTE_JEJU = [
         "order": 2,
         "role": "stamp",
         "name": "용수성지",
-        "lat": 33.32345,
-        "lng": 126.16683
+        "lat": 33.322862633,
+        "lng": 126.16773075
       },
       {
         "id": "신창성당",
@@ -4352,8 +4352,8 @@ window.PILGRIMAGE_ROUTE_JEJU = [
         "id": "용수성지(김대건 신부 제주표착기념성당)",
         "category": "성지",
         "name": "용수성지(김대건 신부 제주표착기념성당)",
-        "lat": 33.32345,
-        "lng": 126.16683
+        "lat": 33.322862633,
+        "lng": 126.16773075
       }
     ]
   },
@@ -17349,8 +17349,8 @@ window.PILGRIMAGE_ROUTE_JEJU = [
         "order": 2,
         "role": "stamp",
         "name": "화북성당",
-        "lat": 33.5198,
-        "lng": 126.5655
+        "lat": 33.517716075749,
+        "lng": 126.570554333
       },
       {
         "id": "주교좌 중앙성당",
