@@ -73,7 +73,7 @@
       dataGroup: '제주교구 순례길',
       location: '제주',
       officialUrl: 'http://santoviaggio.com/',
-      description: 'SANTO VIAGGIO의 빛의 길 — 김대건길을 선택할 수 있습니다.',
+      description: 'SANTO VIAGGIO의 여섯 순례길과 전체코스를 선택할 수 있습니다.',
       logo: 'icons/jeju-santo-viaggio-logo.png'
     },
     {
@@ -521,8 +521,8 @@
     if (orderedRoutes.length > 1) {
       options.push({
         label: '제주교구 순례길 전체코스 보기',
-        title: '거룩한 여정 4개 코스',
-        meta: '총 46.7km',
+        title: '거룩한 여정 6개 코스',
+        meta: '총 83.1km',
         variant: 'full-route',
         route: createJejuFullRoute(orderedRoutes)
       });
@@ -1036,20 +1036,26 @@
       lineType: 'gpx',
       dataQuality: 'actual-gpx',
       routeGroup: '제주교구 순례길',
-      distanceLabel: '46.7km',
-      startName: '거룩한 여정 4개 코스',
+      distanceLabel: '83.1km',
+      startName: '거룩한 여정 6개 코스',
       finishName: 'SANTO VIAGGIO',
       preserveSegmentBreaks: true,
       isOverviewOnly: true,
+      landmarks: dedupeMapPlaces(orderedRoutes.flatMap((route) => route.landmarks || [])),
       features: {
         showRouteLine: true,
-        showStampMarkers: false,
+        showStampMarkers: true,
         autoStamp: false,
         nextStampDistance: false,
         offRouteAlert: false,
         nearestStampDistance: false
       },
-      stamps: [],
+      stamps: orderedRoutes.flatMap((route, routeIndex) => (route.stamps || []).map((stamp, stampIndex) => ({
+        ...stamp,
+        id: `jeju-full-${route.id}-${stamp.id || stampIndex + 1}`,
+        displayOrder: `${routeIndex + 1}-${stamp.order || stampIndex + 1}`,
+        sourceRouteName: route.shortName || route.name
+      }))),
       routeSegments
     };
   }
