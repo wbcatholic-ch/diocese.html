@@ -793,6 +793,26 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; }
   line-height: 1;
 }
 .unified-map-info-card .stamp-info-title { padding: 0; }
+.unified-map-info-card.is-long-title {
+  width: min(210px, calc(100vw - 36px));
+  min-height: 58px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+.unified-map-info-card.is-long-title .stamp-info-title {
+  width: 100%;
+  max-width: 158px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1.42;
+  text-align: center;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 .my-location-marker { position: relative; width: 19px; height: 19px; border-radius: 50%; background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 5px rgba(37,99,235,.22), 0 4px 12px rgba(15,23,42,.25); }
 .my-location-marker.following::after { content: ""; position: absolute; left: 50%; top: -12px; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 12px solid #2563eb; }
 

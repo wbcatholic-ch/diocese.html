@@ -653,6 +653,52 @@
     const lastPoint = lastSegment?.points?.[lastSegment.points.length - 1];
     const startName = firstRoute?.startName || '출발지';
     const finishName = lastRoute?.finishName || '도착지';
+    const endpointStamps = [
+      {
+        id: 'start',
+        role: 'start',
+        name: startName,
+        lat: Number(firstPoint?.lat),
+        lng: Number(firstPoint?.lng)
+      },
+      {
+        id: 'finish',
+        role: 'finish',
+        name: finishName,
+        lat: Number(lastPoint?.lat),
+        lng: Number(lastPoint?.lng)
+      }
+    ];
+
+    // 님의 길 전체지도에서는 2길이 1길·3길과 별도 축으로 이어지므로
+    // 2길의 시작과 도착도 지도에서 분명하게 확인할 수 있게 표시한다.
+    if (id === 'nimui-road-all-full') {
+      const road2Routes = orderedRoutes.filter((route) => route.parentCourseGroup === '2길 최해성 요한의 길');
+      const road2First = road2Routes[0];
+      const road2Last = road2Routes[road2Routes.length - 1];
+      const road2FirstPoint = road2First?.routeSegments?.[0]?.points?.[0];
+      const road2LastSegment = road2Last?.routeSegments?.[road2Last.routeSegments.length - 1];
+      const road2LastPoint = road2LastSegment?.points?.[road2LastSegment.points.length - 1];
+      if (road2FirstPoint && road2LastPoint) {
+        endpointStamps.push(
+          {
+            id: 'road2-start',
+            role: 'start',
+            name: `2길 출발 · ${road2First.startName || '출발지'}`,
+            lat: Number(road2FirstPoint.lat),
+            lng: Number(road2FirstPoint.lng)
+          },
+          {
+            id: 'road2-finish',
+            role: 'finish',
+            name: `2길 도착 · ${road2Last.finishName || '도착지'}`,
+            lat: Number(road2LastPoint.lat),
+            lng: Number(road2LastPoint.lng)
+          }
+        );
+      }
+    }
+
     return {
       id,
       name,
@@ -677,22 +723,7 @@
         offRouteAlert: true,
         nearestStampDistance: false
       },
-      stamps: [
-        {
-          id: 'start',
-          role: 'start',
-          name: startName,
-          lat: Number(firstPoint?.lat),
-          lng: Number(firstPoint?.lng)
-        },
-        {
-          id: 'finish',
-          role: 'finish',
-          name: finishName,
-          lat: Number(lastPoint?.lat),
-          lng: Number(lastPoint?.lng)
-        }
-      ],
+      stamps: endpointStamps,
       routeSegments
     };
   }
@@ -1661,9 +1692,10 @@
       const isHantiRoute = state.activeRoute?.id === 'hanti'
         || String(state.activeRoute?.id || '').startsWith('hanti__')
         || state.activeRoute?.routeGroup === '한티가는길';
-      // 한티가는길의 번호는 기존보다 두 단계 이른 확대 수준부터 보이게 한다.
-      // 다른 순례길의 기존 번호 노출 기준은 유지한다.
-      const visible = isWonjuEndpoint || (isHantiRoute ? level <= 8 : level <= 5);
+      // 숫자형 지점 마커는 상세 줌에서만 표시한다.
+      // 전체코스를 한 화면에 보는 수준에서는 경로선과 코스명 라벨이 먼저 보이도록 숨긴다.
+      // 한티가는길도 다른 순례길과 같은 상세 줌 기준을 사용해 지도 가림을 방지한다.
+      const visible = isWonjuEndpoint || level <= 5;
       marker.setMap(visible ? state.map : null);
     });
   }
@@ -1732,10 +1764,12 @@
 
   function createUnifiedMapInfoCard(title, closeLabel) {
     const content = document.createElement('div');
+    const normalizedTitle = String(title || '').trim();
     content.className = 'stamp-info-card unified-map-info-card';
+    if (Array.from(normalizedTitle).length >= 16) content.classList.add('is-long-title');
     content.innerHTML = `
       <button class="stamp-info-close" type="button" aria-label="${escapeHtml(closeLabel || '정보 닫기')}">×</button>
-      <div class="stamp-info-title">${escapeHtml(title || '')}</div>
+      <div class="stamp-info-title">${escapeHtml(normalizedTitle)}</div>
     `;
     content.querySelector('.stamp-info-close')?.addEventListener('click', (event) => {
       event.preventDefault();
